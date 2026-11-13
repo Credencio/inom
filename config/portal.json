@@ -46,7 +46,7 @@
    },
    "versao": "1.0",
    "ficheiro": "fichas/Registo_de_Viveiros_de_Mangal.xlsx",
-   "survey123": "",
+   "survey123": "https://survey123.arcgis.app/?itemID=3a038002e20a47b484f913651b54225c",
    "mostrarFicheiro": false
   },
   {
@@ -61,7 +61,7 @@
    },
    "versao": "1.1",
    "ficheiro": "fichas/Registo_de_Areas_Degradadas_de_Mangal.xlsx",
-   "survey123": "",
+   "survey123": "https://survey123.arcgis.app/?itemID=770d1be0977d481f9828c495a955b8c0",
    "mostrarFicheiro": false
   },
   {
@@ -76,7 +76,7 @@
    },
    "versao": "1.2",
    "ficheiro": "fichas/Registo_de_Areas_de_Restauracao_de_Mangal.xlsx",
-   "survey123": "",
+   "survey123": "https://survey123.arcgis.app/?itemID=6deac4bf956d47f19e4a362cde0be827",
    "mostrarFicheiro": false
   },
   {
@@ -91,7 +91,7 @@
    },
    "versao": "2.0",
    "ficheiro": "fichas/Monitoria_das_Areas_de_Restauracao.xlsx",
-   "survey123": "",
+   "survey123": "https://survey123.arcgis.app/?itemID=c756eca5487f4d1dbafb60c4b483d3c7",
    "mostrarFicheiro": false
   },
   {
@@ -106,7 +106,7 @@
    },
    "versao": "1.1",
    "ficheiro": "fichas/Levantamento_Ecologico.xlsx",
-   "survey123": "",
+   "survey123": "https://survey123.arcgis.app/?itemID=558728b60b1f4f61b4d0d3dfc39dd012",
    "mostrarFicheiro": false
   },
   {
@@ -121,7 +121,7 @@
    },
    "versao": "1.1",
    "ficheiro": "fichas/Registo_de_Ervas_Marinhas.xlsx",
-   "survey123": "",
+   "survey123": "https://survey123.arcgis.app/?itemID=3e3e4e8897bd40bc9eaca5ee38c28feb",
    "mostrarFicheiro": false
   }
  ],
@@ -250,7 +250,7 @@
   "bbox": [
    30.2,
    -26.95,
-   41.0,
+   41,
    -10.3
   ],
   "limites": [
