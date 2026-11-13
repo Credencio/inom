@@ -31,6 +31,10 @@ export function num(v) {
 export function fmt(v, opts = {}, lang = "pt") {
   if (v === null || v === undefined || Number.isNaN(v)) return "–";
   const locale = lang === "en" ? "en-GB" : "pt-PT";
+  if (opts.compacto && Math.abs(v) >= 10000) {
+    const c = new Intl.NumberFormat(locale, { notation: "compact", maximumFractionDigits: 1 }).format(v);
+    return c + (opts.formato === "pct" ? "%" : opts.sufixo ? " " + opts.sufixo : "");
+  }
   const dec = opts.decimais ?? (Math.abs(v) < 10 && !Number.isInteger(v) ? 1 : 0);
   const s = new Intl.NumberFormat(locale, { maximumFractionDigits: dec, minimumFractionDigits: opts.formato === "pct" ? 0 : 0 }).format(v);
   if (opts.formato === "pct") return s + "%";

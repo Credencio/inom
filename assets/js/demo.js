@@ -24,7 +24,7 @@ export function gerarDemo(choices, schema) {
   const some = (a, min, max) => { const n = min + Math.floor(R() * (max - min + 1)); const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b.slice(0, n); };
   const int = (a, b) => Math.round(a + R() * (b - a));
   let gidN = 0; const gid = () => `{demo-${(++gidN).toString(16).padStart(8, "0")}-0000-4000-8000-000000000000}`;
-  const date = (y0, y1) => Date.UTC(int(y0, y1), int(0, 11), int(1, 28));
+  const date = (y0, y1) => Math.min(Date.UTC(int(y0, y1), int(0, 11), int(1, 28)), Date.now() - 864e5 * int(1, 60));
   const provs = Object.keys(PESO), pesos = Object.values(PESO);
   const distritos = {};
   for (const [k, v] of Object.entries(choices.distrito || {})) (distritos[v.provincia] = distritos[v.provincia] || []).push(k);

@@ -38,8 +38,8 @@ async function imagemPNG(src) {
 }
 
 function graficoPNG(g, largura = 900) {
-  const dados = dadosGrafico(g, { completo: true });
-  const alt = g.tipo === "barrash" || g.tipo === "empilhado" ? Math.min(620, Math.max(260, 50 + dados.cats.length * 26)) : 340;
+  const dados = g.tipo === "gauge" ? { cats: [1], labels: [""], series: [] } : dadosGrafico(g, { completo: true });
+  const alt = g.tipo === "gauge" ? 280 : g.tipo === "barrash" || g.tipo === "empilhado" ? Math.min(620, Math.max(260, 50 + dados.cats.length * 26)) : g.tipo === "sankey" ? 420 : 340;
   const div = document.createElement("div");
   div.style.cssText = `position:fixed;left:-12000px;top:0;width:${largura}px;height:${alt}px;background:#fff`;
   document.body.append(div);
@@ -109,7 +109,7 @@ export async function gerarPDF(paginas) {
         doc.setFont("helvetica", "normal"); doc.setFontSize(7); doc.setTextColor(120, 130, 140);
         doc.text(doc.splitTextToSize(tr(k.subtitulo, lang), bw - 6)[0] || "", x + 3, y + 9.5);
         doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(...cor);
-        doc.text(fmt(kpiValor(k), { formato: k.formato, decimais: k.decimais }, lang), x + 3, y + 17);
+        doc.text(fmt(kpiValor(k), { formato: k.formato, decimais: k.decimais, sufixo: k.sufixo, compacto: k.compacto }, lang), x + 3, y + 17);
       });
       y += bh + 8;
     }
@@ -133,8 +133,8 @@ export async function gerarPDF(paginas) {
         }
         continue;
       }
-      const img = graficoPNG(g);
-      const ww = W - 2 * M, hh = Math.min(150, ww / img.ratio);
+      const img = graficoPNG(g, g.tipo === "gauge" ? 600 : 900);
+      const ww = g.tipo === "gauge" ? 110 : W - 2 * M, hh = Math.min(150, ww / img.ratio);
       espaco(hh + 4);
       doc.addImage(img.url, "PNG", M, y, hh * img.ratio > ww ? ww : hh * img.ratio, hh);
       y += hh + 8;

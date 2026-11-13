@@ -1,7 +1,7 @@
 // Arranque do portal, navegação e páginas Sobre, Documentos e Fichas de campo.
 import { S, carregarTudo, DATASETS } from "./data.js";
 import { UI } from "./i18n.js";
-import { $, h, esc, tr, toast } from "./util.js";
+import { $, h, esc, tr, toast, fmt } from "./util.js";
 
 const t = k => UI[S.lang][k] || k;
 let dadosPromessa = null;
@@ -9,7 +9,7 @@ let dadosPromessa = null;
 /* ---------- Modal reutilizável ---------- */
 export function modal(titulo, corpo, botoes = [{ texto: "OK" }], opts = {}) {
   const fundo = h("div", { class: "modal-fundo" });
-  const fechar = () => fundo.remove();
+  const fechar = () => { fundo.remove(); if (opts.aoFechar) opts.aoFechar(); };
   const caixa = h("div", { class: "modal" + (opts.largo ? " largo" : "") },
     h("div", { class: "modal-t" }, h("span", {}, titulo), h("button", { class: "x", onclick: fechar, "aria-label": t("fechar") }, "×")),
     h("div", { class: "modal-b" }, corpo),
@@ -45,7 +45,7 @@ export function aplicarTema() {
 export function renderShell() {
   aplicarTema();
   const p = S.cfg.portal, rota = location.hash || "#/sobre";
-  const nav = [["#/sobre", "nav_sobre"], ["#/dashboard", "nav_dashboard"], ["#/documentos", "nav_documentos"], ["#/fichas", "nav_fichas"], ["#/tecnica/validacao", "nav_tecnica"], ["#/gestao", "nav_gestao"]];
+  const nav = [["#/sobre", "nav_sobre"], ["#/dashboard", "nav_dashboard"], ["#/documentos", "nav_documentos"], ["#/fichas", "nav_fichas"], ["#/tecnica", "nav_tecnica"], ["#/gestao", "nav_gestao"]];
   const topo = $("#topo"); topo.innerHTML = "";
   topo.append(
     h("a", { class: "marca", href: "#/sobre" },
@@ -77,8 +77,9 @@ export async function route() {
   else if (sec === "fichas") renderFichas(app);
   else if (sec === "tecnica") {
     if (S.cfg.acesso && S.cfg.acesso.tecnicaRequerLogin && !S.auth) return pedirLogin(app);
+    if ((sub || "").startsWith("painel") || (!sub && ((S.cfg.tecnica || {}).paineis || []).length)) { const m = await import("./tecnica.js"); return m.renderTecnica(app, sub || ""); }
     if (!dadosProntos()) { app.innerHTML = `<div class="loading">${t("carregando")}</div>`; await dadosPromessa; renderShell(); }
-    const m = await import("./tecnica.js"); m.renderTecnica(app, sub || "validacao");
+    const m = await import("./tecnica.js"); m.renderTecnica(app, sub || "");
   } else if (sec === "gestao") { const m = await import("./gestao.js"); m.renderGestao(app); }
   else renderSobre(app);
 }
@@ -97,10 +98,31 @@ function md(txt) { return window.marked ? window.marked.parse(txt || "") : esc(t
 
 function renderSobre(app) {
   app.innerHTML = "";
-  const atalhos = [["#/dashboard", "nav_dashboard", "▦"], ["#/documentos", "nav_documentos", "☰"], ["#/fichas", "nav_fichas", "⎘"]];
-  app.append(h("div", { class: "pagina sobre" },
-    h("div", { class: "md", html: md(tr(S.cfg.sobre, S.lang)) }),
-    h("div", { class: "atalhos" }, atalhos.map(([href, k, ic]) => h("a", { class: "atalho", href }, h("span", { class: "ic" }, ic), t(k))))));
+  const L = (pt, en) => (S.lang === "en" ? en : pt);
+  const nums = h("div", { class: "hero-nums" });
+  const paginas = h("div", { class: "hero-pags" });
+  app.append(
+    h("section", { class: "hero" },
+      h("div", { class: "hero-txt" },
+        h("h1", {}, tr(S.cfg.portal.nome, S.lang)),
+        h("p", {}, tr(S.cfg.portal.subtitulo, S.lang)),
+        h("div", { class: "hero-acoes" },
+          h("a", { class: "btn destaque", href: "#/dashboard" }, "▦ " + L("Explorar o dashboard", "Explore the dashboard")),
+          h("a", { class: "btn claro", href: "#/fichas" }, L("Fichas de campo", "Field forms")))),
+      nums),
+    h("div", { class: "pagina sobre" }, h("div", { class: "md", html: md(tr(S.cfg.sobre, S.lang)) })),
+    h("h2", { class: "sec-t" }, L("Temas do dashboard", "Dashboard topics")), paginas);
+  import("./dash.js").then(m => {
+    for (const p of S.cfg.dashboard.paginas) paginas.append(h("a", { class: "pag-cartao", href: `#/dashboard/${p.id}` }, m.icone(p.icone || "lista", "ic grande"),
+      h("div", {}, h("strong", {}, tr(p.titulo, S.lang)), p.descricao ? h("p", {}, tr(p.descricao, S.lang)) : null)));
+    const preencher = () => {
+      nums.innerHTML = "";
+      const ks = ((S.cfg.dashboard.paginas[0] || {}).kpis || []).slice(0, 4);
+      for (const k of ks) { const v = m.kpiValor(k); nums.append(h("div", { class: "hero-num" }, h("strong", {}, fmt(v, { formato: k.formato, decimais: k.decimais, sufixo: k.sufixo, compacto: true }, S.lang)), h("span", {}, tr(k.titulo, S.lang)))); }
+    };
+    nums.append(h("div", { class: "hero-num" }, h("span", {}, t("carregando"))));
+    (dadosPromessa || Promise.resolve()).then(() => { if (location.hash === "" || location.hash.startsWith("#/sobre")) preencher(); });
+  });
 }
 
 function urlFicheiro(f) { return /^https?:\/\//.test(f || "") ? f : f; }
@@ -134,16 +156,26 @@ function renderDocumentos(app) {
   desenhar();
 }
 
+function itemIdSurvey(url) {
+  const m = /share\/([0-9a-f]{32})/i.exec(url || "") || /[?&](?:itemID|id)=([0-9a-f]{32})/i.exec(url || "");
+  return m ? m[1] : "";
+}
+
 function renderFichas(app) {
   app.innerHTML = "";
   app.append(h("div", { class: "pagina" }, h("h2", {}, t("nav_fichas")), h("p", {}, t("fichas_intro")),
-    h("div", { class: "fichas" }, (S.cfg.fichas || []).map(f => h("div", { class: "ficha" },
-      h("div", { class: "ficha-t" }, tr(f.nome, S.lang)),
-      h("p", {}, tr(f.descricao, S.lang)),
-      f.versao ? h("small", {}, `${t("versao")} ${f.versao}`) : null,
-      h("div", { class: "ficha-b" },
-        f.ficheiro ? h("a", { class: "btn primary", href: urlFicheiro(f.ficheiro), download: "" }, "⭳ " + t("ficha_xlsx")) : null,
-        f.survey123 ? h("a", { class: "btn", href: f.survey123, target: "_blank", rel: "noopener" }, t("abrir_survey")) : null))))));
+    h("div", { class: "fichas" }, (S.cfg.fichas || []).map(f => {
+      const id = itemIdSurvey(f.survey123);
+      return h("div", { class: "ficha" },
+        h("div", { class: "ficha-t" }, tr(f.nome, S.lang)),
+        h("p", {}, tr(f.descricao, S.lang)),
+        f.versao ? h("small", {}, `${t("versao")} ${f.versao}`) : null,
+        h("div", { class: "ficha-b" },
+          f.survey123 ? h("a", { class: "btn primary", href: f.survey123, target: "_blank", rel: "noopener" }, "↗ " + t("abrir_survey")) : h("span", { class: "nota" }, t("sem_link")),
+          id ? h("a", { class: "btn", href: `arcgis-survey123://?itemID=${id}` }, "📱 " + t("abrir_app")) : null,
+          f.ficheiro && f.mostrarFicheiro ? h("a", { class: "btn", href: urlFicheiro(f.ficheiro), download: "" }, "⭳ " + t("ficha_xlsx")) : null));
+    })),
+    h("p", { class: "nota" }, t("fichas_nota"))));
 }
 
 /* ---------- Arranque ---------- */

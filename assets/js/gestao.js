@@ -104,8 +104,11 @@ const MEDIDAS = () => [["contagem", L("Contagem de registos", "Record count")], 
   ["percentagem_registos", L("% dos registos com cada categoria (gráficos)", "% of records with each category (charts)")], ["distintos", L("Nº de valores diferentes", "Number of distinct values")],
   ["especial", L("Especial (levantamento ecológico)", "Special (ecological survey)")]];
 const TIPOS = () => [["barras", L("Barras verticais", "Vertical bars")], ["barrash", L("Barras horizontais", "Horizontal bars")], ["empilhado", L("Barras empilhadas", "Stacked bars")],
-  ["pizza", L("Anel (pizza)", "Donut")], ["linha", L("Linha", "Line")], ["mapa", L("Mapa", "Map")], ["tabela", L("Tabela de registos", "Record table")],
+  ["pizza", L("Anel (pizza)", "Donut")], ["linha", L("Linha", "Line")], ["area", L("Área (linha preenchida)", "Area (filled line)")],
+  ["treemap", L("Mosaico (treemap)", "Treemap")], ["sankey", L("Fluxo (sankey): categorias → divisão", "Flow (sankey): categories → split")], ["gauge", L("Medidor (um só valor)", "Gauge (single value)")], ["mapa", L("Mapa", "Map")], ["tabela", L("Tabela de registos", "Record table")],
   ["cobertura", L("Registos por província", "Records by province")], ["texto", L("Texto", "Text")]];
+const ICONES_OPS = () => [["lista", L("Lista", "List")], ["mapa", L("Mapa", "Map")], ["alerta", L("Alerta", "Alert")], ["folha", L("Folha", "Leaf")], ["muda", L("Muda", "Seedling")],
+  ["viveiro", L("Viveiro", "Nursery")], ["grelha", L("Grelha", "Grid")], ["onda", L("Onda", "Wave")], ["pessoas", L("Pessoas", "People")], ["dinheiro", L("Dinheiro", "Money")], ["pct", "%"], ["arvore", L("Árvore", "Tree")]];
 const LARGURAS = [["1/3", "1/3"], ["1/2", "1/2"], ["2/3", "2/3"], ["1", L("Linha inteira", "Full row")]];
 const ORDENS = () => [["valor", L("Pelo valor (maior primeiro)", "By value (largest first)")], ["lista", L("Ordem da lista da ficha", "Form list order")],
   ["provincias", L("Províncias de norte para sul", "Provinces north to south")], ["cronologica", L("Cronológica", "Chronological")], ["alfabetica", L("Alfabética", "Alphabetical")]];
@@ -135,7 +138,7 @@ export function renderGestao(app) {
   if (!S.auth) return renderLogin(app);
   if (!W) W = S.cfg;
   const seccoes = [["geral", L("Geral e logótipos", "General and logos")], ["sobre", t("nav_sobre")], ["documentos", t("nav_documentos")], ["fichas", t("nav_fichas")],
-    ["fontes", L("Fontes de dados", "Data sources")], ["dashboard", t("nav_dashboard")], ["validacao", t("tec_validacao")], ["acesso", L("Privacidade e acesso", "Privacy and access")], ["backup", L("Cópia de segurança", "Backup")]];
+    ["fontes", L("Fontes de dados", "Data sources")], ["dashboard", t("nav_dashboard")], ["tecnica", t("nav_tecnica")], ["validacao", t("tec_validacao")], ["acesso", L("Privacidade e acesso", "Privacy and access")], ["backup", L("Cópia de segurança", "Backup")]];
   const conteudo = h("div", { class: "ges-conteudo" });
   app.append(h("div", { class: "pagina larga gestao" },
     h("div", { class: "ges-topo" },
@@ -149,7 +152,7 @@ export function renderGestao(app) {
     h("div", { class: "ges" },
       h("nav", { class: "ges-menu" }, seccoes.map(([k, l]) => h("a", { class: seccao === k ? "active" : "", onclick: () => { seccao = k; renderGestao(app); } }, l))),
       conteudo)));
-  ({ geral: secGeral, sobre: secSobre, documentos: secDocumentos, fichas: secFichas, fontes: secFontes, dashboard: secDashboard, validacao: secValidacao, acesso: secAcesso, backup: secBackup }[seccao])(conteudo);
+  ({ geral: secGeral, sobre: secSobre, documentos: secDocumentos, fichas: secFichas, fontes: secFontes, dashboard: secDashboard, tecnica: secTecnica, validacao: secValidacao, acesso: secAcesso, backup: secBackup }[seccao])(conteudo);
 }
 
 function renderLogin(app) {
@@ -221,12 +224,13 @@ function secDocumentos(el) {
 }
 
 function secFichas(el) {
-  titulo(el, "Fichas de campo", "Field forms", L("Fichas (XLSForm) disponíveis para descarregar. Ao actualizar uma ficha, carregue o novo ficheiro .xlsx e altere a versão.", "Forms (XLSForm) available to download. When a form changes, upload the new .xlsx and update the version."));
+  titulo(el, "Fichas de campo", "Field forms", L("Cole a ligação de cada formulário Survey123. O ficheiro XLSForm fica guardado como referência e só aparece para descarregar se marcar a opção.", "Paste each Survey123 form link. The XLSForm file is kept for reference and is only shown for download if you tick the option."));
   W.fichas = W.fichas || [];
   el.append(editorLista(W.fichas, () => ({ id: "", nome: { pt: L("Nova ficha", "New form"), en: "" }, descricao: { pt: "", en: "" }, versao: "1.0", ficheiro: "", survey123: "" }),
     (f, c) => c.append(bilingue(L("Nome", "Name"), f, "nome"), bilingue(L("Descrição", "Description"), f, "descricao", { area: true }), campo(t("versao"), f, "versao"),
+      campo(L("Ligação do formulário Survey123", "Survey123 form link"), f, "survey123", { ajuda: L("No Survey123, abra o formulário › Colaborar › copie a ligação (https://survey123.arcgis.com/share/…). O botão da app aparece automaticamente.", "In Survey123, open the form › Collaborate › copy the link (https://survey123.arcgis.com/share/…). The app button appears automatically.") }),
       carregar(L("Ficheiro XLSForm (.xlsx)", "XLSForm file (.xlsx)"), f, "ficheiro", "fichas", { accept: ".xlsx,.xls" }),
-      campo(L("Ligação do formulário Survey123 (opcional)", "Survey123 form link (optional)"), f, "survey123", { ajuda: "https://survey123.arcgis.com/share/…" })), f => tr(f.nome, S.lang)));
+      campo(L("Mostrar também o botão para descarregar o ficheiro XLSForm", "Also show the button to download the XLSForm file"), f, "mostrarFicheiro", { tipo: "checkbox" })), f => tr(f.nome, S.lang)));
 }
 
 function secFontes(el) {
@@ -259,13 +263,22 @@ function secDashboard(el) {
   const D = W.dashboard;
   titulo(el, "Dashboard", "Dashboard", L("Cada página tem indicadores (números em destaque) e gráficos. Altere títulos, tipo de gráfico, campos e ordem. As opções avançadas permitem gráficos com várias séries.",
     "Each page has indicators (headline numbers) and charts. Change titles, chart type, fields and order. Advanced options allow multi-series charts."));
+  el.append(h("div", { class: "sub" }, (D.versao || 1) < 2 ? h("p", {}, h("strong", {}, L("Há uma versão nova do dashboard disponível", "A new dashboard version is available")), " — " + L("gráficos novos (mapa maior, fluxo viveiro → restauração, mosaico de espécies, medidores, áreas acumuladas) e indicadores com tendência.", "new charts (larger map, nursery → restoration flow, species treemap, gauges, cumulative areas) and indicators with trends.")) : null,
+    h("button", { class: "btn", onclick: async () => {
+      if (!confirm(L("Substituir as páginas, indicadores e gráficos do dashboard pela versão padrão? As outras definições do portal não mudam.", "Replace the dashboard pages, indicators and charts with the default version? Other portal settings stay the same."))) return;
+      try { const r = await fetch("config/dashboard_padrao.json?v=" + Date.now()); const novo = await r.json();
+        novo.limiarSobrevivencia = D.limiarSobrevivencia ?? novo.limiarSobrevivencia; novo.areaQuadricula_m2 = D.areaQuadricula_m2 ?? novo.areaQuadricula_m2;
+        W.dashboard = novo; marcar(); renderGestao($("#app")); toast(L("Dashboard padrão aplicado. Clique em Guardar e publicar.", "Default dashboard applied. Click Save and publish."), "ok", 6000); }
+      catch (e) { toast(e.message, "erro"); }
+    } }, "↺ " + L("Aplicar o dashboard padrão (versão mais recente)", "Apply the default dashboard (latest version)"))));
   el.append(h("div", { class: "duas" },
     campo(L("Limiar de sobrevivência para “em recuperação” (%)", "Survival threshold for “recovering” (%)"), D, "limiarSobrevivencia", { tipo: "number" }),
     campo(L("Área de cada quadrícula do levantamento (m²)", "Survey plot area (m²)"), D, "areaQuadricula_m2", { tipo: "number" })));
   el.append(h("h4", {}, L("Páginas", "Pages")));
   el.append(editorLista(D.paginas, () => ({ id: "pagina-" + (D.paginas.length + 1), titulo: { pt: L("Nova página", "New page"), en: "New page" }, kpis: [], graficos: [] }),
     (p, c) => {
-      c.append(bilingue(L("Título da página", "Page title"), p, "titulo"), campo(L("Identificador (sem espaços, aparece no endereço)", "Identifier (no spaces, used in the address)"), p, "id"));
+      c.append(bilingue(L("Título da página", "Page title"), p, "titulo"), bilingue(L("Descrição (aparece no cabeçalho da página)", "Description (shown in the page header)"), p, "descricao", { area: true, rows: 2 }),
+        h("div", { class: "duas" }, campo(L("Identificador (sem espaços, aparece no endereço)", "Identifier (no spaces, used in the address)"), p, "id"), escolha(L("Ícone", "Icon"), p, "icone", ICONES_OPS())));
       c.append(h("h4", {}, L("Indicadores", "Indicators")), editorLista(p.kpis = p.kpis || [], () => ({ id: "k" + Date.now(), titulo: { pt: L("Novo indicador", "New indicator"), en: "" }, dataset: "restauracao", tabela: "main", medida: "contagem" }), editarKPI, k => tr(k.titulo, S.lang)));
       c.append(h("h4", {}, L("Gráficos", "Charts")), editorLista(p.graficos = p.graficos || [], () => ({ id: "g" + Date.now(), titulo: { pt: L("Novo gráfico", "New chart"), en: "" }, tipo: "barrash", dataset: "restauracao", tabela: "main", dimensao: "_provincia", medida: "contagem", largura: "1/3" }), editarGrafico, g => `${tr(g.titulo, S.lang)} · ${g.tipo}`));
     }, p => tr(p.titulo, S.lang)));
@@ -279,7 +292,11 @@ function editarKPI(k, c) {
       escolha(L("Cálculo", "Calculation"), k, "medida", MEDIDAS(), { depois: redesenhar })),
     k.medida === "especial" ? escolha(L("Indicador especial", "Special indicator"), k, "especial", [["lev_densidade", L("Densidade de árvores vivas (árv./ha)", "Live tree density (trees/ha)")], ["lev_area_basal", L("Área basal (m²/ha)", "Basal area (m²/ha)")]])
       : h("div", { class: "duas" }, escolha(L("Campo", "Field"), k, "campo", campoOps(k.dataset, k.tabela)), k.medida === "razao" ? escolha(L("Campo 2 (divisor)", "Field 2 (divisor)"), k, "campo2", campoOps(k.dataset, k.tabela)) : h("span")),
-    h("div", { class: "tres" }, escolha(L("Formato", "Format"), k, "formato", [["", L("Número", "Number")], ["pct", "%"]]), campo(L("Casas decimais", "Decimals"), k, "decimais", { tipo: "number" })),
+    h("div", { class: "tres" }, escolha(L("Formato", "Format"), k, "formato", [["", L("Número", "Number")], ["pct", "%"]]), campo(L("Casas decimais", "Decimals"), k, "decimais", { tipo: "number" }),
+      campo(L("Unidade depois do número (ex.: ha)", "Unit after the number (e.g. ha)"), k, "sufixo")),
+    h("div", { class: "tres" }, escolha(L("Ícone", "Icon"), k, "icone", ICONES_OPS()),
+      campo(L("Números grandes abreviados (ex.: 36,8 M)", "Abbreviate large numbers (e.g. 36.8 M)"), k, "compacto", { tipo: "checkbox" }),
+      campo(L("Esconder a mini-tendência por ano", "Hide the yearly mini-trend"), { get v() { return k.tendencia === false; }, set v(x) { k.tendencia = x ? false : undefined; } }, "v", { tipo: "checkbox" })),
     editorFiltro(k));
 }
 
@@ -297,7 +314,7 @@ function editorFiltro(obj) {
 
 function editarGrafico(g, c) {
   const redesenhar = () => { c.innerHTML = ""; editarGrafico(g, c); };
-  const simples = !["mapa", "tabela", "cobertura", "texto"].includes(g.tipo);
+  const simples = !["mapa", "tabela", "cobertura", "texto", "gauge"].includes(g.tipo);
   c.append(bilingue(L("Título", "Title"), g, "titulo"), bilingue(L("Subtítulo", "Subtitle"), g, "subtitulo"),
     h("div", { class: "tres" }, escolha(L("Tipo", "Type"), g, "tipo", TIPOS(), { depois: redesenhar }), escolha(L("Largura", "Width"), g, "largura", LARGURAS), campo(L("Altura (px, opcional)", "Height (px, optional)"), g, "altura", { tipo: "number" })),
     h("div", { class: "duas" }, escolha(L("Ficha", "Form"), g, "dataset", dsOps(), { depois: redesenhar }), escolha(L("Tabela", "Table"), g, "tabela", tabOps(g.dataset), { depois: redesenhar })));
@@ -310,9 +327,17 @@ function editarGrafico(g, c) {
         escolha(L("Campo", "Field"), g, "campo", campoOps(g.dataset, g.tabela)), g.medida === "razao" ? escolha(L("Campo 2 (divisor)", "Field 2 (divisor)"), g, "campo2", campoOps(g.dataset, g.tabela)) : h("span")),
       h("div", { class: "tres" }, escolha(L("Ordem", "Order"), g, "ordem", ORDENS()), campo(L("Máximo de categorias", "Max categories"), g, "limite", { tipo: "number" }),
         escolha(L("Formato", "Format"), g, "formato", [["", L("Número", "Number")], ["pct", "%"]])),
-      campo(L("Mostrar como % do total", "Show as % of total"), g, "comoPercentagem", { tipo: "checkbox" }),
+      h("div", { class: "tres" }, campo(L("Mostrar como % do total", "Show as % of total"), g, "comoPercentagem", { tipo: "checkbox" }),
+        campo(L("Valores acumulados (linha/área)", "Cumulative values (line/area)"), g, "acumulado", { tipo: "checkbox" }),
+        campo(L("Cor (uma só série)", "Colour (single series)"), g, "cor", { tipo: "color" })),
       editorFiltro(g));
   }
+  if (g.tipo === "gauge") c.append(
+    h("div", { class: "tres" }, escolha(L("Cálculo", "Calculation"), g, "medida", MEDIDAS().filter(m => m[0] !== "percentagem_registos"), { depois: redesenhar }),
+      escolha(L("Campo", "Field"), g, "campo", campoOps(g.dataset, g.tabela)), escolha(L("Campo 2 (divisor)", "Field 2 (divisor)"), g, "campo2", campoOps(g.dataset, g.tabela))),
+    h("div", { class: "tres" }, campo(L("Valor máximo do medidor", "Gauge maximum"), g, "max", { tipo: "number" }), escolha(L("Formato", "Format"), g, "formato", [["", L("Número", "Number")], ["pct", "%"]]),
+      campo(L("Marcar o limiar de sobrevivência", "Show the survival threshold"), g, "usarLimiar", { tipo: "checkbox" })),
+    editorFiltro(g));
   if (g.tipo === "mapa") c.append(h("div", { class: "checks" }, DATASETS.map(d => h("label", { class: "check" }, h("input", { type: "checkbox", checked: (g.camadas || []).includes(d),
     onchange: e => { g.camadas = (g.camadas || []).filter(x => x !== d); if (e.target.checked) g.camadas.push(d); marcar(); } }), " " + tr(W.fontes.datasets[d].nome, S.lang)))));
   if (g.tipo === "tabela") c.append(campoLista(L("Colunas (campos separados por vírgula)", "Columns (comma-separated fields)"), g.colunas, v => (g.colunas = v),
@@ -323,6 +348,17 @@ function editarGrafico(g, c) {
   const msg = h("small", {});
   c.append(h("details", { class: "sub" }, h("summary", {}, L("Avançado (JSON)", "Advanced (JSON)")), ta, h("div", { class: "linha" },
     h("button", { class: "btn", onclick: () => { try { const o = JSON.parse(ta.value); Object.keys(g).forEach(k => delete g[k]); Object.assign(g, o); marcar(); redesenhar(); } catch (e) { msg.textContent = "JSON: " + e.message; } } }, L("Aplicar JSON", "Apply JSON")), msg)));
+}
+
+function secTecnica(el) {
+  titulo(el, "Área técnica: painéis embebidos", "Technical area: embedded panels", L("Cada painel aparece como uma sub-aba da Área técnica, antes da Validação de dados. Cole a ligação da aplicação ArcGIS Experience (ou de um ArcGIS Dashboard). A aplicação tem de estar partilhada com quem a vai ver; se não for pública, a pessoa terá de entrar com a conta ArcGIS dentro do painel.",
+    "Each panel appears as a sub-tab of the Technical area, before Data validation. Paste the ArcGIS Experience app link (or an ArcGIS Dashboard). The app must be shared with its viewers; if it is not public, they will need to sign in to ArcGIS inside the panel."));
+  W.tecnica = W.tecnica || {}; W.tecnica.paineis = W.tecnica.paineis || [];
+  el.append(editorLista(W.tecnica.paineis, () => ({ titulo: { pt: L("Painel técnico", "Technical panel"), en: "Technical panel" }, url: "", altura: 800, descricao: { pt: "", en: "" } }),
+    (p, c) => c.append(bilingue(L("Nome da sub-aba", "Sub-tab name"), p, "titulo"),
+      campo(L("Ligação (URL) da aplicação", "App link (URL)"), p, "url", { ajuda: "https://experience.arcgis.com/experience/…" }),
+      campo(L("Altura (px)", "Height (px)"), p, "altura", { tipo: "number" }),
+      bilingue(L("Nota por cima do painel (opcional)", "Note above the panel (optional)"), p, "descricao")), p => tr(p.titulo, S.lang)));
 }
 
 function secValidacao(el) {
