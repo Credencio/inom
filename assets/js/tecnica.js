@@ -8,12 +8,28 @@ const t = k => UI[S.lang][k] || k;
 
 export function renderTecnica(app, sub) {
   app.innerHTML = "";
+  const paineis = ((S.cfg.tecnica || {}).paineis || []).filter(p => p && p.url);
+  if (!sub) sub = paineis.length ? "painel-1" : "validacao";
   const pg = h("div", { class: "pagina larga" },
     h("div", { class: "subtabs" },
+      paineis.map((p, i) => h("a", { href: `#/tecnica/painel-${i + 1}`, class: sub === `painel-${i + 1}` ? "active" : "" }, tr(p.titulo, S.lang) || `Painel ${i + 1}`)),
       h("a", { href: "#/tecnica/validacao", class: sub === "validacao" ? "active" : "" }, t("tec_validacao")),
       h("a", { href: "#/tecnica/fontes", class: sub === "fontes" ? "active" : "" }, t("tec_fontes"))));
   app.append(pg);
-  if (sub === "fontes") renderFontes(pg); else renderValidacao(pg);
+  if (sub.startsWith("painel-")) renderPainel(pg, paineis[Number(sub.slice(7)) - 1]);
+  else if (sub === "fontes") renderFontes(pg); else renderValidacao(pg);
+}
+
+/* ---------------- Painéis embebidos (ArcGIS Experience, Dashboards, etc.) ---------------- */
+function renderPainel(pg, p) {
+  if (!p) { pg.append(h("p", { class: "vazio" }, t("painel_vazio"))); return; }
+  const url = String(p.url || "").trim();
+  if (!/^https:\/\//i.test(url)) { pg.append(h("p", { class: "erro-txt" }, "URL inválido (tem de começar por https://)")); return; }
+  pg.append(
+    p.descricao && tr(p.descricao, S.lang) ? h("p", { class: "nota" }, tr(p.descricao, S.lang)) : null,
+    h("div", { class: "painel-emb" }, h("iframe", { src: url, title: tr(p.titulo, S.lang) || "ArcGIS", loading: "lazy",
+      allow: "fullscreen; geolocation", allowfullscreen: true, style: `height:${Number(p.altura) || 800}px` })),
+    h("p", { class: "nota" }, h("a", { href: url, target: "_blank", rel: "noopener" }, "↗ " + t("abrir_nova"))));
 }
 
 /* ---------------- Regras ---------------- */

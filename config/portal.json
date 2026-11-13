@@ -43,7 +43,8 @@
    },
    "versao": "1.0",
    "ficheiro": "fichas/Registo_de_Viveiros_de_Mangal.xlsx",
-   "survey123": ""
+   "survey123": "",
+   "mostrarFicheiro": false
   },
   {
    "id": "degradadas",
@@ -57,7 +58,8 @@
    },
    "versao": "1.1",
    "ficheiro": "fichas/Registo_de_Areas_Degradadas_de_Mangal.xlsx",
-   "survey123": ""
+   "survey123": "",
+   "mostrarFicheiro": false
   },
   {
    "id": "restauracao",
@@ -71,7 +73,8 @@
    },
    "versao": "1.2",
    "ficheiro": "fichas/Registo_de_Areas_de_Restauracao_de_Mangal.xlsx",
-   "survey123": ""
+   "survey123": "",
+   "mostrarFicheiro": false
   },
   {
    "id": "monitoria",
@@ -85,7 +88,8 @@
    },
    "versao": "2.0",
    "ficheiro": "fichas/Monitoria_das_Areas_de_Restauracao.xlsx",
-   "survey123": ""
+   "survey123": "",
+   "mostrarFicheiro": false
   },
   {
    "id": "levantamento",
@@ -99,7 +103,8 @@
    },
    "versao": "1.1",
    "ficheiro": "fichas/Levantamento_Ecologico.xlsx",
-   "survey123": ""
+   "survey123": "",
+   "mostrarFicheiro": false
   },
   {
    "id": "ervas",
@@ -113,7 +118,8 @@
    },
    "versao": "1.1",
    "ficheiro": "fichas/Registo_de_Ervas_Marinhas.xlsx",
-   "survey123": ""
+   "survey123": "",
+   "mostrarFicheiro": false
   }
  ],
  "fontes": {
@@ -328,6 +334,7 @@
   }
  },
  "dashboard": {
+  "versao": 2,
   "limiarSobrevivencia": 50,
   "areaQuadricula_m2": 100,
   "paginas": [
@@ -337,36 +344,45 @@
      "pt": "Visão geral",
      "en": "Overview"
     },
+    "icone": "mapa",
+    "descricao": {
+     "pt": "Retrato nacional dos mangais e ervas marinhas: perda, restauração, produção de mudas e levantamentos no terreno.",
+     "en": "National picture of mangroves and seagrass: loss, restoration, seedling production and field surveys."
+    },
     "kpis": [
      {
       "id": "k1",
       "titulo": {
-       "pt": "Área degradada (ha)",
-       "en": "Degraded area (ha)"
+       "pt": "Área degradada",
+       "en": "Degraded area"
       },
       "dataset": "degradadas",
       "tabela": "main",
       "medida": "soma",
       "campo": "_area_ha",
       "subtitulo": {
-       "pt": "Áreas registadas como degradadas",
-       "en": "Areas recorded as degraded"
-      }
+       "pt": "hectares registados como degradados",
+       "en": "hectares recorded as degraded"
+      },
+      "icone": "alerta",
+      "sufixo": "ha"
      },
      {
       "id": "k2",
       "titulo": {
-       "pt": "Área em restauração (ha)",
-       "en": "Area under restoration (ha)"
+       "pt": "Área em restauração",
+       "en": "Area under restoration"
       },
       "dataset": "restauracao",
       "tabela": "main",
       "medida": "soma",
       "campo": "_area_ha",
       "subtitulo": {
-       "pt": "Não significa área recuperada",
-       "en": "Does not mean recovered area"
-      }
+       "pt": "hectares · não significa área recuperada",
+       "en": "hectares · does not mean recovered"
+      },
+      "icone": "folha",
+      "sufixo": "ha"
      },
      {
       "id": "k3",
@@ -379,9 +395,10 @@
       "medida": "soma",
       "campo": "mudas_distribuidas",
       "subtitulo": {
-       "pt": "Pelos viveiros, no último ano",
-       "en": "By nurseries, last year"
-      }
+       "pt": "pelos viveiros registados",
+       "en": "by registered nurseries"
+      },
+      "icone": "muda"
      },
      {
       "id": "k4",
@@ -393,9 +410,10 @@
       "tabela": "main",
       "medida": "contagem",
       "subtitulo": {
-       "pt": "Registados e em funcionamento",
-       "en": "Registered and operating"
+       "pt": "registados e em funcionamento",
+       "en": "registered and operating"
       },
+      "icone": "viveiro",
       "filtro": {
        "campo": "_ativo",
        "valores": [
@@ -413,9 +431,10 @@
       "tabela": "registro_plot",
       "medida": "contagem",
       "subtitulo": {
-       "pt": "Levantamento ecológico",
-       "en": "Ecological survey"
-      }
+       "pt": "levantamento ecológico",
+       "en": "ecological survey"
+      },
+      "icone": "grelha"
      },
      {
       "id": "k6",
@@ -427,30 +446,57 @@
       "tabela": "main",
       "medida": "contagem",
       "subtitulo": {
-       "pt": "Registados",
-       "en": "Recorded"
-      }
+       "pt": "registados",
+       "en": "recorded"
+      },
+      "icone": "onda"
      }
     ],
     "graficos": [
      {
       "id": "g1",
       "titulo": {
-       "pt": "Área degradada e área em restauração por província (ha)",
-       "en": "Degraded and restoration area by province (ha)"
+       "pt": "Onde estão os registos",
+       "en": "Where the records are"
+      },
+      "tipo": "mapa",
+      "dataset": "restauracao",
+      "tabela": "main",
+      "medida": "contagem",
+      "largura": "2/3",
+      "subtitulo": {
+       "pt": "Clique num ponto ou polígono para ver o detalhe",
+       "en": "Click a point or polygon for details"
+      },
+      "altura": 470,
+      "camadas": [
+       "degradadas",
+       "restauracao",
+       "viveiros",
+       "ervas",
+       "monitoria",
+       "levantamento"
+      ]
+     },
+     {
+      "id": "g2",
+      "titulo": {
+       "pt": "Área degradada e em restauração por província",
+       "en": "Degraded and restoration area by province"
       },
       "tipo": "barrash",
       "dataset": "restauracao",
       "tabela": "main",
       "medida": "soma",
-      "largura": "1/2",
+      "largura": "1/3",
       "dimensao": "_provincia",
       "campo": "_area_ha",
       "subtitulo": {
-       "pt": "Províncias de norte para sul",
-       "en": "Provinces north to south"
+       "pt": "hectares · clique numa província para filtrar",
+       "en": "hectares · click a province to filter"
       },
       "ordem": "provincias",
+      "altura": 470,
       "series": [
        {
         "nome": {
@@ -475,89 +521,117 @@
       ]
      },
      {
-      "id": "g2",
-      "titulo": {
-       "pt": "Locais registados no terreno",
-       "en": "Sites recorded in the field"
-      },
-      "tipo": "mapa",
-      "dataset": "restauracao",
-      "tabela": "main",
-      "medida": "contagem",
-      "largura": "1/2",
-      "camadas": [
-       "degradadas",
-       "restauracao",
-       "viveiros",
-       "ervas",
-       "monitoria"
-      ]
-     },
-     {
       "id": "g3",
       "titulo": {
-       "pt": "Área em restauração por ano de início (ha)",
-       "en": "Restoration area by start year (ha)"
+       "pt": "Evolução acumulada da área (ha)",
+       "en": "Cumulative area over time (ha)"
       },
-      "tipo": "barras",
+      "tipo": "area",
       "dataset": "restauracao",
       "tabela": "main",
       "medida": "soma",
       "largura": "1/2",
       "dimensao": "_ano",
       "campo": "_area_ha",
-      "ordem": "cronologica"
+      "subtitulo": {
+       "pt": "Pelo ano de registo (degradação) e de início do projecto (restauração)",
+       "en": "By recording year (degradation) and project start year (restoration)"
+      },
+      "ordem": "cronologica",
+      "acumulado": true,
+      "series": [
+       {
+        "nome": {
+         "pt": "Área degradada registada",
+         "en": "Degraded area recorded"
+        },
+        "dataset": "degradadas",
+        "medida": "soma",
+        "campo": "_area_ha",
+        "cor": "#e8743b"
+       },
+       {
+        "nome": {
+         "pt": "Área em restauração",
+         "en": "Area under restoration"
+        },
+        "dataset": "restauracao",
+        "medida": "soma",
+        "campo": "_area_ha",
+        "cor": "#2f6fdb"
+       }
+      ]
      },
      {
       "id": "g4",
       "titulo": {
-       "pt": "Registos por província e ficha",
-       "en": "Records by province and form"
+       "pt": "Espécies plantadas na restauração",
+       "en": "Species planted in restoration"
       },
-      "tipo": "empilhado",
+      "tipo": "treemap",
+      "dataset": "restauracao",
+      "tabela": "material_vegetal",
+      "medida": "soma",
+      "largura": "1/2",
+      "dimensao": "especie_material",
+      "campo": "quantidade_material",
+      "subtitulo": {
+       "pt": "Mudas e propágulos · tamanho = quantidade",
+       "en": "Seedlings and propagules · size = quantity"
+      }
+     },
+     {
+      "id": "g5",
+      "titulo": {
+       "pt": "Registos por ficha",
+       "en": "Records by form"
+      },
+      "tipo": "pizza",
       "dataset": "restauracao",
       "tabela": "main",
       "medida": "contagem",
-      "largura": "1/2",
-      "dimensao": "_provincia",
-      "ordem": "provincias",
+      "largura": "1/3",
+      "dimensao": "_dataset",
       "series": [
        {
-        "nome": {
-         "pt": "Áreas degradadas",
-         "en": "Degraded areas"
-        },
         "dataset": "degradadas"
        },
        {
-        "nome": {
-         "pt": "Restauração",
-         "en": "Restoration"
-        },
         "dataset": "restauracao"
        },
        {
-        "nome": {
-         "pt": "Viveiros",
-         "en": "Nurseries"
-        },
+        "dataset": "monitoria"
+       },
+       {
         "dataset": "viveiros"
        },
        {
-        "nome": {
-         "pt": "Ervas marinhas",
-         "en": "Seagrass"
-        },
-        "dataset": "ervas"
+        "dataset": "levantamento"
        },
        {
-        "nome": {
-         "pt": "Levantamentos",
-         "en": "Surveys"
-        },
-        "dataset": "levantamento"
+        "dataset": "ervas"
        }
       ]
+     },
+     {
+      "id": "g6",
+      "titulo": {
+       "pt": "Do viveiro à restauração",
+       "en": "From nursery to restoration"
+      },
+      "tipo": "sankey",
+      "dataset": "restauracao",
+      "tabela": "material_vegetal",
+      "medida": "soma",
+      "largura": "2/3",
+      "dimensao": "viveiro_origem",
+      "campo": "quantidade_material",
+      "subtitulo": {
+       "pt": "Mudas de cada viveiro e província onde foram plantadas",
+       "en": "Seedlings from each nursery and province where they were planted"
+      },
+      "serieDimensao": "_provincia",
+      "altura": 380
      }
     ]
    },
@@ -567,21 +641,28 @@
      "pt": "Degradação",
      "en": "Degradation"
     },
+    "icone": "alerta",
+    "descricao": {
+     "pt": "Onde e porquê o mangal se perdeu, com base no Registo de Áreas Degradadas.",
+     "en": "Where and why mangroves were lost, based on the Degraded Areas register."
+    },
     "kpis": [
      {
       "id": "k1",
       "titulo": {
-       "pt": "Área degradada (ha)",
-       "en": "Degraded area (ha)"
+       "pt": "Área degradada",
+       "en": "Degraded area"
       },
       "dataset": "degradadas",
       "tabela": "main",
       "medida": "soma",
       "campo": "_area_ha",
       "subtitulo": {
-       "pt": "Soma das áreas registadas como degradadas",
-       "en": "Sum of areas recorded as degraded"
-      }
+       "pt": "hectares registados",
+       "en": "hectares recorded"
+      },
+      "icone": "alerta",
+      "sufixo": "ha"
      },
      {
       "id": "k2",
@@ -593,9 +674,10 @@
       "tabela": "main",
       "medida": "contagem",
       "subtitulo": {
-       "pt": "Registos com área degradada",
-       "en": "Records with degraded area"
-      }
+       "pt": "registos",
+       "en": "records"
+      },
+      "icone": "lista"
      },
      {
       "id": "k3",
@@ -607,9 +689,10 @@
       "tabela": "main",
       "medida": "percentagem",
       "subtitulo": {
-       "pt": "Pelo menos uma causa humana",
-       "en": "At least one human cause"
+       "pt": "pelo menos uma causa humana",
+       "en": "at least one human cause"
       },
+      "icone": "pessoas",
       "filtro": {
        "campo": "_causa_humana",
        "valores": [
@@ -629,9 +712,10 @@
       "medida": "percentagem",
       "campo": "_area_ha",
       "subtitulo": {
-       "pt": "% da área · perda de 60% ou mais",
-       "en": "% of area · loss of 60% or more"
+       "pt": "% da área · perda ≥ 60%",
+       "en": "% of area · loss ≥ 60%"
       },
+      "icone": "pct",
       "filtro": {
        "campo": "nivel_degradacao",
        "valores": [
@@ -646,19 +730,19 @@
      {
       "id": "g1",
       "titulo": {
-       "pt": "Área degradada por província e nível (ha)",
-       "en": "Degraded area by province and level (ha)"
+       "pt": "Área degradada por província e nível",
+       "en": "Degraded area by province and level"
       },
       "tipo": "empilhado",
       "dataset": "degradadas",
       "tabela": "main",
       "medida": "soma",
-      "largura": "1/3",
+      "largura": "1/2",
       "dimensao": "_provincia",
       "campo": "_area_ha",
       "subtitulo": {
-       "pt": "Províncias de norte para sul",
-       "en": "Provinces north to south"
+       "pt": "hectares · Províncias de norte para sul",
+       "en": "hectares · Provinces north to south"
       },
       "serieDimensao": "nivel_degradacao",
       "ordem": "provincias"
@@ -666,14 +750,33 @@
      {
       "id": "g2",
       "titulo": {
-       "pt": "Causas reportadas (% das áreas degradadas)",
-       "en": "Reported causes (% of degraded areas)"
+       "pt": "Nível de degradação",
+       "en": "Degradation level"
+      },
+      "tipo": "pizza",
+      "dataset": "degradadas",
+      "tabela": "main",
+      "medida": "soma",
+      "largura": "1/2",
+      "dimensao": "nivel_degradacao",
+      "campo": "_area_ha",
+      "subtitulo": {
+       "pt": "% da área degradada",
+       "en": "% of degraded area"
+      },
+      "ordem": "lista"
+     },
+     {
+      "id": "g3",
+      "titulo": {
+       "pt": "Causas reportadas",
+       "en": "Reported causes"
       },
       "tipo": "barrash",
       "dataset": "degradadas",
       "tabela": "main",
       "medida": "percentagem_registos",
-      "largura": "1/3",
+      "largura": "1/2",
       "dimensao": [
        "causa_degradacao_actividades_de_producao_e_extraccao",
        "causa_degradacao_factores_naturais_e_climaticos",
@@ -682,35 +785,35 @@
        "causa_degradacao_processos_fisicos_e_ecologicos"
       ],
       "subtitulo": {
-       "pt": "Cada registo pode ter várias respostas: não soma 100%",
-       "en": "Records can have several answers: does not add up to 100%"
+       "pt": "% das áreas · Cada registo pode ter várias respostas: não soma 100%",
+       "en": "% of areas · Records can have several answers: does not add up to 100%"
       },
       "formato": "pct",
-      "altura": 420
+      "limite": 15
      },
      {
-      "id": "g3",
+      "id": "g4",
       "titulo": {
-       "pt": "Sinais visíveis (% das áreas degradadas)",
-       "en": "Visible signs (% of degraded areas)"
+       "pt": "Sinais visíveis",
+       "en": "Visible signs"
       },
       "tipo": "barrash",
       "dataset": "degradadas",
       "tabela": "main",
       "medida": "percentagem_registos",
-      "largura": "1/3",
+      "largura": "1/2",
       "dimensao": "sinais_degradacao_visiveis",
       "subtitulo": {
-       "pt": "Cada registo pode ter várias respostas: não soma 100%",
-       "en": "Records can have several answers: does not add up to 100%"
+       "pt": "% das áreas · Cada registo pode ter várias respostas: não soma 100%",
+       "en": "% of areas · Records can have several answers: does not add up to 100%"
       },
       "formato": "pct"
      },
      {
-      "id": "g4",
+      "id": "g5",
       "titulo": {
-       "pt": "Espécies mais abatidas (% das áreas degradadas)",
-       "en": "Most felled species (% of degraded areas)"
+       "pt": "Espécies mais abatidas",
+       "en": "Most felled species"
       },
       "tipo": "barrash",
       "dataset": "degradadas",
@@ -719,43 +822,30 @@
       "largura": "1/3",
       "dimensao": "especies_abatidas",
       "subtitulo": {
-       "pt": "Cada registo pode ter várias respostas: não soma 100%",
-       "en": "Records can have several answers: does not add up to 100%"
+       "pt": "% das áreas degradadas",
+       "en": "% of degraded areas"
       },
       "formato": "pct"
      },
      {
-      "id": "g5",
-      "titulo": {
-       "pt": "Nível de degradação",
-       "en": "Degradation level"
-      },
-      "tipo": "pizza",
-      "dataset": "degradadas",
-      "tabela": "main",
-      "medida": "contagem",
-      "largura": "1/3",
-      "dimensao": "nivel_degradacao",
-      "ordem": "lista"
-     },
-     {
       "id": "g6",
       "titulo": {
-       "pt": "Ano estimado da perda",
-       "en": "Estimated year of loss"
+       "pt": "Quando se perdeu o mangal",
+       "en": "When mangroves were lost"
       },
-      "tipo": "barras",
+      "tipo": "area",
       "dataset": "degradadas",
       "tabela": "main",
       "medida": "soma",
-      "largura": "1/3",
+      "largura": "2/3",
       "dimensao": "ano:ano_estimado_perda",
       "campo": "_area_ha",
       "subtitulo": {
-       "pt": "Área degradada (ha)",
-       "en": "Degraded area (ha)"
+       "pt": "Área (ha) pelo ano estimado da perda",
+       "en": "Area (ha) by estimated year of loss"
       },
-      "ordem": "cronologica"
+      "ordem": "cronologica",
+      "cor": "#e8743b"
      }
     ]
    },
@@ -765,21 +855,28 @@
      "pt": "Restauração",
      "en": "Restoration"
     },
+    "icone": "folha",
+    "descricao": {
+     "pt": "Projectos de restauração: técnicas, espécies, entidades envolvidas e investimento.",
+     "en": "Restoration projects: techniques, species, entities involved and investment."
+    },
     "kpis": [
      {
       "id": "k1",
       "titulo": {
-       "pt": "Área em restauração (ha)",
-       "en": "Area under restoration (ha)"
+       "pt": "Área em restauração",
+       "en": "Area under restoration"
       },
       "dataset": "restauracao",
       "tabela": "main",
       "medida": "soma",
       "campo": "_area_ha",
       "subtitulo": {
-       "pt": "Não significa área recuperada",
-       "en": "Does not mean recovered area"
-      }
+       "pt": "hectares · não significa recuperada",
+       "en": "hectares · not necessarily recovered"
+      },
+      "icone": "folha",
+      "sufixo": "ha"
      },
      {
       "id": "k2",
@@ -792,9 +889,10 @@
       "medida": "soma",
       "campo": "quantidade_material",
       "subtitulo": {
-       "pt": "Mudas e propágulos",
-       "en": "Seedlings and propagules"
-      }
+       "pt": "mudas e propágulos",
+       "en": "seedlings and propagules"
+      },
+      "icone": "muda"
      },
      {
       "id": "k3",
@@ -807,9 +905,10 @@
       "medida": "soma",
       "campo": "_pessoas",
       "subtitulo": {
-       "pt": "Homens e mulheres registados",
-       "en": "Men and women recorded"
-      }
+       "pt": "homens e mulheres",
+       "en": "men and women"
+      },
+      "icone": "pessoas"
      },
      {
       "id": "k4",
@@ -825,31 +924,34 @@
        "pt": "% das pessoas envolvidas",
        "en": "% of people involved"
       },
+      "icone": "pct",
       "campo2": "_pessoas",
       "formato": "pct"
      },
      {
       "id": "k5",
       "titulo": {
-       "pt": "Investimento (MZN)",
-       "en": "Investment (MZN)"
+       "pt": "Investimento",
+       "en": "Investment"
       },
       "dataset": "restauracao",
       "tabela": "main",
       "medida": "soma",
       "campo": "custo_total_mt",
       "subtitulo": {
-       "pt": "Custo total declarado",
-       "en": "Total declared cost"
-      }
+       "pt": "MZN · custo total declarado",
+       "en": "MZN · total declared cost"
+      },
+      "icone": "dinheiro",
+      "compacto": true
      }
     ],
     "graficos": [
      {
       "id": "g1",
       "titulo": {
-       "pt": "Área em restauração por técnica (ha)",
-       "en": "Restoration area by technique (ha)"
+       "pt": "Área por técnica",
+       "en": "Area by technique"
       },
       "tipo": "barrash",
       "dataset": "restauracao",
@@ -859,15 +961,15 @@
       "dimensao": "tecnica_restauracao_usadas",
       "campo": "_area_ha",
       "subtitulo": {
-       "pt": "Projectos com várias técnicas contam em cada uma",
-       "en": "Projects with several techniques count in each"
+       "pt": "hectares · projectos com várias técnicas contam em cada uma",
+       "en": "hectares · projects with several techniques count in each"
       }
      },
      {
       "id": "g2",
       "titulo": {
-       "pt": "Plantas utilizadas por espécie",
-       "en": "Plants used by species"
+       "pt": "Plantas por espécie",
+       "en": "Plants by species"
       },
       "tipo": "empilhado",
       "dataset": "restauracao",
@@ -876,45 +978,17 @@
       "largura": "1/3",
       "dimensao": "especie_material",
       "campo": "quantidade_material",
+      "subtitulo": {
+       "pt": "mudas e propágulos",
+       "en": "seedlings and propagules"
+      },
       "serieDimensao": "tipo_material"
      },
      {
       "id": "g3",
       "titulo": {
-       "pt": "Área em restauração por entidade executora (ha)",
-       "en": "Restoration area by implementing entity (ha)"
-      },
-      "tipo": "barrash",
-      "dataset": "restauracao",
-      "tabela": "partes_executoras_rpt",
-      "medida": "soma",
-      "largura": "1/3",
-      "dimensao": "tipo_parte_executora",
-      "campo": "_area_ha",
-      "subtitulo": {
-       "pt": "Projectos com várias entidades contam em cada uma",
-       "en": "Projects with several entities count in each"
-      }
-     },
-     {
-      "id": "g4",
-      "titulo": {
-       "pt": "Origem das mudas",
-       "en": "Seedling origin"
-      },
-      "tipo": "pizza",
-      "dataset": "restauracao",
-      "tabela": "material_vegetal",
-      "medida": "soma",
-      "largura": "1/3",
-      "dimensao": "origem_muda",
-      "campo": "quantidade_material"
-     },
-     {
-      "id": "g5",
-      "titulo": {
-       "pt": "Estado das áreas (última monitoria)",
-       "en": "Area status (latest monitoring)"
+       "pt": "Estado das áreas",
+       "en": "Area status"
       },
       "tipo": "pizza",
       "dataset": "restauracao",
@@ -924,28 +998,88 @@
       "dimensao": "_estado_monitoria",
       "campo": "_area_ha",
       "subtitulo": {
-       "pt": "Área (ha)",
-       "en": "Area (ha)"
+       "pt": "hectares · pela última monitoria",
+       "en": "hectares · by latest monitoring"
       },
       "ordem": "lista"
      },
      {
+      "id": "g4",
+      "titulo": {
+       "pt": "Área por entidade executora",
+       "en": "Area by implementing entity"
+      },
+      "tipo": "barrash",
+      "dataset": "restauracao",
+      "tabela": "partes_executoras_rpt",
+      "medida": "soma",
+      "largura": "1/2",
+      "dimensao": "tipo_parte_executora",
+      "campo": "_area_ha",
+      "subtitulo": {
+       "pt": "hectares · projectos com várias entidades contam em cada uma",
+       "en": "hectares · projects with several entities count in each"
+      }
+     },
+     {
+      "id": "g5",
+      "titulo": {
+       "pt": "Origem do material vegetal",
+       "en": "Origin of planting material"
+      },
+      "tipo": "sankey",
+      "dataset": "restauracao",
+      "tabela": "material_vegetal",
+      "medida": "soma",
+      "largura": "1/2",
+      "dimensao": "tipo_material",
+      "campo": "quantidade_material",
+      "subtitulo": {
+       "pt": "Tipo de material → origem",
+       "en": "Material type → origin"
+      },
+      "serieDimensao": "origem_muda"
+     },
+     {
       "id": "g6",
       "titulo": {
-       "pt": "Área em restauração por ano de início (ha)",
-       "en": "Restoration area by start year (ha)"
+       "pt": "Área por ano de início",
+       "en": "Area by start year"
       },
       "tipo": "barras",
       "dataset": "restauracao",
       "tabela": "main",
       "medida": "soma",
-      "largura": "1/3",
+      "largura": "1/2",
       "dimensao": "_ano",
       "campo": "_area_ha",
+      "subtitulo": {
+       "pt": "hectares",
+       "en": "hectares"
+      },
       "ordem": "cronologica"
      },
      {
       "id": "g7",
+      "titulo": {
+       "pt": "Investimento por província",
+       "en": "Investment by province"
+      },
+      "tipo": "barras",
+      "dataset": "restauracao",
+      "tabela": "main",
+      "medida": "soma",
+      "largura": "1/2",
+      "dimensao": "_provincia",
+      "campo": "custo_total_mt",
+      "subtitulo": {
+       "pt": "MZN",
+       "en": "MZN"
+      },
+      "ordem": "provincias"
+     },
+     {
+      "id": "g8",
       "titulo": {
        "pt": "Projectos de restauração registados",
        "en": "Registered restoration projects"
@@ -976,6 +1110,11 @@
      "pt": "Monitoria",
      "en": "Monitoring"
     },
+    "icone": "pct",
+    "descricao": {
+     "pt": "Sobrevivência e estado das áreas restauradas, a partir das visitas de monitoria.",
+     "en": "Survival and status of restored areas, from monitoring visits."
+    },
     "kpis": [
      {
       "id": "k1",
@@ -988,32 +1127,35 @@
       "medida": "razao",
       "campo": "plantas_vivas",
       "subtitulo": {
-       "pt": "Vivas ÷ plantadas, todas as parcelas",
-       "en": "Live ÷ planted, all plots"
+       "pt": "vivas ÷ plantadas, todas as parcelas",
+       "en": "live ÷ planted, all plots"
       },
+      "icone": "muda",
       "campo2": "plantas_plantadas",
       "formato": "pct"
      },
      {
       "id": "k2",
       "titulo": {
-       "pt": "Área em recuperação (ha)",
-       "en": "Recovering area (ha)"
+       "pt": "Área em recuperação",
+       "en": "Recovering area"
       },
       "dataset": "restauracao",
       "tabela": "main",
       "medida": "soma",
       "campo": "_area_ha",
       "subtitulo": {
-       "pt": "Sobrevivência acima do limiar",
-       "en": "Survival above threshold"
+       "pt": "hectares · sobrevivência ≥ limiar",
+       "en": "hectares · survival ≥ threshold"
       },
+      "icone": "folha",
       "filtro": {
        "campo": "_estado_monitoria",
        "valores": [
         "em_recuperacao"
        ]
-      }
+      },
+      "sufixo": "ha"
      },
      {
       "id": "k3",
@@ -1029,6 +1171,7 @@
        "pt": "% da área em restauração",
        "en": "% of restoration area"
       },
+      "icone": "pct",
       "filtro": {
        "campo": "_estado_monitoria",
        "valores": [
@@ -1048,9 +1191,10 @@
       "tabela": "main",
       "medida": "contagem",
       "subtitulo": {
-       "pt": "Pelo menos uma visita",
-       "en": "At least one visit"
+       "pt": "pelo menos uma visita",
+       "en": "at least one visit"
       },
+      "icone": "lista",
       "filtro": {
        "campo": "_estado_monitoria",
        "valores": [
@@ -1069,37 +1213,58 @@
       "tabela": "parcelas",
       "medida": "contagem",
       "subtitulo": {
-       "pt": "Todas as visitas",
-       "en": "All visits"
-      }
+       "pt": "todas as visitas",
+       "en": "all visits"
+      },
+      "icone": "grelha"
      }
     ],
     "graficos": [
      {
       "id": "g1",
       "titulo": {
-       "pt": "Estado da área em restauração por província (ha)",
-       "en": "Restoration area status by province (ha)"
+       "pt": "Sobrevivência global",
+       "en": "Overall survival"
+      },
+      "tipo": "gauge",
+      "dataset": "monitoria",
+      "tabela": "parcelas",
+      "medida": "razao",
+      "largura": "1/3",
+      "campo": "plantas_vivas",
+      "subtitulo": {
+       "pt": "A linha marca o limiar de recuperação",
+       "en": "The mark shows the recovery threshold"
+      },
+      "campo2": "plantas_plantadas",
+      "formato": "pct",
+      "usarLimiar": true
+     },
+     {
+      "id": "g2",
+      "titulo": {
+       "pt": "Estado da área em restauração por província",
+       "en": "Restoration area status by province"
       },
       "tipo": "empilhado",
       "dataset": "restauracao",
       "tabela": "main",
       "medida": "soma",
-      "largura": "1/3",
+      "largura": "2/3",
       "dimensao": "_provincia",
       "campo": "_area_ha",
       "subtitulo": {
-       "pt": "Províncias de norte para sul",
-       "en": "Provinces north to south"
+       "pt": "hectares · Províncias de norte para sul",
+       "en": "hectares · Provinces north to south"
       },
       "serieDimensao": "_estado_monitoria",
       "ordem": "provincias"
      },
      {
-      "id": "g2",
+      "id": "g3",
       "titulo": {
-       "pt": "Sobrevivência por tempo de restauração (%)",
-       "en": "Survival by restoration time (%)"
+       "pt": "Sobrevivência por tempo de restauração",
+       "en": "Survival by restoration time"
       },
       "tipo": "barras",
       "dataset": "monitoria",
@@ -1108,15 +1273,19 @@
       "largura": "1/3",
       "dimensao": "temp_monitoria",
       "campo": "plantas_vivas",
+      "subtitulo": {
+       "pt": "%",
+       "en": "%"
+      },
       "campo2": "plantas_plantadas",
       "formato": "pct",
       "ordem": "lista"
      },
      {
-      "id": "g3",
+      "id": "g4",
       "titulo": {
-       "pt": "Sobrevivência por espécie (%)",
-       "en": "Survival by species (%)"
+       "pt": "Sobrevivência por espécie",
+       "en": "Survival by species"
       },
       "tipo": "barrash",
       "dataset": "monitoria",
@@ -1125,14 +1294,18 @@
       "largura": "1/3",
       "dimensao": "especie_parcela",
       "campo": "plantas_vivas",
+      "subtitulo": {
+       "pt": "%",
+       "en": "%"
+      },
       "campo2": "plantas_plantadas",
       "formato": "pct"
      },
      {
-      "id": "g4",
+      "id": "g5",
       "titulo": {
-       "pt": "Ameaças observadas (% das visitas)",
-       "en": "Threats observed (% of visits)"
+       "pt": "Ameaças observadas",
+       "en": "Threats observed"
       },
       "tipo": "barrash",
       "dataset": "monitoria",
@@ -1141,13 +1314,28 @@
       "largura": "1/3",
       "dimensao": "ameacas_observadas",
       "subtitulo": {
-       "pt": "Cada registo pode ter várias respostas: não soma 100%",
-       "en": "Records can have several answers: does not add up to 100%"
+       "pt": "% das visitas",
+       "en": "% of visits"
       },
       "formato": "pct"
      },
      {
-      "id": "g5",
+      "id": "g6",
+      "titulo": {
+       "pt": "Visitas de monitoria por ano",
+       "en": "Monitoring visits per year"
+      },
+      "tipo": "area",
+      "dataset": "monitoria",
+      "tabela": "main",
+      "medida": "contagem",
+      "largura": "1/2",
+      "dimensao": "_ano",
+      "ordem": "cronologica",
+      "cor": "#1f9e74"
+     },
+     {
+      "id": "g7",
       "titulo": {
        "pt": "Estado das plantas nas parcelas",
        "en": "Plant condition in plots"
@@ -1156,26 +1344,12 @@
       "dataset": "monitoria",
       "tabela": "parcelas",
       "medida": "contagem",
-      "largura": "1/3",
+      "largura": "1/2",
       "dimensao": "estado_plantas",
       "ordem": "lista"
      },
      {
-      "id": "g6",
-      "titulo": {
-       "pt": "Visitas de monitoria por ano",
-       "en": "Monitoring visits per year"
-      },
-      "tipo": "barras",
-      "dataset": "monitoria",
-      "tabela": "main",
-      "medida": "contagem",
-      "largura": "1/3",
-      "dimensao": "_ano",
-      "ordem": "cronologica"
-     },
-     {
-      "id": "g7",
+      "id": "g8",
       "titulo": {
        "pt": "Visitas de monitoria registadas",
        "en": "Recorded monitoring visits"
@@ -1203,6 +1377,11 @@
      "pt": "Viveiros",
      "en": "Nurseries"
     },
+    "icone": "viveiro",
+    "descricao": {
+     "pt": "Capacidade de produção, espécies, desafios e necessidades dos viveiros de mangal.",
+     "en": "Production capacity, species, challenges and needs of mangrove nurseries."
+    },
     "kpis": [
      {
       "id": "k1",
@@ -1214,9 +1393,10 @@
       "tabela": "main",
       "medida": "contagem",
       "subtitulo": {
-       "pt": "Registados e em funcionamento",
-       "en": "Registered and operating"
+       "pt": "registados e em funcionamento",
+       "en": "registered and operating"
       },
+      "icone": "viveiro",
       "filtro": {
        "campo": "_ativo",
        "valores": [
@@ -1235,15 +1415,17 @@
       "medida": "soma",
       "campo": "capacidade_anual",
       "subtitulo": {
-       "pt": "Mudas por ano, viveiros activos",
-       "en": "Seedlings per year, active nurseries"
+       "pt": "mudas por ano, viveiros activos",
+       "en": "seedlings per year, active nurseries"
       },
+      "icone": "muda",
       "filtro": {
        "campo": "_ativo",
        "valores": [
         "sim"
        ]
-      }
+      },
+      "compacto": true
      },
      {
       "id": "k3",
@@ -1256,9 +1438,10 @@
       "medida": "soma",
       "campo": "mudas_disponiveis",
       "subtitulo": {
-       "pt": "No momento do registo",
-       "en": "At time of recording"
-      }
+       "pt": "no momento do registo",
+       "en": "at time of recording"
+      },
+      "icone": "folha"
      },
      {
       "id": "k4",
@@ -1271,24 +1454,26 @@
       "medida": "soma",
       "campo": "mudas_distribuidas",
       "subtitulo": {
-       "pt": "No último ano",
-       "en": "In the last year"
-      }
+       "pt": "no último ano",
+       "en": "in the last year"
+      },
+      "icone": "pessoas"
      },
      {
       "id": "k5",
       "titulo": {
-       "pt": "Custo por muda (MZN)",
-       "en": "Cost per seedling (MZN)"
+       "pt": "Custo por muda",
+       "en": "Cost per seedling"
       },
       "dataset": "viveiros",
       "tabela": "main",
       "medida": "media",
       "campo": "custo_por_muda",
       "subtitulo": {
-       "pt": "Média simples entre viveiros",
-       "en": "Simple average across nurseries"
+       "pt": "MZN · média entre viveiros",
+       "en": "MZN · average across nurseries"
       },
+      "icone": "dinheiro",
       "decimais": 1
      }
     ],
@@ -1303,12 +1488,12 @@
       "dataset": "viveiros",
       "tabela": "registo_especies",
       "medida": "soma",
-      "largura": "1/3",
+      "largura": "1/2",
       "dimensao": "especies_produzidas",
       "campo": "mudas_disponiveis",
       "subtitulo": {
-       "pt": "Declaradas no registo de cada viveiro",
-       "en": "Declared in each nursery record"
+       "pt": "Disponíveis e distribuídas",
+       "en": "Available and distributed"
       },
       "series": [
        {
@@ -1336,8 +1521,27 @@
      {
       "id": "g2",
       "titulo": {
-       "pt": "Desafios (% dos viveiros)",
-       "en": "Challenges (% of nurseries)"
+       "pt": "Capacidade anual por província",
+       "en": "Annual capacity by province"
+      },
+      "tipo": "barras",
+      "dataset": "viveiros",
+      "tabela": "main",
+      "medida": "soma",
+      "largura": "1/2",
+      "dimensao": "_provincia",
+      "campo": "capacidade_anual",
+      "subtitulo": {
+       "pt": "mudas por ano",
+       "en": "seedlings per year"
+      },
+      "ordem": "provincias"
+     },
+     {
+      "id": "g3",
+      "titulo": {
+       "pt": "Desafios",
+       "en": "Challenges"
       },
       "tipo": "barrash",
       "dataset": "viveiros",
@@ -1346,16 +1550,16 @@
       "largura": "1/3",
       "dimensao": "desafios_enfrentados",
       "subtitulo": {
-       "pt": "Cada registo pode ter várias respostas: não soma 100%",
-       "en": "Records can have several answers: does not add up to 100%"
+       "pt": "% dos viveiros · Cada registo pode ter várias respostas: não soma 100%",
+       "en": "% of nurseries · Records can have several answers: does not add up to 100%"
       },
       "formato": "pct"
      },
      {
-      "id": "g3",
+      "id": "g4",
       "titulo": {
-       "pt": "Necessidades (% dos viveiros)",
-       "en": "Needs (% of nurseries)"
+       "pt": "Necessidades",
+       "en": "Needs"
       },
       "tipo": "barrash",
       "dataset": "viveiros",
@@ -1364,24 +1568,10 @@
       "largura": "1/3",
       "dimensao": "necessidades_prioritarias",
       "subtitulo": {
-       "pt": "Cada registo pode ter várias respostas: não soma 100%",
-       "en": "Records can have several answers: does not add up to 100%"
+       "pt": "% dos viveiros · Cada registo pode ter várias respostas: não soma 100%",
+       "en": "% of nurseries · Records can have several answers: does not add up to 100%"
       },
       "formato": "pct"
-     },
-     {
-      "id": "g4",
-      "titulo": {
-       "pt": "Viveiros por província",
-       "en": "Nurseries by province"
-      },
-      "tipo": "barras",
-      "dataset": "viveiros",
-      "tabela": "main",
-      "medida": "contagem",
-      "largura": "1/3",
-      "dimensao": "_provincia",
-      "ordem": "provincias"
      },
      {
       "id": "g5",
@@ -1399,21 +1589,6 @@
      {
       "id": "g6",
       "titulo": {
-       "pt": "Capacidade anual por província",
-       "en": "Annual capacity by province"
-      },
-      "tipo": "barras",
-      "dataset": "viveiros",
-      "tabela": "main",
-      "medida": "soma",
-      "largura": "1/3",
-      "dimensao": "_provincia",
-      "campo": "capacidade_anual",
-      "ordem": "provincias"
-     },
-     {
-      "id": "g7",
-      "titulo": {
        "pt": "Viveiros registados",
        "en": "Registered nurseries"
       },
@@ -1423,8 +1598,8 @@
       "medida": "contagem",
       "largura": "1",
       "subtitulo": {
-       "pt": "Sem dados pessoais: nomes e contactos dos responsáveis não são publicados",
-       "en": "No personal data: names and contacts of managers are not published"
+       "pt": "Sem dados pessoais dos responsáveis",
+       "en": "No personal data of managers"
       },
       "colunas": [
        "_rotulo",
@@ -1445,6 +1620,11 @@
      "pt": "Levantamento ecológico",
      "en": "Ecological survey"
     },
+    "icone": "arvore",
+    "descricao": {
+     "pt": "Estrutura da floresta de mangal medida em quadrículas: espécies, densidade, área basal e regeneração.",
+     "en": "Mangrove forest structure measured in plots: species, density, basal area and regeneration."
+    },
     "kpis": [
      {
       "id": "k1",
@@ -1456,9 +1636,10 @@
       "tabela": "registro_plot",
       "medida": "contagem",
       "subtitulo": {
-       "pt": "Quadrículas de 10 × 10 m",
-       "en": "10 × 10 m plots"
-      }
+       "pt": "10 × 10 m",
+       "en": "10 × 10 m"
+      },
+      "icone": "grelha"
      },
      {
       "id": "k2",
@@ -1470,40 +1651,45 @@
       "tabela": "Medicoes",
       "medida": "contagem",
       "subtitulo": {
-       "pt": "Inclui cepos e árvores mortas",
-       "en": "Includes stumps and dead trees"
-      }
+       "pt": "inclui cepos e mortas",
+       "en": "includes stumps and dead"
+      },
+      "icone": "arvore"
      },
      {
       "id": "k3",
       "titulo": {
-       "pt": "Densidade (árv./ha)",
-       "en": "Density (trees/ha)"
+       "pt": "Densidade",
+       "en": "Density"
       },
       "dataset": "levantamento",
       "tabela": "main",
       "medida": "especial",
       "subtitulo": {
-       "pt": "Árvores vivas por hectare",
-       "en": "Live trees per hectare"
+       "pt": "árvores vivas por hectare",
+       "en": "live trees per hectare"
       },
-      "especial": "lev_densidade"
+      "icone": "grelha",
+      "especial": "lev_densidade",
+      "sufixo": "/ha"
      },
      {
       "id": "k4",
       "titulo": {
-       "pt": "Área basal (m²/ha)",
-       "en": "Basal area (m²/ha)"
+       "pt": "Área basal",
+       "en": "Basal area"
       },
       "dataset": "levantamento",
       "tabela": "main",
       "medida": "especial",
       "subtitulo": {
-       "pt": "Árvores vivas",
-       "en": "Live trees"
+       "pt": "m² por hectare, árvores vivas",
+       "en": "m² per hectare, live trees"
       },
+      "icone": "pct",
       "especial": "lev_area_basal",
-      "decimais": 1
+      "decimais": 1,
+      "sufixo": "m²/ha"
      },
      {
       "id": "k5",
@@ -1515,9 +1701,10 @@
       "tabela": "Medicoes",
       "medida": "percentagem",
       "subtitulo": {
-       "pt": "Parcial, severa ou cepo",
-       "en": "Partial, severe or stump"
+       "pt": "parcial, severa ou cepo",
+       "en": "partial, severe or stump"
       },
+      "icone": "alerta",
       "filtro": {
        "campo": "condicao",
        "valores": [
@@ -1533,17 +1720,21 @@
      {
       "id": "g1",
       "titulo": {
-       "pt": "Composição de espécies (% das árvores)",
-       "en": "Species composition (% of trees)"
+       "pt": "Composição de espécies",
+       "en": "Species composition"
       },
-      "tipo": "barrash",
+      "tipo": "treemap",
       "dataset": "levantamento",
       "tabela": "Medicoes",
       "medida": "contagem",
-      "largura": "1/3",
+      "largura": "1/2",
       "dimensao": "MALGAL_1",
-      "formato": "pct",
-      "comoPercentagem": true
+      "subtitulo": {
+       "pt": "% das árvores medidas",
+       "en": "% of measured trees"
+      },
+      "comoPercentagem": true,
+      "formato": "pct"
      },
      {
       "id": "g2",
@@ -1551,19 +1742,19 @@
        "pt": "Condição das árvores",
        "en": "Tree condition"
       },
-      "tipo": "barrash",
+      "tipo": "pizza",
       "dataset": "levantamento",
       "tabela": "Medicoes",
       "medida": "contagem",
-      "largura": "1/3",
+      "largura": "1/2",
       "dimensao": "condicao",
       "ordem": "lista"
      },
      {
       "id": "g3",
       "titulo": {
-       "pt": "Regeneração natural (indivíduos)",
-       "en": "Natural regeneration (individuals)"
+       "pt": "Regeneração natural",
+       "en": "Natural regeneration"
       },
       "tipo": "empilhado",
       "dataset": "levantamento",
@@ -1572,40 +1763,17 @@
       "largura": "1/3",
       "dimensao": "MALGAL_2",
       "campo": "individuos",
+      "subtitulo": {
+       "pt": "indivíduos por classe de altura",
+       "en": "individuals by height class"
+      },
       "serieDimensao": "regeneracao"
      },
      {
       "id": "g4",
       "titulo": {
-       "pt": "Tipo de floresta (quadrículas)",
-       "en": "Forest type (plots)"
-      },
-      "tipo": "pizza",
-      "dataset": "levantamento",
-      "tabela": "registro_plot",
-      "medida": "contagem",
-      "largura": "1/3",
-      "dimensao": "floresta"
-     },
-     {
-      "id": "g5",
-      "titulo": {
-       "pt": "Cobertura do dossel (quadrículas)",
-       "en": "Canopy cover (plots)"
-      },
-      "tipo": "barras",
-      "dataset": "levantamento",
-      "tabela": "registro_plot",
-      "medida": "contagem",
-      "largura": "1/3",
-      "dimensao": "cobertura",
-      "ordem": "lista"
-     },
-     {
-      "id": "g6",
-      "titulo": {
-       "pt": "Altura média por espécie (m)",
-       "en": "Mean height by species (m)"
+       "pt": "Altura média por espécie",
+       "en": "Mean height by species"
       },
       "tipo": "barrash",
       "dataset": "levantamento",
@@ -1614,10 +1782,31 @@
       "largura": "1/3",
       "dimensao": "MALGAL_1",
       "campo": "altura",
+      "subtitulo": {
+       "pt": "metros",
+       "en": "metres"
+      },
       "decimais": 1
      },
      {
-      "id": "g7",
+      "id": "g5",
+      "titulo": {
+       "pt": "Tipo de floresta",
+       "en": "Forest type"
+      },
+      "tipo": "pizza",
+      "dataset": "levantamento",
+      "tabela": "registro_plot",
+      "medida": "contagem",
+      "largura": "1/3",
+      "dimensao": "floresta",
+      "campo": [
+       "quadrículas",
+       "plots"
+      ]
+     },
+     {
+      "id": "g6",
       "titulo": {
        "pt": "Quadrículas levantadas",
        "en": "Surveyed plots"
@@ -1650,6 +1839,11 @@
      "pt": "Ervas marinhas",
      "en": "Seagrass"
     },
+    "icone": "onda",
+    "descricao": {
+     "pt": "Tapetes de ervas marinhas: espécies, cobertura, ameaças, fauna e gestão.",
+     "en": "Seagrass meadows: species, cover, threats, fauna and management."
+    },
     "kpis": [
      {
       "id": "k1",
@@ -1661,24 +1855,27 @@
       "tabela": "main",
       "medida": "contagem",
       "subtitulo": {
-       "pt": "Registo de ervas marinhas",
-       "en": "Seagrass records"
-      }
+       "pt": "registos",
+       "en": "records"
+      },
+      "icone": "onda"
      },
      {
       "id": "k2",
       "titulo": {
-       "pt": "Área dos tapetes (ha)",
-       "en": "Meadow area (ha)"
+       "pt": "Área dos tapetes",
+       "en": "Meadow area"
       },
       "dataset": "ervas",
       "tabela": "main",
       "medida": "soma",
       "campo": "_area_ha",
       "subtitulo": {
-       "pt": "Polígonos registados",
-       "en": "Recorded polygons"
-      }
+       "pt": "hectares",
+       "en": "hectares"
+      },
+      "icone": "mapa",
+      "sufixo": "ha"
      },
      {
       "id": "k3",
@@ -1691,9 +1888,10 @@
       "medida": "distintos",
       "campo": "registro_especies",
       "subtitulo": {
-       "pt": "Espécies diferentes",
-       "en": "Distinct species"
-      }
+       "pt": "espécies diferentes",
+       "en": "distinct species"
+      },
+      "icone": "folha"
      },
      {
       "id": "k4",
@@ -1705,9 +1903,10 @@
       "tabela": "main",
       "medida": "percentagem",
       "subtitulo": {
-       "pt": "Regular ou ocasional",
-       "en": "Regular or occasional"
+       "pt": "regular ou ocasional",
+       "en": "regular or occasional"
       },
+      "icone": "pessoas",
       "filtro": {
        "campo": "fiscalizacao",
        "valores": [
@@ -1731,6 +1930,7 @@
        "pt": "% do fundo coberto",
        "en": "% of seabed covered"
       },
+      "icone": "pct",
       "formato": "pct"
      }
     ],
@@ -1738,8 +1938,43 @@
      {
       "id": "g1",
       "titulo": {
-       "pt": "Espécies presentes (% dos tapetes)",
-       "en": "Species present (% of meadows)"
+       "pt": "Mapa dos tapetes",
+       "en": "Meadow map"
+      },
+      "tipo": "mapa",
+      "dataset": "ervas",
+      "tabela": "main",
+      "medida": "contagem",
+      "largura": "2/3",
+      "altura": 420,
+      "camadas": [
+       "ervas"
+      ]
+     },
+     {
+      "id": "g2",
+      "titulo": {
+       "pt": "Cobertura média",
+       "en": "Mean cover"
+      },
+      "tipo": "gauge",
+      "dataset": "ervas",
+      "tabela": "main",
+      "medida": "media",
+      "largura": "1/3",
+      "campo": "cobertura_total",
+      "subtitulo": {
+       "pt": "% do fundo coberto por ervas marinhas",
+       "en": "% of seabed covered by seagrass"
+      },
+      "formato": "pct",
+      "cor": "#13a3b8"
+     },
+     {
+      "id": "g3",
+      "titulo": {
+       "pt": "Espécies presentes",
+       "en": "Species present"
       },
       "tipo": "barrash",
       "dataset": "ervas",
@@ -1748,16 +1983,16 @@
       "largura": "1/3",
       "dimensao": "registro_especies",
       "subtitulo": {
-       "pt": "Cada registo pode ter várias respostas: não soma 100%",
-       "en": "Records can have several answers: does not add up to 100%"
+       "pt": "% dos tapetes",
+       "en": "% of meadows"
       },
       "formato": "pct"
      },
      {
-      "id": "g2",
+      "id": "g4",
       "titulo": {
-       "pt": "Ameaças (% dos tapetes)",
-       "en": "Threats (% of meadows)"
+       "pt": "Ameaças",
+       "en": "Threats"
       },
       "tipo": "barrash",
       "dataset": "ervas",
@@ -1766,16 +2001,16 @@
       "largura": "1/3",
       "dimensao": "ameacas",
       "subtitulo": {
-       "pt": "Cada registo pode ter várias respostas: não soma 100%",
-       "en": "Records can have several answers: does not add up to 100%"
+       "pt": "% dos tapetes",
+       "en": "% of meadows"
       },
       "formato": "pct"
      },
      {
-      "id": "g3",
+      "id": "g5",
       "titulo": {
-       "pt": "Fauna observada (% dos tapetes)",
-       "en": "Fauna observed (% of meadows)"
+       "pt": "Fauna observada",
+       "en": "Fauna observed"
       },
       "tipo": "barrash",
       "dataset": "ervas",
@@ -1784,13 +2019,13 @@
       "largura": "1/3",
       "dimensao": "fauna_presente",
       "subtitulo": {
-       "pt": "Cada registo pode ter várias respostas: não soma 100%",
-       "en": "Records can have several answers: does not add up to 100%"
+       "pt": "% dos tapetes",
+       "en": "% of meadows"
       },
       "formato": "pct"
      },
      {
-      "id": "g4",
+      "id": "g6",
       "titulo": {
        "pt": "Dominância por espécie",
        "en": "Dominance by species"
@@ -1801,10 +2036,14 @@
       "medida": "contagem",
       "largura": "1/2",
       "dimensao": "especie_codigo",
+      "subtitulo": {
+       "pt": "nº de tapetes por classe de dominância",
+       "en": "number of meadows by dominance class"
+      },
       "serieDimensao": "escala_dominancia"
      },
      {
-      "id": "g5",
+      "id": "g7",
       "titulo": {
        "pt": "Tapetes por província",
        "en": "Meadows by province"
@@ -1816,21 +2055,6 @@
       "largura": "1/2",
       "dimensao": "_provincia",
       "ordem": "provincias"
-     },
-     {
-      "id": "g6",
-      "titulo": {
-       "pt": "Mapa dos tapetes",
-       "en": "Meadow map"
-      },
-      "tipo": "mapa",
-      "dataset": "ervas",
-      "tabela": "main",
-      "medida": "contagem",
-      "largura": "1",
-      "camadas": [
-       "ervas"
-      ]
      }
     ]
    },
@@ -1870,8 +2094,16 @@
        "en": "**Sources.** Figures come from the Survey123 forms: Degraded Areas, Restoration Areas, Monitoring, Nurseries, Ecological Survey and Seagrass.\n\n**Degraded / restoration area.** Computed from the polygon drawn in the form. Area under restoration does not mean recovered area.\n\n**Survival.** Live plants ÷ planted in the monitoring plots.\n\n**Recovering.** Restoration area whose latest monitoring shows survival at or above the threshold set in Management (default 50%).\n\n**Causes, signs and challenges.** Multiple-choice questions: values are % of records and do not add up to 100%.\n\n**Filters.** Year uses the recording date (degradation), project start (restoration), visit date (monitoring), establishment year (nurseries), plot date (survey) and observation date (seagrass). Clicking a bar or slice filters the other charts; click again to remove."
       }
      }
-    ]
+    ],
+    "icone": "lista",
+    "descricao": {
+     "pt": "Cobertura dos registos por província e notas sobre como os indicadores são calculados.",
+     "en": "Record coverage by province and notes on how indicators are computed."
+    }
    }
   ]
+ },
+ "tecnica": {
+  "paineis": []
  }
 }

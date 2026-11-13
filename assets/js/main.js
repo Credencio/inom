@@ -59,6 +59,15 @@ export function renderShell() {
     h("div", { class: "rodape-txt" }, tr(p.rodape, S.lang), p.contacto ? h("span", {}, " · ", h("a", { href: "mailto:" + p.contacto }, p.contacto)) : null));
   const demo = Object.values(S.data).some(d => d.estado === "demo");
   $("#aviso").innerHTML = demo ? `<div class="banner">${esc(t("demo_banner"))}</div>` : "";
+  let barra = $("#barra-preview");
+  if (S.preview && S.gestaoSujo && !(location.hash || "").startsWith("#/gestao")) {
+    const L = (pt, en) => (S.lang === "en" ? en : pt);
+    if (!barra) { barra = h("div", { id: "barra-preview" }); document.body.append(barra); }
+    barra.innerHTML = "";
+    barra.append(h("span", {}, "👁 " + L("Pré-visualização: as alterações ainda não estão públicas.", "Preview: changes are not public yet.")),
+      h("a", { class: "btn claro", href: "#/gestao" }, L("Voltar à gestão", "Back to management")),
+      h("button", { class: "btn destaque", onclick: async () => { const m = await import("./gestao.js"); await m.publicarAlteracoes(); renderShell(); } }, L("Publicar alterações", "Publish changes")));
+  } else if (barra) barra.remove();
 }
 
 function mudarLingua(l) { S.lang = l; localStorage.setItem("lang", l); renderShell(); route(); }
@@ -68,6 +77,7 @@ export async function route() {
   const hash = location.hash || "#/sobre";
   const [, sec, sub] = hash.split("/");
   const app = $("#app");
+  document.body.classList.toggle("modo-gestao", sec === "gestao");
   renderShell();
   window.scrollTo(0, 0);
   if (sec === "dashboard") {

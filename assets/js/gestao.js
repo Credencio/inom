@@ -3,6 +3,7 @@ import { S, DATASETS, lerArcGIS, rotuloCampo } from "./data.js";
 import { UI, VIRTUAIS_CAMPOS } from "./i18n.js";
 import { $, h, tr, clone, toast, b64utf8, fileToB64, slug, download, esc } from "./util.js";
 import { renderShell, repoPadrao, recarregarDados, modal } from "./main.js";
+export { guardar as publicarAlteracoes };
 
 const t = k => UI[S.lang][k] || k;
 const L = (pt, en) => (S.lang === "en" ? en : pt);
@@ -11,8 +12,12 @@ let W = null, sujo = false, seccao = "geral", paginaSel = 0;
 /* ---------------- GitHub ---------------- */
 async function gh(caminho, opts = {}) {
   const a = S.auth;
-  const r = await fetch(`https://api.github.com/repos/${a.owner}/${a.repo}/${caminho}`, {
-    ...opts, headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${a.token}`, "X-GitHub-Api-Version": "2022-11-28", ...(opts.headers || {}) } });
+  const base = `https://api.github.com/repos/${encodeURIComponent(a.owner)}/${encodeURIComponent(a.repo)}`;
+  let r;
+  try {
+    r = await fetch(caminho ? `${base}/${caminho}` : base, { ...opts, headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${a.token}`, ...(opts.headers || {}) } });
+  } catch (e) { throw new Error(L("Não foi possível contactar o GitHub. Verifique a ligação à internet e se algum bloqueador de anúncios ou firewall impede o acesso a api.github.com.", "Could not reach GitHub. Check the internet connection and whether an ad blocker or firewall blocks api.github.com.")); }
+  if (r.status === 401) throw new Error(L("Token inválido ou expirado.", "Invalid or expired token."));
   if (!r.ok && r.status !== 404) { let m = "HTTP " + r.status; try { m = (await r.json()).message || m; } catch { /* */ } throw new Error(m); }
   return r.status === 404 ? null : r.json();
 }
@@ -27,7 +32,8 @@ async function entrar(owner, repo, branch, token) {
   S.auth = { owner, repo, branch, token };
   try {
     const info = await gh("");
-    if (!info || !info.permissions || !(info.permissions.push || info.permissions.admin)) throw new Error(t("login_erro"));
+    if (!info) throw new Error(L("Repositório não encontrado. Confirme a conta e o nome do repositório (o token tem de ter acesso a ele).", "Repository not found. Check the account and repository name (the token must have access to it)."));
+    if (!info.permissions || !(info.permissions.push || info.permissions.admin)) throw new Error(t("login_erro"));
     try { const u = await fetch("https://api.github.com/user", { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json()); S.auth.login = u.login || ""; } catch { /* opcional */ }
     sessionStorage.setItem("gh_auth", JSON.stringify(S.auth));
     return true;
@@ -35,7 +41,12 @@ async function entrar(owner, repo, branch, token) {
 }
 
 /* ---------------- Componentes de formulário ---------------- */
-function marcar() { sujo = true; S.cfg = W; const b = $("#btn-guardar"); if (b) b.classList.add("pulsar"); }
+function marcar() {
+  if (!W || !S.auth) return;
+  sujo = true; S.gestaoSujo = true; S.cfg = W;
+  const b = $("#btn-guardar"); if (b) b.classList.add("pulsar");
+  const c = $(".adm-cab .linha"); if (c && !$(".adm-pend")) c.prepend(h("span", { class: "adm-pend" }, "● " + L("Alterações por publicar", "Unpublished changes")));
+}
 function campo(label, obj, chave, opts = {}) {
   const tipo = opts.tipo || "text";
   const inp = opts.area ? h("textarea", { rows: opts.rows || 3 }, obj[chave] ?? "") : h("input", { type: tipo, value: obj[chave] ?? "", step: opts.step });
@@ -133,42 +144,113 @@ function datasCampos(ds) {
 }
 
 /* ---------------- Ecrãs ---------------- */
-export function renderGestao(app) {
+const MENU = () => [
+  ["resumo", L("Resumo", "Overview"), "mapa"], ["geral", L("Geral e logótipos", "General and logos"), "folha"], ["sobre", t("nav_sobre"), "lista"],
+  ["documentos", t("nav_documentos"), "lista", () => (W.documentos || []).length], ["fichas", t("nav_fichas"), "muda", () => (W.fichas || []).length],
+  ["fontes", L("Fontes de dados", "Data sources"), "grelha", () => `${DATASETS.filter(d => W.fontes.datasets[d] && W.fontes.datasets[d].url).length}/${DATASETS.length}`],
+  ["dashboard", t("nav_dashboard"), "pct", () => (W.dashboard.paginas || []).length], ["tecnica", t("nav_tecnica"), "arvore", () => ((W.tecnica || {}).paineis || []).length],
+  ["validacao", t("tec_validacao"), "alerta"], ["acesso", L("Privacidade e acesso", "Privacy and access"), "pessoas"], ["backup", L("Cópia de segurança", "Backup"), "dinheiro"]
+];
+const TITULOS = () => ({ resumo: [L("Bem-vindo à gestão do portal", "Welcome to portal management"), L("Escolha o que quer alterar. Nada fica público até carregar em “Publicar alterações”.", "Choose what to change. Nothing goes public until you click “Publish changes”.")],
+  publicar: [L("Publicar", "Publish"), L("Torne públicas as alterações feitas nesta sessão.", "Make the changes from this session public.")],
+  github: [L("Ligação GitHub", "GitHub connection"), L("Repositório onde o portal está guardado.", "Repository where the portal is stored.")] });
+
+let iconeFn = null;
+function ic(nome) { return iconeFn ? iconeFn(nome, "ic") : h("span"); }
+
+export async function renderGestao(app) {
+  if (!iconeFn) { try { iconeFn = (await import("./dash.js")).icone; } catch { /* sem ícones */ } }
   app.innerHTML = "";
+  document.body.classList.add("modo-gestao");
   if (!S.auth) return renderLogin(app);
   if (!W) W = S.cfg;
-  const seccoes = [["geral", L("Geral e logótipos", "General and logos")], ["sobre", t("nav_sobre")], ["documentos", t("nav_documentos")], ["fichas", t("nav_fichas")],
-    ["fontes", L("Fontes de dados", "Data sources")], ["dashboard", t("nav_dashboard")], ["tecnica", t("nav_tecnica")], ["validacao", t("tec_validacao")], ["acesso", L("Privacidade e acesso", "Privacy and access")], ["backup", L("Cópia de segurança", "Backup")]];
-  const conteudo = h("div", { class: "ges-conteudo" });
-  app.append(h("div", { class: "pagina larga gestao" },
-    h("div", { class: "ges-topo" },
-      h("div", {}, h("h2", {}, t("nav_gestao")), h("small", {}, `${S.auth.login ? "@" + S.auth.login + " · " : ""}${S.auth.owner}/${S.auth.repo} (${S.auth.branch})`)),
-      h("div", { class: "linha" },
-        h("button", { class: "btn", onclick: descartar }, L("Descartar alterações", "Discard changes")),
-        h("button", { id: "btn-guardar", class: "btn primary" + (sujo ? " pulsar" : ""), onclick: guardar }, "💾 " + L("Guardar e publicar", "Save and publish")),
-        h("button", { class: "btn link", onclick: sair }, t("login_sair")))),
-    h("p", { class: "nota" }, L("As alterações aparecem logo neste navegador. Para ficarem visíveis para todos, clique em “Guardar e publicar”; o site actualiza em 1 a 2 minutos.",
-      "Changes show immediately in this browser. To make them visible to everyone, click “Save and publish”; the site updates in 1 to 2 minutes.")),
-    h("div", { class: "ges" },
-      h("nav", { class: "ges-menu" }, seccoes.map(([k, l]) => h("a", { class: seccao === k ? "active" : "", onclick: () => { seccao = k; renderGestao(app); } }, l))),
+  S.gestaoSujo = sujo;
+  const menu = MENU();
+  const tit = TITULOS()[seccao] || [ (menu.find(m => m[0] === seccao) || [, ""])[1], "" ];
+  const conteudo = h("div", { class: "adm-conteudo" });
+  const item = (k, label, icn, cont) => h("a", { class: "adm-item" + (seccao === k ? " active" : ""), onclick: () => { seccao = k; renderGestao(app); } },
+    ic(icn), h("span", {}, label), cont !== undefined && cont !== null ? h("b", { class: "adm-cont" }, String(cont)) : null);
+  app.append(h("div", { class: "adm" },
+    h("aside", { class: "adm-lado" },
+      h("div", { class: "adm-marca" }, h("img", { src: W.portal.logoInom, alt: "InOM" }), h("span", {}, L("GESTÃO DO PORTAL", "PORTAL MANAGEMENT"))),
+      h("nav", { class: "adm-menu" }, menu.map(([k, l, icn, c]) => item(k, l, icn, c ? c() : null)),
+        h("hr"), item("publicar", L("Publicar", "Publish"), "folha", sujo ? "•" : null), item("github", L("Ligação GitHub", "GitHub connection"), "pessoas")),
+      h("div", { class: "adm-rodape" },
+        h("div", { class: "adm-estado" }, L("Ligado a ", "Connected to "), h("strong", {}, `${S.auth.owner}/${S.auth.repo}`), ` (${S.auth.branch})`),
+        h("a", { href: "#/sobre", class: "adm-site", onclick: () => document.body.classList.remove("modo-gestao") }, L("Abrir o site ↗", "Open the site ↗")))),
+    h("section", { class: "adm-main" },
+      h("header", { class: "adm-cab" },
+        h("div", {}, h("h1", {}, tit[0]), tit[1] ? h("p", {}, tit[1]) : null),
+        h("div", { class: "linha" },
+          sujo ? h("span", { class: "adm-pend" }, "● " + L("Alterações por publicar", "Unpublished changes")) : null,
+          h("button", { class: "btn adm-btn", onclick: preVisualizar }, L("Pré-visualizar", "Preview")),
+          h("button", { id: "btn-guardar", class: "btn adm-pub" + (sujo ? " pulsar" : ""), onclick: guardar }, L("Publicar alterações", "Publish changes")))),
       conteudo)));
-  ({ geral: secGeral, sobre: secSobre, documentos: secDocumentos, fichas: secFichas, fontes: secFontes, dashboard: secDashboard, tecnica: secTecnica, validacao: secValidacao, acesso: secAcesso, backup: secBackup }[seccao])(conteudo);
+  const secs = { resumo: secResumo, publicar: secPublicar, github: secGithub, geral: secGeral, sobre: secSobre, documentos: secDocumentos, fichas: secFichas, fontes: secFontes, dashboard: secDashboard, tecnica: secTecnica, validacao: secValidacao, acesso: secAcesso, backup: secBackup };
+  (secs[seccao] || secResumo)(conteudo);
+}
+
+function preVisualizar() { S.preview = true; S.cfg = W; document.body.classList.remove("modo-gestao"); location.hash = "#/sobre"; }
+
+function secResumo(el) {
+  const fontes = DATASETS.filter(d => W.fontes.datasets[d] && W.fontes.datasets[d].url).length;
+  const cartoes = [[(W.dashboard.paginas || []).length, L("páginas do dashboard", "dashboard pages"), "dashboard"], [(W.documentos || []).length, L("documentos", "documents"), "documentos"],
+    [(W.fichas || []).length, L("fichas de campo", "field forms"), "fichas"], [`${fontes}/${DATASETS.length}`, L("fontes de dados ligadas", "data sources connected"), "fontes"]];
+  el.append(h("div", { class: "adm-cartoes" }, cartoes.map(([n, l, k]) => h("a", { class: "adm-cartao", onclick: () => { seccao = k; renderGestao($("#app")); } }, h("strong", {}, String(n)), h("span", {}, l)))));
+  const passos = [L("Faça as alterações nas secções do menu à esquerda: textos (em português e inglês), logótipos, documentos, fichas, fontes de dados e gráficos.", "Make changes in the sections of the left menu: texts (Portuguese and English), logos, documents, forms, data sources and charts."),
+    L("Use “Pré-visualizar” para ver o portal com as alterações antes de as tornar públicas.", "Use “Preview” to see the portal with your changes before making them public."),
+    L("Carregue em “Publicar alterações”. O site é actualizado em 1 a 2 minutos.", "Click “Publish changes”. The site updates in 1 to 2 minutes."),
+    L(`Está ligado ao GitHub (${S.auth.owner}/${S.auth.repo}). Pode publicar.`, `Connected to GitHub (${S.auth.owner}/${S.auth.repo}). You can publish.`)];
+  el.append(h("div", { class: "adm-caixa" }, h("h3", {}, L("Como funciona", "How it works")), h("ol", { class: "adm-passos" }, passos.map(p => h("li", {}, p)))));
+  if (fontes < DATASETS.length && W.fontes.modoDemo) el.append(h("div", { class: "adm-caixa aviso" }, h("strong", {}, L("Dados de demonstração activos. ", "Demo data active. ")),
+    L("Ligue os Feature Services em ", "Connect the Feature Services in "), h("a", { onclick: () => { seccao = "fontes"; renderGestao($("#app")); } }, L("Fontes de dados", "Data sources")), "."));
+}
+
+function secPublicar(el) {
+  el.append(h("div", { class: "adm-caixa" },
+    h("h3", {}, sujo ? L("Há alterações por publicar", "There are unpublished changes") : L("Tudo publicado", "Everything is published")),
+    h("p", {}, sujo ? L("As alterações só estão neste navegador. Publique para as tornar visíveis a todos.", "Changes are only in this browser. Publish to make them visible to everyone.") : L("Não há alterações pendentes nesta sessão.", "No pending changes in this session.")),
+    h("div", { class: "linha" }, h("button", { class: "btn adm-pub", disabled: !sujo, onclick: guardar }, L("Publicar alterações", "Publish changes")),
+      h("button", { class: "btn", disabled: !sujo, onclick: descartar }, L("Descartar alterações", "Discard changes")))));
+  const hist = h("div", { class: "adm-caixa" }, h("h3", {}, L("Últimas publicações", "Latest publications")), h("p", { class: "nota" }, t("carregando")));
+  el.append(hist);
+  gh(`commits?path=config/portal.json&sha=${encodeURIComponent(S.auth.branch)}&per_page=10`).then(cs => {
+    hist.lastChild.remove();
+    hist.append(h("table", { class: "tabela" }, h("tbody", {}, (cs || []).map(c => h("tr", {}, h("td", {}, new Date(c.commit.author.date).toLocaleString(S.lang === "en" ? "en-GB" : "pt-PT")),
+      h("td", {}, c.commit.author.name), h("td", {}, c.commit.message.split("\n")[0]), h("td", {}, h("a", { href: c.html_url, target: "_blank", rel: "noopener" }, c.sha.slice(0, 7))))))),
+      h("p", { class: "nota" }, L("Para reverter uma publicação, abra-a no GitHub e use “Revert”, ou reponha uma cópia em Cópia de segurança.", "To undo a publication, open it on GitHub and use “Revert”, or restore a copy in Backup.")));
+  }).catch(e => { hist.lastChild.textContent = e.message; });
+}
+
+function secGithub(el) {
+  const a = S.auth;
+  el.append(h("div", { class: "adm-caixa" },
+    h("table", { class: "tabela mini" }, h("tbody", {},
+      [[L("Conta", "Account"), a.login ? "@" + a.login : "—"], [L("Repositório", "Repository"), `${a.owner}/${a.repo}`], [L("Ramo", "Branch"), a.branch]].map(([k, v]) => h("tr", {}, h("td", {}, k), h("td", {}, h("strong", {}, v)))))),
+    h("div", { class: "linha", style: "margin-top:.8rem" },
+      h("a", { class: "btn", href: `https://github.com/${a.owner}/${a.repo}`, target: "_blank", rel: "noopener" }, L("Abrir o repositório ↗", "Open the repository ↗")),
+      h("button", { class: "btn perigo", onclick: sair }, t("login_sair"))),
+    h("p", { class: "nota" }, L("O token fica só neste separador do navegador e é apagado quando o fecha. Quando expirar, crie um novo no GitHub.", "The token stays only in this browser tab and is removed when you close it. When it expires, create a new one on GitHub."))));
 }
 
 function renderLogin(app) {
   const def = repoPadrao();
   const st = { owner: def.owner, repo: def.repo, branch: def.branch, token: "" };
   const erro = h("p", { class: "erro-txt" });
-  app.append(h("div", { class: "pagina estreita" }, h("h2", {}, t("login_titulo")), h("p", {}, t("login_intro")),
-    campo(t("login_owner"), st, "owner"), campo(t("login_repo"), st, "repo"), campo(t("login_branch"), st, "branch"),
+  const btn = h("button", { class: "btn adm-pub largo", onclick: async () => {
+    erro.textContent = ""; btn.disabled = true; btn.textContent = L("A verificar…", "Checking…");
+    try { await entrar(st.owner.trim(), st.repo.trim(), st.branch.trim() || "main", st.token.replace(/\s+/g, "")); seccao = "resumo"; renderGestao(app); }
+    catch (err) { erro.textContent = err.message || t("login_erro"); }
+    finally { btn.disabled = false; btn.textContent = t("login_entrar"); }
+  } }, t("login_entrar"));
+  app.append(h("div", { class: "adm-login" }, h("div", { class: "adm-login-caixa" },
+    h("div", { class: "adm-marca" }, h("img", { src: S.cfg.portal.logoInom, alt: "InOM" }), h("span", {}, L("GESTÃO DO PORTAL", "PORTAL MANAGEMENT"))),
+    h("h1", {}, t("login_titulo")), h("p", {}, t("login_intro")),
+    h("div", { class: "duas" }, campo(t("login_owner"), st, "owner"), campo(t("login_repo"), st, "repo")),
+    campo(t("login_branch"), st, "branch"),
     campo(t("login_token"), st, "token", { tipo: "password" }),
-    h("p", { class: "nota" }, t("login_ajuda")), erro,
-    h("button", { class: "btn primary", onclick: async e => {
-      erro.textContent = ""; e.target.disabled = true;
-      try { await entrar(st.owner.trim(), st.repo.trim(), st.branch.trim() || "main", st.token.trim()); renderGestao(app); }
-      catch (err) { erro.textContent = err.message || t("login_erro"); }
-      finally { e.target.disabled = false; }
-    } }, t("login_entrar"))));
+    h("p", { class: "nota" }, t("login_ajuda")), erro, btn,
+    h("a", { class: "adm-site", href: "#/sobre", onclick: () => document.body.classList.remove("modo-gestao") }, "← " + L("Voltar ao portal", "Back to the portal")))));
   sujo = false;
 }
 
@@ -176,13 +258,13 @@ async function guardar() {
   try {
     W.versao = (W.versao || 1);
     await gravarFicheiro("config/portal.json", b64utf8(JSON.stringify(W, null, 1)), `Portal: actualização da configuração (${new Date().toISOString().slice(0, 16)})`);
-    sujo = false; $("#btn-guardar") && $("#btn-guardar").classList.remove("pulsar");
+    sujo = false; S.gestaoSujo = false; S.preview = false; if (location.hash.startsWith("#/gestao")) renderGestao($("#app"));
     toast(L("Guardado no GitHub. O site público actualiza em 1 a 2 minutos.", "Saved to GitHub. The public site updates in 1 to 2 minutes."), "ok", 6000);
   } catch (e) { toast(L("Erro ao guardar: ", "Save error: ") + e.message, "erro", 10000); }
 }
 async function descartar() {
   if (!confirm(L("Descartar todas as alterações não guardadas?", "Discard all unsaved changes?"))) return;
-  const r = await fetch("config/portal.json?v=" + Date.now()); W = await r.json(); S.cfg = W; sujo = false; renderShell(); renderGestao($("#app"));
+  const r = await fetch("config/portal.json?v=" + Date.now()); W = await r.json(); S.cfg = W; sujo = false; S.gestaoSujo = false; S.preview = false; renderShell(); renderGestao($("#app"));
 }
 function sair() { if (sujo && !confirm(L("Há alterações não guardadas. Sair mesmo assim?", "There are unsaved changes. Sign out anyway?"))) return; S.auth = null; sessionStorage.removeItem("gh_auth"); W = null; sujo = false; renderGestao($("#app")); }
 window.addEventListener("beforeunload", e => { if (sujo) { e.preventDefault(); e.returnValue = ""; } });

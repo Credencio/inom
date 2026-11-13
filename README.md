@@ -21,6 +21,15 @@ Site estático (HTML + JavaScript, sem servidor) para publicar no **GitHub Pages
 
 Enquanto as fontes não estiverem configuradas, o portal mostra **dados de demonstração** (fictícios), com um aviso no topo.
 
+## Abrir no computador (para testar antes de publicar)
+
+Abrir o `index.html` com duplo clique **não funciona**: o navegador bloqueia a leitura dos ficheiros de configuração quando a página é aberta como ficheiro (`file://`). Use um servidor local:
+
+- **Com Python** (Windows, Mac ou Linux): abra uma janela de comandos na pasta do portal e escreva `python -m http.server 8000`. Depois abra `http://localhost:8000` no navegador.
+- **Com o Visual Studio Code**: instale a extensão *Live Server*, abra a pasta e clique em *Go Live*.
+
+É preciso **ligação à internet**: as bibliotecas dos gráficos, do mapa e do PDF, e os dados do ArcGIS Online, vêm da internet.
+
 ## 2. Ligar os dados reais (Feature Services)
 
 1. No ArcGIS Online, para cada camada das fichas, crie uma **vista** (*Create View Layer*), retire os campos pessoais (nome, e-mail e telefone de quem preencheu) e **partilhe a vista publicamente**. O portal é um site público: só lê camadas públicas.

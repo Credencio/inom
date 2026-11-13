@@ -223,3 +223,53 @@ body{background:linear-gradient(180deg,#eef3f1 0,#f3f5f4 320px)}
 .pag-cartao strong{color:var(--cor1)}.pag-cartao p{margin:.2rem 0 0;font-size:.82rem;color:var(--suave)}
 @media (max-width:860px){.hero{grid-template-columns:1fr;padding:1.4rem}.hero h1{font-size:1.45rem}.pag-cab{padding:.9rem}.filtros{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ===== Gestão do portal (layout próprio) ===== */
+.topo{z-index:2000}.mapa{isolation:isolate}
+body.modo-gestao .topo,body.modo-gestao #aviso,body.modo-gestao .rodape{display:none}
+body.modo-gestao main{max-width:none;padding:0}
+body.modo-gestao{background:#f4f5f2}
+.adm{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+.adm-lado{background:#151b18;color:#e8eeea;display:flex;flex-direction:column;padding:1.1rem 1rem;position:sticky;top:0;height:100vh;overflow-y:auto}
+.adm-marca{background:#fff;border-radius:14px;padding:.8rem 1rem;display:flex;flex-direction:column;gap:.35rem;margin-bottom:1.4rem}
+.adm-marca img{max-height:44px;max-width:170px;object-fit:contain;object-position:left}
+.adm-marca span{font-size:.72rem;font-weight:800;letter-spacing:.14em;color:#1f6b4a}
+.adm-menu{display:flex;flex-direction:column;gap:.2rem;flex:1}
+.adm-menu hr{border:0;border-top:1px solid rgba(255,255,255,.1);margin:.7rem 0}
+.adm-item{display:flex;align-items:center;gap:.7rem;padding:.7rem .85rem;border-radius:11px;color:#e3ebe6;cursor:pointer;font-size:.95rem;font-weight:500;text-decoration:none}
+.adm-item svg{width:18px;height:18px;opacity:.85}
+.adm-item:hover{background:rgba(255,255,255,.07)}
+.adm-item.active{background:#126b44;color:#fff;font-weight:700}
+.adm-cont{margin-left:auto;background:rgba(255,255,255,.12);border-radius:999px;padding:.05rem .5rem;font-size:.75rem;font-weight:700}
+.adm-rodape{margin-top:1rem;display:flex;flex-direction:column;gap:.6rem}
+.adm-estado{background:#1d3a2c;color:#bfe6cf;border-radius:11px;padding:.7rem .85rem;font-size:.84rem}
+.adm-estado strong{color:#e6f6ec;font-weight:600}
+.adm-site{color:#9fd5b6;font-size:.86rem;text-decoration:underline;cursor:pointer}
+.adm-main{min-width:0;display:flex;flex-direction:column}
+.adm-cab{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;padding:1.2rem 2rem;border-bottom:1px solid #e3e6e1;background:#f7f8f5;position:sticky;top:0;z-index:5}
+.adm-cab h1{font-size:1.6rem;margin:0;color:#14201a}.adm-cab p{margin:.15rem 0 0;color:#5d6b63;font-size:.92rem}
+.adm-btn{background:#fff;padding:.65rem 1.1rem;font-size:.95rem;font-weight:600;border-radius:10px}
+.adm-pub{background:#126b44;border-color:#126b44;color:#fff;padding:.65rem 1.2rem;font-size:.95rem;font-weight:700;border-radius:10px}
+.adm-pub:hover{background:#0f5a39}.adm-pub:disabled{opacity:.5}
+.adm-pub.largo{width:100%;justify-content:center;margin-top:.4rem}
+.adm-pend{color:#b45309;font-size:.84rem;font-weight:600}
+.adm-conteudo{padding:1.6rem 2rem 3rem;max-width:1200px}
+.adm-conteudo>h3:first-child{margin-top:0}
+.adm-cartoes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.2rem}
+.adm-cartao{background:#fff;border:1px solid #e3e6e1;border-radius:16px;padding:1.2rem 1.4rem;cursor:pointer;text-decoration:none;color:#14201a;transition:box-shadow .15s,transform .15s}
+.adm-cartao:hover{box-shadow:0 6px 18px rgba(0,0,0,.07);transform:translateY(-1px)}
+.adm-cartao strong{display:block;font-size:2.1rem;line-height:1.1}.adm-cartao span{color:#5d6b63}
+.adm-caixa{background:#fff;border:1px solid #e3e6e1;border-radius:16px;padding:1.3rem 1.6rem;margin-bottom:1rem}
+.adm-caixa h3{margin:.1rem 0 .8rem;font-size:1.15rem}
+.adm-caixa.aviso{background:#fff8eb;border-color:#f3dcae}
+.adm-passos{list-style:none;counter-reset:p;padding:0;margin:0;display:flex;flex-direction:column;gap:.75rem}
+.adm-passos li{counter-increment:p;display:flex;gap:.8rem;align-items:center}
+.adm-passos li:before{content:counter(p);flex:none;width:32px;height:32px;border-radius:50%;background:#126b44;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+.adm-conteudo details.item,.adm-conteudo .lista-ed{background:transparent}
+.adm-login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(circle at 20% 20%,#1d3a2c,#151b18 60%)}
+.adm-login-caixa{background:#fff;border-radius:18px;padding:1.6rem 1.8rem;width:min(520px,100%);box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.adm-login-caixa .adm-marca{padding:0;margin-bottom:1rem}
+.adm-login-caixa h1{font-size:1.35rem;margin:.2rem 0 .3rem}
+.adm-login-caixa .adm-site{display:inline-block;margin-top:1rem;color:#126b44}
+#barra-preview{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);z-index:3500;background:#151b18;color:#fff;border-radius:14px;padding:.6rem .8rem .6rem 1.1rem;display:flex;gap:.6rem;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.3);font-size:.9rem;flex-wrap:wrap;max-width:calc(100% - 2rem)}
+@media (max-width:900px){.adm{grid-template-columns:1fr}.adm-lado{position:static;height:auto}.adm-cab{position:static;padding:1rem}.adm-conteudo{padding:1rem}}

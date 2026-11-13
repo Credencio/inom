@@ -251,7 +251,7 @@ function opcaoGauge(g, base, pdf) {
     series: [{ id: "s0", type: "gauge", min: 0, max, startAngle: 210, endAngle: -30, radius: "92%", center: ["50%", "58%"],
       progress: { show: true, width: 16, roundCap: true, itemStyle: { color: cor } },
       axisLine: { roundCap: true, lineStyle: { width: 16, color: seg } },
-      pointer: { show: lim !== null, length: "12%", width: 6, offsetCenter: [0, "-62%"], itemStyle: { color: "#33414e" } },
+      pointer: { show: false },
       axisTick: { show: false }, splitLine: { show: false }, axisLabel: { show: false },
       anchor: { show: false }, title: { show: true, offsetCenter: [0, "34%"], fontSize: 11, color: "#7a8792" },
       detail: { valueAnimation: !pdf, offsetCenter: [0, "4%"], fontSize: 30, fontWeight: 700, color: "#1d2a33", fontFamily: FONTE, formatter: x => fmt(x, { formato: g.formato, decimais: g.decimais }, S.lang) },
@@ -516,7 +516,9 @@ function renderMapa(g, corpo) {
   if (!window.L) { div.textContent = "Leaflet não carregou"; return; }
   const Lf = window.L;
   const map = Lf.map(div, { scrollWheelZoom: false, attributionControl: true }).setView([-18.5, 36.5], 5);
-  const pos = Lf.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { attribution: "© OpenStreetMap © CARTO", maxZoom: 19 }).addTo(map);
+  const pos = Lf.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", { attribution: "Esri, HERE, Garmin, © OpenStreetMap", maxZoom: 16 }).addTo(map);
+  const pr = map.createPane("rotulos"); pr.style.zIndex = 450; pr.style.pointerEvents = "none";
+  Lf.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}", { maxZoom: 16, pane: "rotulos" }).addTo(map);
   const sat = Lf.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { attribution: "Esri World Imagery", maxZoom: 19 });
   const over = {}; const bounds = Lf.latLngBounds([]); const legenda = [];
   for (const ds of g.camadas || [g.dataset]) {

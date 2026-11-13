@@ -15,6 +15,13 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
+<script>
+if (location.protocol === "file:") document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("app").innerHTML = '<div class="pagina estreita"><h2>O portal não abre directamente do ficheiro</h2>' +
+    '<p>Os navegadores bloqueiam a leitura da configuração quando se abre o <code>index.html</code> com duplo clique. Publique o portal no GitHub Pages ou abra-o através de um servidor local (ver README.md, secção “Abrir no computador”).</p>' +
+    '<p><em>The portal cannot be opened directly from the file. Publish it on GitHub Pages or use a local server (see README.md).</em></p></div>';
+});
+</script>
 <script type="module" src="assets/js/main.js"></script>
 </head>
 <body>
