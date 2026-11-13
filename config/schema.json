@@ -1,0 +1,1568 @@
+{
+ "viveiros": {
+  "form": "Registo_de_Viveiros_de_Mangal.xlsx",
+  "tables": {
+   "main": {
+    "fields": {
+     "nome_digitalizador": {
+      "type": "text",
+      "label": "Nome da pessoa que preencheu o formulário",
+      "required": true
+     },
+     "email_digitalizador": {
+      "type": "text",
+      "label": "Correio electrónico"
+     },
+     "telefone_digitalizador": {
+      "type": "integer",
+      "label": "Número de telefone"
+     },
+     "id_viveiro": {
+      "type": "calculate",
+      "label": "ID do Viveiro"
+     },
+     "nome_viveiro": {
+      "type": "text",
+      "label": "Nome do viveiro",
+      "required": true
+     },
+     "tempo": {
+      "type": "select_one",
+      "label": "O viveiro é permanente ou temporário?",
+      "list": "tempo",
+      "required": true
+     },
+     "ano_estabelecimento": {
+      "type": "date",
+      "label": "Ano de estabelecimento",
+      "required": true
+     },
+     "ano_enceramento": {
+      "type": "date",
+      "label": "Data de enceramento"
+     },
+     "entidade_responsavel": {
+      "type": "text",
+      "label": "Nome da entidade responsável",
+      "required": true
+     },
+     "email_entidade": {
+      "type": "text",
+      "label": "Endereço de e-mail da entidade responsável"
+     },
+     "contacto_entidade_responsavel": {
+      "type": "integer",
+      "label": "Contacto telefónico da entidade responsável"
+     },
+     "provincia": {
+      "type": "select_one",
+      "label": "Província",
+      "list": "provincia",
+      "required": true
+     },
+     "distrito": {
+      "type": "select_one",
+      "label": "Distrito",
+      "list": "distrito",
+      "required": true
+     },
+     "posto_adm": {
+      "type": "select_one",
+      "label": "Posto Administrativo",
+      "list": "posto_adm",
+      "required": true
+     },
+     "localidade": {
+      "type": "select_one",
+      "label": "Localidade",
+      "list": "localidade",
+      "required": true
+     },
+     "nome_comunidade": {
+      "type": "text",
+      "label": "Nome da Comunidade Local"
+     },
+     "nome_floresta": {
+      "type": "text",
+      "label": "Nome da Floresta de Mangal (se aplicável)"
+     },
+     "area_viveiro": {
+      "type": "geoshape",
+      "label": "Delimite no mapa a área total do viveiro de mangal",
+      "required": true
+     },
+     "num_homens": {
+      "type": "integer",
+      "label": "Homens"
+     },
+     "num_mulheres": {
+      "type": "integer",
+      "label": "Mulheres"
+     },
+     "capacidade_instalada": {
+      "type": "integer",
+      "label": "Capacidade instalada de produção (número de mudas)"
+     },
+     "capacidade_anual": {
+      "type": "integer",
+      "label": "Capacidade de produção anual (número de mudas por ano)"
+     },
+     "fonte_agua_irrigacao": {
+      "type": "select_one",
+      "label": "Fonte de água para irrigação",
+      "list": "fonte_agua"
+     },
+     "tipo_estufa": {
+      "type": "select_one",
+      "label": "Tipo de estufa utilizada",
+      "list": "tipo_estufa"
+     },
+     "outro": {
+      "type": "text",
+      "label": "Especifique o outro tipo de estufa"
+     },
+     "custo_por_muda": {
+      "type": "decimal",
+      "label": "Custo médio (em meticais) de produção por muda"
+     },
+     "destino_mudas": {
+      "type": "text",
+      "label": "Destino das mudas"
+     },
+     "tem_financiador": {
+      "type": "select_one",
+      "label": "Existe alguma entidade financiadora para o estabelecimento e manutenção do viveiro?",
+      "list": "simnao"
+     },
+     "financiadores": {
+      "type": "select_multiple",
+      "label": "Indique o tipo de entidade financiadora e o nome completo",
+      "list": "partes_interessadas_fin"
+     },
+     "agencia_intergovernamental_fin": {
+      "type": "text",
+      "label": "Agência intergovernamental (ex: Banco Mundial, FAO, UNEP, UNESCO)"
+     },
+     "agencia_estrangeira_fin": {
+      "type": "text",
+      "label": "Agência governamental estrangeira (ex: AFD, AICS, JICA, GIZ, NORAD)"
+     },
+     "governo_fin": {
+      "type": "text",
+      "label": "Governo (ex: Instituições do Estado em diferentes níveis)"
+     },
+     "sector_privado_fin": {
+      "type": "text",
+      "label": "Sector privado"
+     },
+     "instituicao_academica_fin": {
+      "type": "text",
+      "label": "Instituição académica ou centro de investigação"
+     },
+     "ong_fin": {
+      "type": "text",
+      "label": "ONG"
+     },
+     "operador_turistico_fin": {
+      "type": "text",
+      "label": "Operador turístico"
+     },
+     "organizacao_comunitaria_fin": {
+      "type": "text",
+      "label": "Organização comunitária de base (ex: CCP)"
+     },
+     "especificar_outra_fin": {
+      "type": "text",
+      "label": "Especifique outra organização"
+     },
+     "data_inicio_fin": {
+      "type": "date",
+      "label": "Ano de início do apoio financeiro"
+     },
+     "data_fim_fin": {
+      "type": "date",
+      "label": "Ano de fim do apoio financeiro"
+     },
+     "tipo_apoio": {
+      "type": "select_multiple",
+      "label": "Que tipo(s) de apoio foram providenciados pela entidade financiadora?",
+      "list": "apoio_tipo"
+     },
+     "outro_tipo_apoio": {
+      "type": "text",
+      "label": "Especifique outro tipo de apoio"
+     },
+     "desafios_enfrentados": {
+      "type": "select_multiple",
+      "label": "Principais desafios enfrentados",
+      "list": "desafios"
+     },
+     "outro_desafio": {
+      "type": "text",
+      "label": "Especifique o outro desafio"
+     },
+     "necessidades_prioritarias": {
+      "type": "select_multiple",
+      "label": "Necessidades prioritárias",
+      "list": "necessidades_prioritarias"
+     },
+     "outra_necessidade": {
+      "type": "text",
+      "label": "Especifique outro tipo de necessidade"
+     },
+     "referencias": {
+      "type": "text",
+      "label": "Links ou referências"
+     },
+     "observacoes": {
+      "type": "text",
+      "label": "Observações adicionais"
+     }
+    }
+   },
+   "registo_especies": {
+    "fields": {
+     "especies_produzidas": {
+      "type": "select_one",
+      "label": "Seleccione a(s) espécie(s) actualmente produzida(s)",
+      "list": "especies_mangal"
+     },
+     "especie_outra": {
+      "type": "text",
+      "label": "Especifique a espécie"
+     },
+     "mudas_disponiveis": {
+      "type": "integer",
+      "label": "Número de mudas actualmente disponíveis"
+     },
+     "mudas_distribuidas": {
+      "type": "integer",
+      "label": "Número de mudas distribuídas no último ano"
+     }
+    },
+    "label": "Espécies produzidas",
+    "parent": "main"
+   }
+  }
+ },
+ "degradadas": {
+  "form": "Registo_de_Areas_Degradadas_de_Mangal.xlsx",
+  "tables": {
+   "main": {
+    "fields": {
+     "nome_digitalizador": {
+      "type": "text",
+      "label": "Nome da pessoa que preencheu o formulário",
+      "required": true
+     },
+     "email_digitalizador": {
+      "type": "text",
+      "label": "Correio electrónico"
+     },
+     "telefone_digitalizador": {
+      "type": "integer",
+      "label": "Número de telefone"
+     },
+     "id_area_degradada": {
+      "type": "calculate",
+      "label": "ID da Área Degradada"
+     },
+     "data_levantamento": {
+      "type": "date",
+      "label": "Data do levantamento",
+      "required": true
+     },
+     "ano_estimado_perda": {
+      "type": "date",
+      "label": "Ano estimado da perda do mangal",
+      "required": true
+     },
+     "fonte_estimativa_perda": {
+      "type": "select_one",
+      "label": "Fonte de evidência utilizada para estimar o ano da perda",
+      "list": "fonte_evidencia"
+     },
+     "outra_fonte": {
+      "type": "text",
+      "label": "Especifique outra fonte, se aplicável"
+     },
+     "provincia": {
+      "type": "select_one",
+      "label": "Província",
+      "list": "provincia",
+      "required": true
+     },
+     "distrito": {
+      "type": "select_one",
+      "label": "Distrito",
+      "list": "distrito",
+      "required": true
+     },
+     "posto_adm": {
+      "type": "select_one",
+      "label": "Posto Administrativo",
+      "list": "posto_adm",
+      "required": true
+     },
+     "localidade": {
+      "type": "select_one",
+      "label": "Localidade",
+      "list": "localidade",
+      "required": true
+     },
+     "nome_comunidade": {
+      "type": "text",
+      "label": "Nome da Comunidade Local"
+     },
+     "nome_floresta": {
+      "type": "text",
+      "label": "Nome da Floresta de Mangal (se aplicável)"
+     },
+     "area_poligono": {
+      "type": "geoshape",
+      "label": "Delimite a área clicando no ícone do mapa",
+      "required": true
+     },
+     "inundacao_frequencia": {
+      "type": "select_one",
+      "label": "Frequência diária de inundação pela maré",
+      "list": "freq_mar",
+      "required": true
+     },
+     "tipo_solo_mangal": {
+      "type": "select_one",
+      "label": "Tipo de solo dominante",
+      "list": "tipo_solo"
+     },
+     "tipo_solo_outro": {
+      "type": "text",
+      "label": "Especifique outro tipo de solo"
+     },
+     "cor_solo_mangal": {
+      "type": "select_one",
+      "label": "Cor predominante do solo",
+      "list": "cor_solo"
+     },
+     "outra_cor_solo_mangal": {
+      "type": "text",
+      "label": "Especifique outra cor do solo"
+     },
+     "foto_solo": {
+      "type": "image",
+      "label": "Fotografia do solo observado"
+     },
+     "presenca_bentonicos": {
+      "type": "select_one",
+      "label": "Presença de organismos bentónicos",
+      "list": "simnao"
+     },
+     "bentonicos_observados": {
+      "type": "text",
+      "label": "Quais organismos foram observados?"
+     },
+     "tipo_protecao": {
+      "type": "select_one",
+      "label": "Tipo de protecção aplicável à área",
+      "list": "protecao"
+     },
+     "tipo_protecao_other": {
+      "type": "text",
+      "label": "Especifique outro tipo de protecção"
+     },
+     "plano_gestao": {
+      "type": "select_one",
+      "label": "Indique se existe algum plano de gestão da área?",
+      "list": "simnao_naosabe"
+     },
+     "periodo_plano_gestao": {
+      "type": "text",
+      "label": "Nome do plano e o período de vigência"
+     },
+     "org_comunitaria": {
+      "type": "text",
+      "label": "Organização comunitária de base gestora da área"
+     },
+     "degradada_sim_nao": {
+      "type": "select_one",
+      "label": "Indique se a área está degradada",
+      "list": "simnao_degradada",
+      "required": true
+     },
+     "nivel_degradacao": {
+      "type": "select_one",
+      "label": "Qual é o nível de degradação observado?",
+      "list": "nivel_degradacao"
+     },
+     "sinais_degradacao_visiveis": {
+      "type": "select_multiple",
+      "label": "Quais destes sinais de degradação estão visíveis?",
+      "list": "sinais_visiveis"
+     },
+     "outro_sinal_degradacao_especificar": {
+      "type": "text",
+      "label": "Especifique outro(s) sinal(ais) de degradação observado(s):"
+     },
+     "foto_area_degradada": {
+      "type": "image",
+      "label": "Fotografia da área degradada"
+     },
+     "metodologia": {
+      "type": "select_one",
+      "label": "Que metodologia foi usada para a estimativa",
+      "list": "metodologia",
+      "required": true
+     },
+     "causa_degradacao_actividades_de_producao_e_extraccao": {
+      "type": "select_multiple",
+      "label": "🌾 ACTIVIDADES DE PRODUÇÃO E EXTRACÇÃO",
+      "list": "causas_producao"
+     },
+     "causa_degradacao_factores_naturais_e_climaticos": {
+      "type": "select_multiple",
+      "label": "🌊 FACTORES NATURAIS E CLIMÁTICOS",
+      "list": "causas_naturais"
+     },
+     "causa_degradacao_infraestruturas_e_uso_do_solo": {
+      "type": "select_multiple",
+      "label": "🛠️ INFRAESTRUTURAS E USO DO SOLO",
+      "list": "causas_infraestrutura"
+     },
+     "causa_degradacao_poluicao_e_impactos_ambientais": {
+      "type": "select_multiple",
+      "label": "🧪 POLUIÇÃO E IMPACTOS AMBIENTAIS",
+      "list": "causas_poluicao"
+     },
+     "causa_degradacao_processos_fisicos_e_ecologicos": {
+      "type": "select_multiple",
+      "label": "🌱 PROCESSOS FÍSICOS E ECOLÓGICOS",
+      "list": "causas_ecologicas"
+     },
+     "causas_degradacao_outras": {
+      "type": "select_multiple",
+      "label": "📝 OUTRAS CAUSAS",
+      "list": "causas_outras"
+     },
+     "especificar_outra_causa_degradacao": {
+      "type": "text",
+      "label": "Especifique outra causa"
+     },
+     "especies_presentes": {
+      "type": "select_multiple",
+      "label": "Espécies de mangal presentes na área (ou nas zonas adjacentes)",
+      "list": "especies_mangal"
+     },
+     "especies_presentes_other": {
+      "type": "text",
+      "label": "Outra (especificar)"
+     },
+     "avicennia_marina": {
+      "type": "select_one",
+      "label": "Avicennia marina",
+      "list": "abundancia_relativa"
+     },
+     "bruguiera_gymnorrhiza": {
+      "type": "select_one",
+      "label": "Bruguiera gymnorrhiza",
+      "list": "abundancia_relativa"
+     },
+     "ceriops_tagal": {
+      "type": "select_one",
+      "label": "Ceriops tagal",
+      "list": "abundancia_relativa"
+     },
+     "heritiera_littoralis": {
+      "type": "select_one",
+      "label": "Heritiera littoralis",
+      "list": "abundancia_relativa"
+     },
+     "lumnitzera_racemosa": {
+      "type": "select_one",
+      "label": "Lumnitzera racemosa",
+      "list": "abundancia_relativa"
+     },
+     "pemphis_acidula": {
+      "type": "select_one",
+      "label": "Pemphis acidula",
+      "list": "abundancia_relativa"
+     },
+     "rhizophora_mucronata": {
+      "type": "select_one",
+      "label": "Rhizophora mucronata",
+      "list": "abundancia_relativa"
+     },
+     "sonneratia_alba": {
+      "type": "select_one",
+      "label": "Sonneratia alba",
+      "list": "abundancia_relativa"
+     },
+     "xylocarpus_granatum": {
+      "type": "select_one",
+      "label": "Xylocarpus granatum",
+      "list": "abundancia_relativa"
+     },
+     "other": {
+      "type": "select_one",
+      "label": "Outra espécie (a indicada acima)",
+      "list": "abundancia_relativa"
+     },
+     "especies_abatidas": {
+      "type": "select_multiple",
+      "label": "Espécies de mangal mais abatidas na área",
+      "list": "especies_mangal"
+     },
+     "especies_abatidas_other": {
+      "type": "text",
+      "label": "Outra (especificar)"
+     },
+     "referencias": {
+      "type": "text",
+      "label": "Links ou referências"
+     },
+     "observacoes": {
+      "type": "text",
+      "label": "Observações adicionais"
+     }
+    }
+   },
+   "executores_rpt": {
+    "fields": {
+     "tipo_executor": {
+      "type": "select_one",
+      "label": "Tipo de entidade",
+      "list": "partes_interessadas_exec",
+      "required": true
+     },
+     "nome_executor": {
+      "type": "text",
+      "label": "Nome completo da entidade"
+     }
+    },
+    "label": "Partes interessadas executoras do levantamento de áreas degradadas",
+    "parent": "main"
+   },
+   "financiadores_rpt": {
+    "fields": {
+     "tipo_financiador": {
+      "type": "select_one",
+      "label": "Tipo de entidade",
+      "list": "partes_interessadas_fin",
+      "required": true
+     },
+     "nome_financiador": {
+      "type": "text",
+      "label": "Nome completo da entidade"
+     }
+    },
+    "label": "Partes interessadas que disponibilizaram apoio financeiro ao levantamento de áreas degradadas",
+    "parent": "main"
+   }
+  }
+ },
+ "restauracao": {
+  "form": "Registo_de_Areas_de_Restauracao_de_Mangal.xlsx",
+  "tables": {
+   "main": {
+    "fields": {
+     "nome_digitalizador": {
+      "type": "text",
+      "label": "Nome da pessoa que preencheu o formulário",
+      "required": true
+     },
+     "email": {
+      "type": "text",
+      "label": "Correio electrónico"
+     },
+     "telefone": {
+      "type": "integer",
+      "label": "Número de telefone"
+     },
+     "id_area_restauracao": {
+      "type": "calculate",
+      "label": "ID da Área de Restauração"
+     },
+     "nome_do_projecto": {
+      "type": "text",
+      "label": "Nome do Projecto",
+      "required": true
+     },
+     "em_area_degradada": {
+      "type": "select_one",
+      "label": "A restauração decorre numa área degradada já registada?",
+      "list": "sim_nao_naosabe"
+     },
+     "id_area_degradada": {
+      "type": "select_one_from_file",
+      "label": "Área degradada registada",
+      "file": "areas_degradadas.csv"
+     },
+     "inicio_do_projecto": {
+      "type": "date",
+      "label": "Data de Início do Projecto",
+      "required": true
+     },
+     "tem_data_fim": {
+      "type": "select_one",
+      "label": "O projecto tem uma data de conclusão?",
+      "list": "simnao"
+     },
+     "data_de_fim_do_projecto": {
+      "type": "date",
+      "label": "Data de Fim do Projecto"
+     },
+     "provincia": {
+      "type": "select_one",
+      "label": "Província",
+      "list": "provincia",
+      "required": true
+     },
+     "distrito": {
+      "type": "select_one",
+      "label": "Distrito",
+      "list": "distrito",
+      "required": true
+     },
+     "posto_adm": {
+      "type": "select_one",
+      "label": "Posto Administrativo",
+      "list": "posto_adm",
+      "required": true
+     },
+     "localidade": {
+      "type": "select_one",
+      "label": "Localidade",
+      "list": "localidade",
+      "required": true
+     },
+     "nome_comunidade": {
+      "type": "text",
+      "label": "Nome da Comunidade Local"
+     },
+     "nome_floresta": {
+      "type": "text",
+      "label": "Nome da Floresta de Mangal (se aplicável)"
+     },
+     "area_total": {
+      "type": "decimal",
+      "label": "Área total (em hectares) proposta para a restauração"
+     },
+     "area_restaurada": {
+      "type": "geoshape",
+      "label": "Delimite no mapa a área restaurada até ao momento",
+      "required": true
+     },
+     "estado_protecao_anterior": {
+      "type": "select_one",
+      "label": "Estado de protecção da área antes do início do projecto",
+      "list": "estado_protecao"
+     },
+     "especificar_outro_estado": {
+      "type": "text",
+      "label": "Especifique outro estado de protecção"
+     },
+     "objectivos_ecologicos": {
+      "type": "select_multiple",
+      "label": "Objectivos ecológicos",
+      "list": "objectivos_ecologicos"
+     },
+     "objectivos_ecologicos_other": {
+      "type": "text",
+      "label": "Especifique outro objectivo ecológico"
+     },
+     "objectivos_economicos": {
+      "type": "select_multiple",
+      "label": "Objectivos socioeconómicos",
+      "list": "objetivos_economicos"
+     },
+     "objectivos_economicos_other": {
+      "type": "text",
+      "label": "Especifique outro objectivo socioeconómico"
+     },
+     "objectivos_outros": {
+      "type": "select_multiple",
+      "label": "Outros objectivos",
+      "list": "objectivos_outros"
+     },
+     "objectivos_outros_other": {
+      "type": "text",
+      "label": "Especifique outro objectivo"
+     },
+     "ocorrencia_mangais_pre": {
+      "type": "select_one",
+      "label": "Mangais já ocorriam naturalmente nessa área antes do projecto?",
+      "list": "sim_nao_naosabe"
+     },
+     "restauracao_anterior": {
+      "type": "select_one",
+      "label": "Já houve alguma tentativa anterior de restauração de mangais na área",
+      "list": "sim_nao_naosabe"
+     },
+     "ano_ultima_restauracao": {
+      "type": "date",
+      "label": "Ano da última tentativa de restauração da área"
+     },
+     "tecnica_restauracao_previas": {
+      "type": "select_multiple",
+      "label": "Técnica(s) de restauração anteriormente tentada(s)",
+      "list": "tecnica_restauracao"
+     },
+     "tecnica_restauracao_previas_outra": {
+      "type": "text",
+      "label": "Especifique a outra técnica aplicada"
+     },
+     "motivo_insucesso_restauracao": {
+      "type": "select_multiple",
+      "label": "Indique o motivo do fracasso da última tentativa de restauração",
+      "list": "motivo_insucesso_restauracao"
+     },
+     "motivo_insucesso_outro": {
+      "type": "text",
+      "label": "Especifique outro motivo do insucesso"
+     },
+     "avaliacao_previa_actual_proj": {
+      "type": "select_one",
+      "label": "Indique se houve avaliação prévia da área antes do início das actividades do projecto actual",
+      "list": "sim_nao_naosabe"
+     },
+     "metodo_avaliacao_previa": {
+      "type": "select_multiple",
+      "label": "Como foi realizada a avaliação?",
+      "list": "metodo_avaliacao_previa"
+     },
+     "comparacao_area_referencia": {
+      "type": "select_one",
+      "label": "A área de intervenção foi comparada a uma área de referência?",
+      "list": "sim_nao_naosabe"
+     },
+     "ano_perda_mangal": {
+      "type": "date",
+      "label": "Indique o ano em que houve perda de mangal na área"
+     },
+     "especies_presentes": {
+      "type": "select_multiple",
+      "label": "Espécies de mangal presentes na área (ou em áreas adjacentes)",
+      "list": "especies_mangal"
+     },
+     "especies_presentes_other": {
+      "type": "text",
+      "label": "Outra (especificar)"
+     },
+     "especies_abundantes": {
+      "type": "select_multiple",
+      "label": "Espécies de mangal mais abundantes na área",
+      "list": "especies_mangal"
+     },
+     "intervencao_piloto": {
+      "type": "select_one",
+      "label": "Indique se foi conduzido um teste-piloto",
+      "list": "sim_nao_naosabe"
+     },
+     "apoio_externo": {
+      "type": "select_multiple",
+      "label": "Que tipo de apoio técnico foi recebido?",
+      "list": "apoio_externo"
+     },
+     "num_homens": {
+      "type": "integer",
+      "label": "Homens"
+     },
+     "num_mulheres": {
+      "type": "integer",
+      "label": "Mulheres"
+     },
+     "total_pessoas": {
+      "type": "calculate",
+      "label": "total_pessoas"
+     },
+     "tecnica_restauracao_usadas": {
+      "type": "select_multiple",
+      "label": "Técnicas aplicadas para a restauração da área",
+      "list": "tecnica_restauracao"
+     },
+     "tecnica_restauracao_usadas_outra": {
+      "type": "text",
+      "label": "Especifique a outra técnica aplicada"
+     },
+     "data_inicio_interv": {
+      "type": "date",
+      "label": "Data de início da intervenção"
+     },
+     "data_fim_interv": {
+      "type": "date",
+      "label": "Data de fim da intervenção"
+     },
+     "especies_utilizadas": {
+      "type": "select_multiple",
+      "label": "Espécies de mangal utilizadas para a restauração",
+      "list": "especies_mangal"
+     },
+     "especies_utilizadas_other": {
+      "type": "text",
+      "label": "Outra (especificar)"
+     },
+     "total_mudas": {
+      "type": "integer",
+      "label": "Total de mudas utilizadas"
+     },
+     "total_propagulos": {
+      "type": "integer",
+      "label": "Total de propágulos utilizados"
+     },
+     "formacao_participantes": {
+      "type": "select_one",
+      "label": "As pessoas que realizaram as intervenções receberam formação em restauração de mangais?",
+      "list": "sim_nao_naosabe"
+     },
+     "tipo_formacao": {
+      "type": "select_multiple",
+      "label": "Tipo(s) de formação obtida",
+      "list": "tipo_formacao"
+     },
+     "outra_formacao": {
+      "type": "text",
+      "label": "Especifique a outra formação"
+     },
+     "formador": {
+      "type": "text",
+      "label": "Quem deu a Formação?"
+     },
+     "apoio_financeiro": {
+      "type": "select_one",
+      "label": "O projecto teve alguma apoio financeiro?",
+      "list": "sim_nao_naosabe"
+     },
+     "apoio_projecto": {
+      "type": "select_multiple",
+      "label": "28.1 Que tipo de apoio foi disponibilizado para as actividades do projecto realizadas na área?",
+      "list": "tipo_apoio"
+     },
+     "mecanismo_financiamento": {
+      "type": "select_one",
+      "label": "Qual é o principal mecanismo de financiamento utilizado para financiar as intervenções do projecto?",
+      "list": "mecanismo_financiamento"
+     },
+     "outro_mecanismo": {
+      "type": "text",
+      "label": "Especifique o outro mecanismo de financiamento"
+     },
+     "custo_total_mt": {
+      "type": "integer",
+      "label": "Qual foi o custo total (em meticais) das actividades do projecto na área?"
+     },
+     "plano_monitoria": {
+      "type": "select_one",
+      "label": "Existe Plano de Monitoria?",
+      "list": "simnao"
+     },
+     "indicadores_monitoria": {
+      "type": "select_multiple",
+      "label": "Indicadores Utilizados",
+      "list": "indicadores_monitoria"
+     },
+     "outro_indicador": {
+      "type": "text",
+      "label": "Especifique outro indicador"
+     },
+     "periodicidade_monitoria": {
+      "type": "select_one",
+      "label": "Periodicidade da monitoria",
+      "list": "periodicidade"
+     },
+     "outra_periodicidade": {
+      "type": "text",
+      "label": "Especifique a outra periodicidade"
+     },
+     "data_ultimo_mes": {
+      "type": "date",
+      "label": "Último mês e ano de monitoria"
+     },
+     "ano_monitoria": {
+      "type": "date",
+      "label": "Último Ano de Monitoria"
+     },
+     "referencias": {
+      "type": "text",
+      "label": "Links ou referências"
+     },
+     "observacoes": {
+      "type": "text",
+      "label": "Observações adicionais"
+     }
+    }
+   },
+   "partes_interessadas_rpt": {
+    "fields": {
+     "tipo_parte_interessada": {
+      "type": "select_one",
+      "label": "Tipo de entidade",
+      "list": "partes_interessadas",
+      "required": true
+     },
+     "nome_parte_interessada": {
+      "type": "text",
+      "label": "Nome completo da entidade"
+     }
+    },
+    "label": "Partes interessadas responsáveis pelo projecto",
+    "parent": "main"
+   },
+   "partes_executoras_rpt": {
+    "fields": {
+     "tipo_parte_executora": {
+      "type": "select_one",
+      "label": "Tipo de entidade",
+      "list": "partes_interessadas_exec",
+      "required": true
+     },
+     "nome_parte_executora": {
+      "type": "text",
+      "label": "Nome completo da entidade"
+     }
+    },
+    "label": "Partes interessadas executoras das actividades do projecto",
+    "parent": "main"
+   },
+   "material_vegetal": {
+    "fields": {
+     "especie_material": {
+      "type": "select_one",
+      "label": "Espécie",
+      "list": "especies_mangal",
+      "required": true
+     },
+     "tipo_material": {
+      "type": "select_one",
+      "label": "Tipo de material utilizado",
+      "list": "tipo_material",
+      "required": true
+     },
+     "origem_muda": {
+      "type": "select_one",
+      "label": "Origem da muda",
+      "list": "origem_muda"
+     },
+     "viveiro_origem": {
+      "type": "select_one_from_file",
+      "label": "Nome do viveiro",
+      "file": "viveiros_mangal.csv"
+     },
+     "origem_propagulo": {
+      "type": "select_one",
+      "label": "Origem do propágulo",
+      "list": "origem_propagulo"
+     },
+     "quantidade_material": {
+      "type": "integer",
+      "label": "Quantidade utilizada (número de mudas ou propágulos)"
+     }
+    },
+    "label": "Material vegetal utilizado",
+    "parent": "main"
+   },
+   "financiadores_grp": {
+    "fields": {
+     "nome_financiador": {
+      "type": "text",
+      "label": "Nome do financiador"
+     },
+     "tipo_financiador": {
+      "type": "select_one",
+      "label": "Tipo de financiador",
+      "list": "partes_interessadas"
+     },
+     "percentagem_aporte": {
+      "type": "decimal",
+      "label": "Percentagem de apoio (%)"
+     }
+    },
+    "label": "Identifique as entidades que disponibilizaram apoio financeiro ao projecto",
+    "parent": "main"
+   }
+  }
+ },
+ "monitoria": {
+  "form": "Monitoria_das_Areas_de_Restauracao.xlsx",
+  "tables": {
+   "main": {
+    "fields": {
+     "nome_digitalizador": {
+      "type": "text",
+      "label": "Nome da pessoa que preencheu o formulário",
+      "required": true
+     },
+     "email": {
+      "type": "text",
+      "label": "Correio electrónico"
+     },
+     "telefone": {
+      "type": "integer",
+      "label": "Número de telefone"
+     },
+     "id_area_restauracao": {
+      "type": "select_one_from_file",
+      "label": "Área de restauração monitorizada",
+      "file": "areas_restauracao.csv",
+      "required": true
+     },
+     "nome_projecto": {
+      "type": "calculate",
+      "label": "nome_projecto"
+     },
+     "inicio_projecto": {
+      "type": "calculate",
+      "label": "inicio_projecto"
+     },
+     "data1": {
+      "type": "date",
+      "label": "Data da monitoria",
+      "required": true
+     },
+     "tempo_anos": {
+      "type": "decimal",
+      "label": "Tempo desde o início do projecto (anos)"
+     },
+     "temp_monitoria": {
+      "type": "select_one",
+      "label": "Tempo de restauração",
+      "list": "temp_monitoria"
+     },
+     "visita": {
+      "type": "select_one",
+      "label": "Tipo de visita",
+      "list": "visita",
+      "required": true
+     },
+     "freq_monitoria": {
+      "type": "select_one",
+      "label": "Frequência de monitoria",
+      "list": "freq_monitoria"
+     },
+     "localizacao": {
+      "type": "geopoint",
+      "label": "Localização da visita"
+     },
+     "sobrevivencia_media": {
+      "type": "decimal",
+      "label": "Taxa de sobrevivência global (%)"
+     },
+     "ameacas_observadas": {
+      "type": "select_multiple",
+      "label": "Ameaças observadas",
+      "list": "ameacas_monitoria"
+     },
+     "outra_ameaca": {
+      "type": "text",
+      "label": "Especifique a outra ameaça"
+     },
+     "replantio_necessario": {
+      "type": "select_one",
+      "label": "É necessário replantio?",
+      "list": "simnao"
+     },
+     "mudas_replantio": {
+      "type": "integer",
+      "label": "Nº estimado de mudas necessárias"
+     },
+     "participantes_homens": {
+      "type": "integer",
+      "label": "Homens"
+     },
+     "participantes_mulheres": {
+      "type": "integer",
+      "label": "Mulheres"
+     },
+     "foto_geral": {
+      "type": "image",
+      "label": "Fotografia geral da área"
+     },
+     "recomendacoes": {
+      "type": "text",
+      "label": "Recomendações"
+     },
+     "observacoes": {
+      "type": "text",
+      "label": "Observações adicionais"
+     }
+    }
+   },
+   "parcelas": {
+    "fields": {
+     "codigo_parcela": {
+      "type": "text",
+      "label": "Código da parcela",
+      "required": true
+     },
+     "ponto_parcela": {
+      "type": "geopoint",
+      "label": "Localização da parcela"
+     },
+     "especie_parcela": {
+      "type": "select_one",
+      "label": "Espécie principal plantada",
+      "list": "especies_mangal"
+     },
+     "plantas_plantadas": {
+      "type": "integer",
+      "label": "Nº de plantas plantadas na parcela"
+     },
+     "plantas_vivas": {
+      "type": "integer",
+      "label": "Nº de plantas vivas"
+     },
+     "sobrevivencia_parcela": {
+      "type": "decimal",
+      "label": "Taxa de sobrevivência (%)"
+     },
+     "altura_media": {
+      "type": "decimal",
+      "label": "Altura média das plantas (cm)"
+     },
+     "cobertura_parcela": {
+      "type": "select_one",
+      "label": "Cobertura do dossel",
+      "list": "cobertura"
+     },
+     "regeneracao_natural": {
+      "type": "integer",
+      "label": "Nº de plântulas de regeneração natural"
+     },
+     "estado_plantas": {
+      "type": "select_one",
+      "label": "Estado geral das plantas",
+      "list": "estado_plantas"
+     },
+     "foto_parcela": {
+      "type": "image",
+      "label": "Fotografia da parcela"
+     }
+    },
+    "label": "Parcelas de monitoria",
+    "parent": "main"
+   }
+  }
+ },
+ "levantamento": {
+  "form": "Levantamento_Ecologico.xlsx",
+  "tables": {
+   "main": {
+    "fields": {
+     "nome_digitalizador": {
+      "type": "text",
+      "label": "Nome da pessoa que preencheu o formulário",
+      "required": true
+     },
+     "email_digitalizador": {
+      "type": "text",
+      "label": "Correio electrónico",
+      "required": true
+     },
+     "telefone_digitalizador": {
+      "type": "integer",
+      "label": "Número de telefone",
+      "required": true
+     },
+     "id_levantamento_ecologico": {
+      "type": "calculate",
+      "label": "ID da área"
+     },
+     "provincia": {
+      "type": "select_one",
+      "label": "Província",
+      "list": "provincia",
+      "required": true
+     },
+     "distrito": {
+      "type": "select_one",
+      "label": "Distrito",
+      "list": "distrito",
+      "required": true
+     },
+     "posto_adm": {
+      "type": "select_one",
+      "label": "Posto Administrativo",
+      "list": "posto_adm",
+      "required": true
+     },
+     "localidade": {
+      "type": "select_one",
+      "label": "Localidade",
+      "list": "localidade",
+      "required": true
+     },
+     "nome_comunidade": {
+      "type": "text",
+      "label": "Nome da/s comunidade/s local/is",
+      "required": true
+     },
+     "tipo_area_ligada": {
+      "type": "select_one",
+      "label": "O levantamento está ligado a alguma área registada?",
+      "list": "area_ligada",
+      "required": true
+     },
+     "id_area_restauracao": {
+      "type": "select_one_from_file",
+      "label": "Área de restauração",
+      "file": "areas_restauracao.csv"
+     },
+     "id_area_degradada": {
+      "type": "select_one_from_file",
+      "label": "Área degradada",
+      "file": "areas_degradadas.csv"
+     }
+    }
+   },
+   "registro_plot": {
+    "fields": {
+     "data_1": {
+      "type": "date",
+      "label": "Data"
+     },
+     "nome_floresta": {
+      "type": "text",
+      "label": "Nome da floresta de mangal"
+     },
+     "ponto": {
+      "type": "geopoint",
+      "label": "Coordenada geográfica"
+     },
+     "transectd_ID": {
+      "type": "text",
+      "label": "ID do Transecto"
+     },
+     "plot_id": {
+      "type": "text",
+      "label": "Codigo da quadrícula",
+      "required": true
+     },
+     "especie": {
+      "type": "select_one",
+      "label": "Especie dominante",
+      "list": "especies_mangal",
+      "required": true
+     },
+     "solo": {
+      "type": "select_one",
+      "label": "Composição do solo",
+      "list": "solo",
+      "required": true
+     },
+     "inundacao": {
+      "type": "select_one",
+      "label": "Classe de inundação",
+      "list": "classe_de_inundacao",
+      "required": true
+     },
+     "cobertura": {
+      "type": "select_one",
+      "label": "Percentagem de cobertura",
+      "list": "cobertura",
+      "required": true
+     },
+     "solo_tipo": {
+      "type": "select_one",
+      "label": "Tipo de solo",
+      "list": "tipo_de_solo",
+      "required": true
+     },
+     "floresta": {
+      "type": "select_one",
+      "label": "Tipo de floresta",
+      "list": "Tipo_de_floresta"
+     },
+     "temp": {
+      "type": "decimal",
+      "label": "Temperatura da água (°C)"
+     },
+     "sal": {
+      "type": "decimal",
+      "label": "Salinidade (PSU)"
+     },
+     "pH": {
+      "type": "decimal",
+      "label": "pH"
+     },
+     "od": {
+      "type": "decimal",
+      "label": "Oxigénio dissolvido (mg/L)"
+     },
+     "obs": {
+      "type": "text",
+      "label": "Observações"
+     },
+     "Equipamento": {
+      "type": "select_one",
+      "label": "Equipamento usado para a medição do diametro da árvore",
+      "list": "Equipamento",
+      "required": true
+     }
+    },
+    "label": "Informações da quadrícula",
+    "parent": "main"
+   },
+   "Medicoes": {
+    "fields": {
+     "MALGAL_1": {
+      "type": "select_one",
+      "label": "Espécie",
+      "list": "especies_mangal"
+     },
+     "codigo_arvore": {
+      "type": "text",
+      "label": "Código da árvore"
+     },
+     "condicao": {
+      "type": "select_one",
+      "label": "Condição da árvore",
+      "list": "condicao"
+     },
+     "qualidade": {
+      "type": "select_one",
+      "label": "Qualidade das estacas",
+      "list": "qualidade"
+     }
+    },
+    "label": "Medições",
+    "parent": "registro_plot"
+   },
+   "caules": {
+    "fields": {
+     "dap_caule": {
+      "type": "decimal",
+      "label": "DAP (cm)"
+     },
+     "per_caule": {
+      "type": "decimal",
+      "label": "Perímetro (cm)"
+     },
+     "altura": {
+      "type": "decimal",
+      "label": "Altura (m)"
+     },
+     "n_caule": {
+      "type": "integer",
+      "label": "Nº do caule"
+     },
+     "dap_caule_calc": {
+      "type": "decimal",
+      "label": "DAP calculado (cm)"
+     }
+    },
+    "label": "Troncos da árvore",
+    "parent": "Medicoes"
+   },
+   "Regenera": {
+    "fields": {
+     "subquadricula": {
+      "type": "text",
+      "label": "Codigo da subquadrícula"
+     },
+     "MALGAL_2": {
+      "type": "select_one",
+      "label": "Espécie",
+      "list": "especies_mangal"
+     },
+     "regeneracao": {
+      "type": "select_one",
+      "label": "Potencial de regeneração",
+      "list": "regeneracao"
+     },
+     "individuos": {
+      "type": "integer",
+      "label": "Numero de regenerações"
+     }
+    },
+    "label": "Regeneração",
+    "parent": "registro_plot"
+   }
+  }
+ },
+ "ervas": {
+  "form": "Registo_de_Ervas_Marinhas.xlsx",
+  "tables": {
+   "main": {
+    "fields": {
+     "nome_digitalizador": {
+      "type": "text",
+      "label": "Nome da pessoa que preencheu o formulário",
+      "required": true
+     },
+     "email_digitalizador": {
+      "type": "text",
+      "label": "Correio electrónico"
+     },
+     "telefone_digitalizador": {
+      "type": "integer",
+      "label": "Número de telefone"
+     },
+     "provincia": {
+      "type": "select_one",
+      "label": "Província",
+      "list": "provincia",
+      "required": true
+     },
+     "distrito": {
+      "type": "select_one",
+      "label": "Distrito",
+      "list": "distrito",
+      "required": true
+     },
+     "posto_adm": {
+      "type": "select_one",
+      "label": "Posto Administrativo",
+      "list": "posto_adm",
+      "required": true
+     },
+     "localidade": {
+      "type": "select_one",
+      "label": "Localidade",
+      "list": "localidade",
+      "required": true
+     },
+     "nome_comunidade": {
+      "type": "text",
+      "label": "Nome da comunidade Local"
+     },
+     "nome_tapete": {
+      "type": "text",
+      "label": "Nome da área de Tapete"
+     },
+     "area_poligono": {
+      "type": "geoshape",
+      "label": "Delimite a área clicando no ícone do mapa"
+     },
+     "data_observacao": {
+      "type": "date",
+      "label": "Data da observação",
+      "required": true
+     },
+     "inundacao_frequencia": {
+      "type": "select_one",
+      "label": "Frequência diária de inundação pela maré",
+      "list": "inundacao_frequencia"
+     },
+     "tipo_solo": {
+      "type": "select_one",
+      "label": "Tipo de solo dominante",
+      "list": "tipo_solo"
+     },
+     "tipo_solo_other": {
+      "type": "text",
+      "label": "Especifique o outro tipo de solo"
+     },
+     "exposicao": {
+      "type": "select_one",
+      "label": "Exposição a ondas ou vento",
+      "list": "exposicao"
+     },
+     "ameacas": {
+      "type": "select_multiple",
+      "label": "Indique as principais ameaças que o tapete tem sofrido",
+      "list": "ameacas",
+      "required": true
+     },
+     "ameacas_other": {
+      "type": "text",
+      "label": "Indique as outras ameaças"
+     },
+     "registro_especies": {
+      "type": "select_multiple",
+      "label": "Espécies de Ervas Marinhas presentes",
+      "list": "registro_especies"
+     },
+     "cobertura_total": {
+      "type": "decimal",
+      "label": "Cobertura total estimada de ervas marinhas (%)"
+     },
+     "fauna_presente": {
+      "type": "select_multiple",
+      "label": "Existe fauna presente?",
+      "list": "fauna"
+     },
+     "fauna_presente_esp": {
+      "type": "text",
+      "label": "Indique"
+     },
+     "iniciativa_de_gestao": {
+      "type": "select_one",
+      "label": "Esta área está sob gestão de alguma entidade?",
+      "list": "simnao"
+     },
+     "fiscalizacao": {
+      "type": "select_one",
+      "label": "Existem acções de fiscalização activas no local?",
+      "list": "simnao_fisca"
+     },
+     "restauro": {
+      "type": "select_one",
+      "label": "Existem actividades de transplantes ou restauro do tapete?",
+      "list": "simnao1"
+     },
+     "financiamento": {
+      "type": "select_one",
+      "label": "Estas actividades tem/tiveram algum apoio externo (financiamento)?",
+      "list": "simnao2"
+     },
+     "referencias": {
+      "type": "text",
+      "label": "Links ou referências"
+     },
+     "observacoes": {
+      "type": "text",
+      "label": "Observações adicionais"
+     }
+    }
+   },
+   "dominancia": {
+    "fields": {
+     "especie_selecionada": {
+      "type": "calculate",
+      "label": "Selecione a espécie para avaliar"
+     },
+     "especie_codigo": {
+      "type": "calculate",
+      "label": "especie_codigo"
+     },
+     "escala_dominancia": {
+      "type": "select_one",
+      "label": "Indique o nível de dominância para: ${especie_selecionada}",
+      "list": "escala_dominancia"
+     }
+    },
+    "label": "Por cada espécie seleccionada deve se indicar a Estimativa da abundância relativa (numa área de 1ha):",
+    "parent": "main"
+   },
+   "gestores_rpt": {
+    "fields": {
+     "tipo_entidade_gestora": {
+      "type": "select_one",
+      "label": "Tipo de entidade",
+      "list": "partes_interessadas",
+      "required": true
+     },
+     "nome_entidade_gestora": {
+      "type": "text",
+      "label": "Nome completo da entidade"
+     }
+    },
+    "label": "Entidades que gerem a área",
+    "parent": "main"
+   },
+   "apoio_externo_rpt": {
+    "fields": {
+     "tipo_entidade_apoio": {
+      "type": "select_one",
+      "label": "Tipo de entidade",
+      "list": "partes_interessadas",
+      "required": true
+     },
+     "nome_entidade_apoio": {
+      "type": "text",
+      "label": "Nome completo da entidade"
+     }
+    },
+    "label": "Entidade(s) que forneceram apoio",
+    "parent": "main"
+   }
+  }
+ }
+}
