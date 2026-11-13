@@ -1,7 +1,7 @@
 // Arranque do portal, navegação e páginas Sobre, Documentos e Fichas de campo.
 import { S, carregarTudo, DATASETS } from "./data.js";
 import { UI } from "./i18n.js";
-import { $, h, esc, tr, toast, fmt } from "./util.js";
+import { $, h, esc, tr, toast, fmt, imagem, comImagem } from "./util.js";
 
 const t = k => UI[S.lang][k] || k;
 let dadosPromessa = null;
@@ -111,15 +111,26 @@ function renderSobre(app) {
   const L = (pt, en) => (S.lang === "en" ? en : pt);
   const nums = h("div", { class: "hero-nums" });
   const paginas = h("div", { class: "hero-pags" });
+  const eco = (chave, titulo, texto, href) => {
+    const im = imagem(S.cfg, chave);
+    const c = h("a", { class: "eco-cartao", href }, h("div", { class: "eco-txt" }, h("h3", {}, titulo), h("p", {}, texto), h("span", { class: "eco-lig" }, L("Ver no dashboard →", "See in the dashboard →"))));
+    return im ? comImagem(c, im, S.lang) : c;
+  };
+  const temPag = id => S.cfg.dashboard.paginas.some(p => p.id === id);
+  const pagMangal = temPag("restauracao") ? "restauracao" : (S.cfg.dashboard.paginas[0] || {}).id;
+  const ecos = imagem(S.cfg, "mangal") || imagem(S.cfg, "ervas") ? h("section", { class: "eco" },
+    eco("mangal", L("Mangal", "Mangroves"), L("Florestas costeiras que protegem a costa, armazenam carbono e sustentam a pesca. Acompanhe as áreas degradadas, restauradas e monitoradas.", "Coastal forests that protect the shore, store carbon and support fisheries. Follow degraded, restored and monitored areas."), `#/dashboard/${pagMangal}`),
+    eco("ervas", L("Ervas marinhas", "Seagrasses"), L("Pradarias submersas que abrigam juvenis de peixe, dugongos e tartarugas e fixam sedimentos. Veja onde foram registadas e o seu estado.", "Submerged meadows that shelter juvenile fish, dugongs and turtles and hold sediments. See where they were recorded and their condition."), temPag("ervas") ? "#/dashboard/ervas" : "#/dashboard")) : null;
   app.append(
-    h("section", { class: "hero" },
+    comImagem(h("section", { class: "hero" },
       h("div", { class: "hero-txt" },
         h("h1", {}, tr(S.cfg.portal.nome, S.lang)),
         h("p", {}, tr(S.cfg.portal.subtitulo, S.lang)),
         h("div", { class: "hero-acoes" },
           h("a", { class: "btn destaque", href: "#/dashboard" }, "▦ " + L("Explorar o dashboard", "Explore the dashboard")),
           h("a", { class: "btn claro", href: "#/fichas" }, L("Fichas de campo", "Field forms")))),
-      nums),
+      nums), imagem(S.cfg, "hero"), S.lang),
+    ecos,
     h("div", { class: "pagina sobre" }, h("div", { class: "md", html: md(tr(S.cfg.sobre, S.lang)) })),
     h("h2", { class: "sec-t" }, L("Temas do dashboard", "Dashboard topics")), paginas);
   import("./dash.js").then(m => {

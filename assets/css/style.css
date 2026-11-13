@@ -273,3 +273,26 @@ body.modo-gestao{background:#f4f5f2}
 .adm-login-caixa .adm-site{display:inline-block;margin-top:1rem;color:#126b44}
 #barra-preview{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);z-index:3500;background:#151b18;color:#fff;border-radius:14px;padding:.6rem .8rem .6rem 1.1rem;display:flex;gap:.6rem;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.3);font-size:.9rem;flex-wrap:wrap;max-width:calc(100% - 2rem)}
 @media (max-width:900px){.adm{grid-template-columns:1fr}.adm-lado{position:static;height:auto}.adm-cab{position:static;padding:1rem}.adm-conteudo{padding:1rem}}
+
+/* ---------- Imagens de fundo ---------- */
+.com-img{position:relative;overflow:hidden;background:linear-gradient(105deg,color-mix(in srgb,var(--cor1) 94%,transparent) 0%,color-mix(in srgb,var(--cor1) 78%,transparent) 45%,color-mix(in srgb,var(--cor1) 35%,transparent) 100%),var(--img) center/cover no-repeat,var(--cor1)}
+.hero.com-img{min-height:340px;padding-bottom:2.4rem}
+.pag-cab.com-img{padding:1.5rem 1.4rem 1.9rem;min-height:130px}
+.credito-img{position:absolute;right:.7rem;bottom:.4rem;font-size:.66rem;color:#fff;opacity:.72;text-decoration:none;text-shadow:0 1px 2px rgba(0,0,0,.6);max-width:70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+a.credito-img:hover{opacity:1;text-decoration:underline}
+.eco{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:0 0 1.2rem}
+.eco-cartao{display:flex;align-items:flex-end;min-height:230px;border-radius:16px;color:#fff;text-decoration:none;box-shadow:0 8px 24px rgba(11,74,58,.18);transition:transform .25s,box-shadow .25s}
+.eco-cartao.com-img{background:linear-gradient(to top,rgba(6,30,24,.92) 0%,rgba(6,30,24,.55) 45%,rgba(6,30,24,.08) 100%),var(--img) center/cover no-repeat,var(--cor1)}
+.eco-cartao:not(.com-img){background:linear-gradient(125deg,var(--cor1),var(--cor2))}
+.eco-cartao:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(11,74,58,.28)}
+.eco-txt{padding:1.2rem 1.3rem 1.6rem}
+.eco-txt h3{margin:0 0 .3rem;font-size:1.35rem}.eco-txt p{margin:0 0 .5rem;font-size:.9rem;opacity:.92;max-width:46ch}
+.eco-lig{font-weight:600;font-size:.85rem;color:#bff0d5}
+.adm-login.com-img{background:linear-gradient(rgba(10,20,16,.72),rgba(10,20,16,.82)),var(--img) center/cover no-repeat,#151b18}
+.img-slot .img-cab{display:flex;justify-content:space-between;margin-bottom:.5rem}.img-slot .img-cab small{display:block;color:#667}
+.img-prev{height:170px;border-radius:12px;background:#dfe7e3 center/cover no-repeat;position:relative;margin-bottom:.6rem}
+.img-prev span{position:absolute;left:.6rem;top:.6rem;background:rgba(0,0,0,.55);color:#fff;font-size:.72rem;padding:.15rem .5rem;border-radius:20px}
+.dica-mapa{background:rgba(255,255,255,.93);border-radius:8px;padding:.3rem .6rem;font-size:.75rem;color:#2c3a33;box-shadow:0 1px 4px rgba(0,0,0,.2);max-width:240px}
+.dica-mapa.ok{color:#126b44;font-weight:600}
+.pop-btn{display:block;margin-top:.45rem}
+@media (max-width:860px){.eco{grid-template-columns:1fr}.eco-cartao{min-height:190px}}

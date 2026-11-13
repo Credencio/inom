@@ -1,5 +1,5 @@
 {
- "versao": 2,
+ "versao": 3,
  "limiarSobrevivencia": 50,
  "areaQuadricula_m2": 100,
  "paginas": [
@@ -393,6 +393,23 @@
    ],
    "graficos": [
     {
+     "id": "gmapa",
+     "tipo": "mapa",
+     "titulo": {
+      "pt": "Áreas degradadas no mapa",
+      "en": "Degraded areas on the map"
+     },
+     "subtitulo": {
+      "pt": "Aproxime ou clique num ponto › Ver a área para ver o contorno de cada área",
+      "en": "Zoom in or click a point › Zoom to area to see each area's outline"
+     },
+     "camadas": [
+      "degradadas"
+     ],
+     "largura": "1",
+     "altura": 420
+    },
+    {
      "id": "g1",
      "titulo": {
       "pt": "Área degradada por província e nível",
@@ -612,6 +629,23 @@
     }
    ],
    "graficos": [
+    {
+     "id": "gmapa",
+     "tipo": "mapa",
+     "titulo": {
+      "pt": "Áreas restauradas no mapa",
+      "en": "Restored areas on the map"
+     },
+     "subtitulo": {
+      "pt": "Aproxime ou clique num ponto › Ver a área para ver o contorno de cada área",
+      "en": "Zoom in or click a point › Zoom to area to see each area's outline"
+     },
+     "camadas": [
+      "restauracao"
+     ],
+     "largura": "1",
+     "altura": 440
+    },
     {
      "id": "g1",
      "titulo": {

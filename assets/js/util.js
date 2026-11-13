@@ -141,3 +141,27 @@ export function rng(seed = 42) {
   let s = seed >>> 0;
   return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
+
+/* ---------- Imagens de fundo (mangal e ervas marinhas) ---------- */
+const WM = f => `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(f)}?width=1600`;
+export const IMAGENS_PADRAO = {
+  hero: { url: WM("Mozambique_Mangroves.jpg"), credito: { pt: "Mangal na ilha da Inhaca · Foto: Valentina Buj (CC BY-SA 2.0)", en: "Mangroves on Inhaca Island · Photo: Valentina Buj (CC BY-SA 2.0)" }, link: "https://commons.wikimedia.org/wiki/File:Mozambique_Mangroves.jpg" },
+  mangal: { url: WM("Bruguiera_gymnorrhiza_3_(8349980202).jpg"), credito: { pt: "Bruguiera gymnorrhiza, baía de Pemba · Foto: Ton Rulkens (CC BY-SA 2.0)", en: "Bruguiera gymnorrhiza, Pemba Bay · Photo: Ton Rulkens (CC BY-SA 2.0)" }, link: "https://commons.wikimedia.org/wiki/File:Bruguiera_gymnorrhiza_3_(8349980202).jpg" },
+  ervas: { url: WM("Sanc0209_-_Flickr_-_NOAA_Photo_Library.jpg"), credito: { pt: "Pradaria de ervas marinhas · Foto: Heather Dine, NOAA (domínio público)", en: "Seagrass meadow · Photo: Heather Dine, NOAA (public domain)" }, link: "https://commons.wikimedia.org/wiki/File:Sanc0209_-_Flickr_-_NOAA_Photo_Library.jpg" }
+};
+export const IMAGENS_SLOTS = ["hero", "mangal", "ervas"];
+export function imagem(cfg, chave) {
+  const I = (cfg && cfg.portal && cfg.portal.imagens) || {};
+  if (I.mostrar === false || !chave || chave === "nenhuma") return null;
+  const im = { ...(IMAGENS_PADRAO[chave] || {}), ...(I[chave] || {}) };
+  return im.url ? im : null;
+}
+/** Aplica a imagem como fundo (com camada de cor por cima, no CSS) e acrescenta o crédito. */
+export function comImagem(el, im, lang) {
+  if (!im) return el;
+  el.classList.add("com-img");
+  el.style.setProperty("--img", `url("${String(im.url).replace(/"/g, "%22")}")`);
+  const cr = tr(im.credito, lang);
+  if (cr) el.append(h(im.link ? "a" : "span", { class: "credito-img", href: im.link || undefined, target: im.link ? "_blank" : undefined, rel: "noopener" }, "📷 " + cr));
+  return el;
+}

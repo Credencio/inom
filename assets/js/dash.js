@@ -2,7 +2,7 @@
 import { S, DATASETS, ORDEM_PROVINCIAS, vista, linhas, valores, get, rotulo, rotuloCampo, ordemLista, campoSchema,
   temFiltros, invalidar, chaveGlobal, dataDe, descricaoFiltros } from "./data.js";
 import { UI, LISTAS_VIRTUAIS } from "./i18n.js";
-import { $, h, esc, num, fmt, fmtDate, tr, geomCenter, toCSV, download } from "./util.js";
+import { $, h, esc, num, fmt, fmtDate, tr, geomCenter, toCSV, download, imagem, comImagem } from "./util.js";
 import { modal } from "./main.js";
 
 const t = k => UI[S.lang][k] || k;
@@ -336,6 +336,14 @@ let mapas = [];
 
 export function paginaPorId(id) { const ps = S.cfg.dashboard.paginas; return ps.find(p => p.id === id) || ps[0]; }
 
+/** Imagem de fundo do cabeçalho da página: escolhida na Gestão ou, por omissão, pelo tema da página. */
+export function imagemPagina(p) {
+  if (p.imagem) return p.imagem;
+  if (/erva/.test(p.id)) return "ervas";
+  if (p.id === "visao-geral" || p.id === "sobre-dados") return "hero";
+  return "mangal";
+}
+
 export function renderDashboard(el, paginaId) {
   raiz = el; paginaActual = paginaPorId(paginaId);
   graficos.forEach(x => x.inst && x.inst.dispose()); graficos.clear();
@@ -344,12 +352,12 @@ export function renderDashboard(el, paginaId) {
   const ps = S.cfg.dashboard.paginas, pg = paginaActual, lang = S.lang;
   el.append(
     h("nav", { class: "pag-nav" }, ps.map(p => h("a", { href: `#/dashboard/${p.id}`, class: p.id === pg.id ? "active" : "" }, icone(p.icone || "lista"), h("span", {}, tr(p.titulo, lang))))),
-    h("section", { class: "pag-cab" },
+    comImagem(h("section", { class: "pag-cab" },
       h("div", { class: "pag-tit" }, icone(pg.icone || "lista", "ic grande"), h("div", {}, h("h1", {}, tr(pg.titulo, lang)), pg.descricao ? h("p", {}, tr(pg.descricao, lang)) : null)),
       h("div", { class: "dash-tools" },
         h("span", { id: "dados-ate", class: "dados-ate" }),
         h("button", { class: "btn claro", onclick: () => import("./exportar.js").then(m => m.abrirDownload(paginaActual)) }, "⭳ " + t("descarregar")),
-        h("button", { class: "btn destaque", onclick: () => import("./report.js").then(m => m.abrirPDF(paginaActual)) }, "⎙ " + t("exportar_pdf")))),
+        h("button", { class: "btn destaque", onclick: () => import("./report.js").then(m => m.abrirPDF(paginaActual)) }, "⎙ " + t("exportar_pdf")))), imagem(S.cfg, imagemPagina(pg)), lang),
     h("div", { id: "filtros", class: "filtros" }),
     h("div", { id: "chips", class: "chips" }),
     h("div", { id: "kpis", class: "kpis" }),
@@ -521,9 +529,17 @@ function renderMapa(g, corpo) {
   Lf.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}", { maxZoom: 16, pane: "rotulos" }).addTo(map);
   const sat = Lf.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { attribution: "Esri World Imagery", maxZoom: 19 });
   const over = {}; const bounds = Lf.latLngBounds([]); const legenda = [];
+  const ZOOM_POL = g.zoomPoligonos || 12; // a partir deste zoom mostram-se só os contornos (sem o ponto central)
+  const centrais = []; let temPol = false;
+  const verArea = (b) => {
+    const z0 = map.getZoom();
+    map.flyToBounds(b, { maxZoom: 17, padding: [30, 30], duration: 1.2 });
+    setTimeout(() => { if (map.getZoom() === z0) map.fitBounds(b, { maxZoom: 17, padding: [30, 30], animate: false }); }, 1600); // sem animação (ex.: separador em segundo plano)
+    if (map.hasLayer(pos)) { map.removeLayer(pos); sat.addTo(map); }
+  };
   for (const ds of g.camadas || [g.dataset]) {
     const cfg = S.cfg.fontes.datasets[ds] || {}; const cor = cfg.cor || "#2f6fdb";
-    const grp = Lf.featureGroup();
+    const grp = Lf.featureGroup(); const pts = Lf.featureGroup();
     const rows = ds === "levantamento" ? linhas(ds, "registro_plot") : vista(ds).main;
     let n = 0;
     for (const r of rows) {
@@ -532,16 +548,27 @@ function renderMapa(g, corpo) {
       const nome = r.d._rotulo || (r.root && r.root.d._rotulo) || "";
       const info = `<div class="pop"><div class="pop-t" style="border-color:${cor}">${esc(tr(cfg.nome, S.lang))}</div><b>${esc(nome)}</b><br>${esc(rotulo(ds, "main", "_provincia", get(r, "_provincia") || ""))} · ${esc(rotulo(ds, "main", "_distrito", get(r, "_distrito") || ""))}` +
         (r.d._area_ha ? `<br>${fmt(r.d._area_ha, {}, S.lang)} ha` : "") + (r.d._estado_monitoria ? `<br>${esc(rotulo(ds, "main", "_estado_monitoria", r.d._estado_monitoria))}` : "") + `</div>`;
-      let lyr;
-      if (geom.type === "Point") lyr = Lf.circleMarker([geom.coordinates[1], geom.coordinates[0]], { radius: 6, color: "#fff", weight: 1.5, fillColor: cor, fillOpacity: 0.9 });
-      else {
-        lyr = Lf.geoJSON(geom, { style: { color: cor, weight: 1.5, fillColor: cor, fillOpacity: 0.35 } });
-        const c = geomCenter(geom);
-        if (c) grp.addLayer(Lf.circleMarker(c, { radius: 5, color: "#fff", weight: 1.2, fillColor: cor, fillOpacity: 0.95 }).bindTooltip(esc(nome)).bindPopup(info));
+      if (geom.type === "Point") {
+        const lyr = Lf.circleMarker([geom.coordinates[1], geom.coordinates[0]], { radius: 6, color: "#fff", weight: 1.5, fillColor: cor, fillOpacity: 0.9 });
+        lyr.bindTooltip(esc(nome)).bindPopup(info); grp.addLayer(lyr);
+        continue;
       }
-      lyr.bindTooltip(esc(nome)).bindPopup(info);
-      grp.addLayer(lyr);
+      temPol = true;
+      const pol = Lf.geoJSON(geom, { style: { color: cor, weight: 2.2, opacity: 1, fillColor: cor, fillOpacity: 0.32 } });
+      const b = pol.getBounds();
+      const popup = () => {
+        const d = document.createElement("div"); d.innerHTML = info;
+        const bt = document.createElement("button"); bt.className = "btn mini pop-btn"; bt.textContent = "⌖ " + (S.lang === "en" ? "Zoom to area" : "Ver a área");
+        bt.onclick = () => { map.closePopup(); verArea(b); }; d.firstChild.append(bt); return d;
+      };
+      pol.bindTooltip(esc(nome), { sticky: true }).bindPopup(popup);
+      pol.on("mouseover", e => e.layer.setStyle && e.layer.setStyle({ weight: 3.5, fillOpacity: 0.5 }));
+      pol.on("mouseout", e => e.layer.setStyle && e.layer.setStyle({ weight: 2.2, fillOpacity: 0.32 }));
+      grp.addLayer(pol);
+      const c = geomCenter(geom);
+      if (c) pts.addLayer(Lf.circleMarker(c, { radius: 5.5, color: "#fff", weight: 1.3, fillColor: cor, fillOpacity: 0.95 }).bindTooltip(esc(nome)).bindPopup(popup));
     }
+    if (pts.getLayers().length) { grp.addLayer(pts); centrais.push([grp, pts]); }
     if (n) { grp.addTo(map); bounds.extend(grp.getBounds()); legenda.push([cor, tr(cfg.nome, S.lang), n]); }
     over[`<span class="leg" style="background:${cor}"></span>${esc(tr(cfg.nome, S.lang))}`] = grp;
   }
@@ -550,6 +577,19 @@ function renderMapa(g, corpo) {
     const ctl = Lf.control({ position: "bottomleft" });
     ctl.onAdd = () => { const d = document.createElement("div"); d.className = "legenda-mapa"; d.innerHTML = legenda.map(([c, n, k]) => `<div><span class="leg" style="background:${c}"></span>${esc(n)} <small>(${k})</small></div>`).join(""); return d; };
     ctl.addTo(map);
+  }
+  if (temPol) {
+    const dica = Lf.control({ position: "topright" });
+    let el;
+    dica.onAdd = () => { el = document.createElement("div"); el.className = "dica-mapa"; return el; };
+    dica.addTo(map);
+    const zoomOk = () => {
+      const z = map.getZoom(), perto = z >= ZOOM_POL;
+      for (const [grp, pts] of centrais) { if (perto && grp.hasLayer(pts)) grp.removeLayer(pts); else if (!perto && !grp.hasLayer(pts)) grp.addLayer(pts); }
+      el.textContent = perto ? L("A mostrar os contornos das áreas", "Showing area outlines") : L("Aproxime (ou clique num ponto › Ver a área) para ver o contorno das áreas", "Zoom in (or click a point › Zoom to area) to see area outlines");
+      el.classList.toggle("ok", perto);
+    };
+    map.on("zoomend", zoomOk); zoomOk();
   }
   if (bounds.isValid()) map.fitBounds(bounds.pad(0.1), { maxZoom: 9 });
   mapas.push(map);

@@ -1,7 +1,7 @@
 // Gestão do portal: editor gráfico da configuração, com gravação no GitHub (token pessoal).
 import { S, DATASETS, lerArcGIS, rotuloCampo } from "./data.js";
 import { UI, VIRTUAIS_CAMPOS } from "./i18n.js";
-import { $, h, tr, clone, toast, b64utf8, fileToB64, slug, download, esc } from "./util.js";
+import { $, h, tr, clone, toast, b64utf8, fileToB64, slug, download, esc, imagem, IMAGENS_PADRAO, IMAGENS_SLOTS } from "./util.js";
 import { renderShell, repoPadrao, recarregarDados, modal } from "./main.js";
 export { guardar as publicarAlteracoes };
 
@@ -145,7 +145,7 @@ function datasCampos(ds) {
 
 /* ---------------- Ecrãs ---------------- */
 const MENU = () => [
-  ["resumo", L("Resumo", "Overview"), "mapa"], ["geral", L("Geral e logótipos", "General and logos"), "folha"], ["sobre", t("nav_sobre"), "lista"],
+  ["resumo", L("Resumo", "Overview"), "mapa"], ["geral", L("Geral e logótipos", "General and logos"), "folha"], ["sobre", t("nav_sobre"), "lista"], ["imagens", L("Imagens de fundo", "Background images"), "onda"],
   ["documentos", t("nav_documentos"), "lista", () => (W.documentos || []).length], ["fichas", t("nav_fichas"), "muda", () => (W.fichas || []).length],
   ["fontes", L("Fontes de dados", "Data sources"), "grelha", () => `${DATASETS.filter(d => W.fontes.datasets[d] && W.fontes.datasets[d].url).length}/${DATASETS.length}`],
   ["dashboard", t("nav_dashboard"), "pct", () => (W.dashboard.paginas || []).length], ["tecnica", t("nav_tecnica"), "arvore", () => ((W.tecnica || {}).paineis || []).length],
@@ -186,7 +186,7 @@ export async function renderGestao(app) {
           h("button", { class: "btn adm-btn", onclick: preVisualizar }, L("Pré-visualizar", "Preview")),
           h("button", { id: "btn-guardar", class: "btn adm-pub" + (sujo ? " pulsar" : ""), onclick: guardar }, L("Publicar alterações", "Publish changes")))),
       conteudo)));
-  const secs = { resumo: secResumo, publicar: secPublicar, github: secGithub, geral: secGeral, sobre: secSobre, documentos: secDocumentos, fichas: secFichas, fontes: secFontes, dashboard: secDashboard, tecnica: secTecnica, validacao: secValidacao, acesso: secAcesso, backup: secBackup };
+  const secs = { resumo: secResumo, publicar: secPublicar, github: secGithub, geral: secGeral, sobre: secSobre, imagens: secImagens, documentos: secDocumentos, fichas: secFichas, fontes: secFontes, dashboard: secDashboard, tecnica: secTecnica, validacao: secValidacao, acesso: secAcesso, backup: secBackup };
   (secs[seccao] || secResumo)(conteudo);
 }
 
@@ -243,7 +243,8 @@ function renderLogin(app) {
     catch (err) { erro.textContent = err.message || t("login_erro"); }
     finally { btn.disabled = false; btn.textContent = t("login_entrar"); }
   } }, t("login_entrar"));
-  app.append(h("div", { class: "adm-login" }, h("div", { class: "adm-login-caixa" },
+  const imL = imagem(S.cfg, "hero");
+  app.append(h("div", { class: "adm-login" + (imL ? " com-img" : ""), style: imL ? `--img:url("${String(imL.url).replace(/"/g, "%22")}")` : undefined }, h("div", { class: "adm-login-caixa" },
     h("div", { class: "adm-marca" }, h("img", { src: S.cfg.portal.logoInom, alt: "InOM" }), h("span", {}, L("GESTÃO DO PORTAL", "PORTAL MANAGEMENT"))),
     h("h1", {}, t("login_titulo")), h("p", {}, t("login_intro")),
     h("div", { class: "duas" }, campo(t("login_owner"), st, "owner"), campo(t("login_repo"), st, "repo")),
@@ -284,6 +285,60 @@ function secGeral(el) {
     bilingue(L("Texto junto ao logótipo de apoio", "Text next to support logo"), p, "textoApoio", { depois: actualizar }),
     bilingue(L("Texto do rodapé", "Footer text"), p, "rodape", { depois: actualizar }),
     campo(L("E-mail de contacto (opcional)", "Contact e-mail (optional)"), p, "contacto", { tipo: "email", depois: actualizar }));
+}
+
+/* Reduz a foto no navegador (máx. 1920 px, JPEG) para o site carregar depressa. */
+function reduzirImagem(f, max = 1920) {
+  return new Promise((ok, falha) => {
+    const img = new Image(); const u = URL.createObjectURL(f);
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height));
+      const cv = document.createElement("canvas"); cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+      cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(u);
+      ok(cv.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = () => falha(new Error(L("Não foi possível ler a imagem.", "Could not read the image.")));
+    img.src = u;
+  });
+}
+
+function secImagens(el) {
+  const p = W.portal; p.imagens = p.imagens || {};
+  const I = p.imagens;
+  titulo(el, "Imagens de fundo", "Background images", L("Fotografias de mangal e ervas marinhas usadas no topo da página Sobre, nos cartões dos ecossistemas, no cabeçalho de cada página do dashboard e no ecrã de entrada da gestão. Por omissão usam-se fotos livres do Wikimedia Commons; pode carregar fotos próprias (são reduzidas automaticamente).",
+    "Mangrove and seagrass photos used at the top of the About page, on the ecosystem cards, in each dashboard page header and on the management sign-in screen. By default free photos from Wikimedia Commons are used; you can upload your own (they are resized automatically)."));
+  el.append(campo(L("Mostrar imagens de fundo", "Show background images"), { get v() { return I.mostrar !== false; }, set v(x) { I.mostrar = x; } }, "v", { tipo: "checkbox", depois: () => renderShell() }));
+  const NOMES = { hero: [L("Principal (topo da página Sobre e entrada da gestão)", "Main (top of the About page and sign-in)"), L("Visão geral, Sobre os dados", "Overview, About the data")],
+    mangal: [L("Mangal", "Mangroves"), L("Cartão Mangal e páginas de mangal do dashboard", "Mangrove card and mangrove dashboard pages")],
+    ervas: [L("Ervas marinhas", "Seagrasses"), L("Cartão Ervas marinhas e página de ervas do dashboard", "Seagrass card and seagrass dashboard page")] };
+  for (const k of IMAGENS_SLOTS) {
+    const caixa = h("div", { class: "adm-caixa img-slot" });
+    const desenhar = () => {
+      caixa.innerHTML = "";
+      const atual = { ...IMAGENS_PADRAO[k], ...(I[k] || {}) };
+      const proprio = !!(I[k] && I[k].url);
+      const prev = h("div", { class: "img-prev", style: `background-image:url("${String(atual.url || "").replace(/"/g, "%22")}")` }, h("span", {}, proprio ? L("Foto própria", "Own photo") : L("Foto padrão", "Default photo")));
+      const ficheiro = h("input", { type: "file", accept: "image/*", style: "display:none", onchange: async e => {
+        const f = e.target.files[0]; if (!f) return;
+        try {
+          toast(L("A preparar e enviar a foto…", "Preparing and uploading the photo…"));
+          const dataUrl = await reduzirImagem(f);
+          const nome = `assets/img/fundo-${k}-${Date.now().toString(36)}.jpg`;
+          await gravarFicheiro(nome, dataUrl.split(",")[1], `Portal: imagem de fundo ${k}`);
+          I[k] = { url: nome, credito: { pt: "", en: "" }, link: "" }; marcar(); desenhar();
+          caixa.querySelector(".img-prev").style.backgroundImage = `url("${dataUrl}")`; // o site só mostra o ficheiro novo após publicar
+          toast(L("Foto enviada. Escreva o crédito e clique em Publicar alterações.", "Photo uploaded. Add the credit and click Publish changes."), "ok", 6000);
+        } catch (err) { toast(err.message, "erro", 8000); }
+      } });
+      I[k] = I[k] || {};
+      caixa.append(h("div", { class: "img-cab" }, h("div", {}, h("strong", {}, NOMES[k][0]), h("small", {}, NOMES[k][1]))), prev,
+        h("div", { class: "linha" }, ficheiro, h("button", { class: "btn", onclick: () => ficheiro.click() }, "⭱ " + L("Carregar foto", "Upload photo")),
+          proprio ? h("button", { class: "btn claro", onclick: () => { delete I[k]; marcar(); desenhar(); } }, "↺ " + L("Voltar à foto padrão", "Back to default photo")) : null),
+        proprio ? h("div", {}, campo(L("Endereço da imagem", "Image address"), I[k], "url", { depois: () => { prev.style.backgroundImage = `url("${I[k].url}")`; } }),
+          bilingue(L("Crédito (autor da foto, local)", "Credit (photographer, place)"), I[k], "credito")) : h("p", { class: "nota" }, "📷 " + tr(atual.credito, S.lang)));
+    };
+    desenhar(); el.append(caixa);
+  }
 }
 
 function secSobre(el) {
@@ -345,7 +400,7 @@ function secDashboard(el) {
   const D = W.dashboard;
   titulo(el, "Dashboard", "Dashboard", L("Cada página tem indicadores (números em destaque) e gráficos. Altere títulos, tipo de gráfico, campos e ordem. As opções avançadas permitem gráficos com várias séries.",
     "Each page has indicators (headline numbers) and charts. Change titles, chart type, fields and order. Advanced options allow multi-series charts."));
-  el.append(h("div", { class: "sub" }, (D.versao || 1) < 2 ? h("p", {}, h("strong", {}, L("Há uma versão nova do dashboard disponível", "A new dashboard version is available")), " — " + L("gráficos novos (mapa maior, fluxo viveiro → restauração, mosaico de espécies, medidores, áreas acumuladas) e indicadores com tendência.", "new charts (larger map, nursery → restoration flow, species treemap, gauges, cumulative areas) and indicators with trends.")) : null,
+  el.append(h("div", { class: "sub" }, (D.versao || 1) < 3 ? h("p", {}, h("strong", {}, L("Há uma versão nova do dashboard disponível", "A new dashboard version is available")), " — " + L("mapas com o contorno das áreas restauradas e degradadas, fluxo viveiro → restauração, mosaico de espécies, medidores, áreas acumuladas e indicadores com tendência.", "maps with restored and degraded area outlines, nursery → restoration flow, species treemap, gauges, cumulative areas and indicators with trends.")) : null,
     h("button", { class: "btn", onclick: async () => {
       if (!confirm(L("Substituir as páginas, indicadores e gráficos do dashboard pela versão padrão? As outras definições do portal não mudam.", "Replace the dashboard pages, indicators and charts with the default version? Other portal settings stay the same."))) return;
       try { const r = await fetch("config/dashboard_padrao.json?v=" + Date.now()); const novo = await r.json();
@@ -360,7 +415,8 @@ function secDashboard(el) {
   el.append(editorLista(D.paginas, () => ({ id: "pagina-" + (D.paginas.length + 1), titulo: { pt: L("Nova página", "New page"), en: "New page" }, kpis: [], graficos: [] }),
     (p, c) => {
       c.append(bilingue(L("Título da página", "Page title"), p, "titulo"), bilingue(L("Descrição (aparece no cabeçalho da página)", "Description (shown in the page header)"), p, "descricao", { area: true, rows: 2 }),
-        h("div", { class: "duas" }, campo(L("Identificador (sem espaços, aparece no endereço)", "Identifier (no spaces, used in the address)"), p, "id"), escolha(L("Ícone", "Icon"), p, "icone", ICONES_OPS())));
+        h("div", { class: "duas" }, campo(L("Identificador (sem espaços, aparece no endereço)", "Identifier (no spaces, used in the address)"), p, "id"), escolha(L("Ícone", "Icon"), p, "icone", ICONES_OPS())),
+        escolha(L("Imagem de fundo do cabeçalho", "Header background image"), p, "imagem", [["", L("Automática (pelo tema da página)", "Automatic (by page topic)")], ["hero", L("Principal", "Main")], ["mangal", L("Mangal", "Mangroves")], ["ervas", L("Ervas marinhas", "Seagrasses")], ["nenhuma", L("Sem imagem", "No image")]]));
       c.append(h("h4", {}, L("Indicadores", "Indicators")), editorLista(p.kpis = p.kpis || [], () => ({ id: "k" + Date.now(), titulo: { pt: L("Novo indicador", "New indicator"), en: "" }, dataset: "restauracao", tabela: "main", medida: "contagem" }), editarKPI, k => tr(k.titulo, S.lang)));
       c.append(h("h4", {}, L("Gráficos", "Charts")), editorLista(p.graficos = p.graficos || [], () => ({ id: "g" + Date.now(), titulo: { pt: L("Novo gráfico", "New chart"), en: "" }, tipo: "barrash", dataset: "restauracao", tabela: "main", dimensao: "_provincia", medida: "contagem", largura: "1/3" }), editarGrafico, g => `${tr(g.titulo, S.lang)} · ${g.tipo}`));
     }, p => tr(p.titulo, S.lang)));
