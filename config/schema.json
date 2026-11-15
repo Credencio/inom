@@ -1044,6 +1044,14 @@
       "type": "decimal",
       "label": "Taxa de sobrevivência global (%)"
      },
+     "regeneracao_total": {
+      "type": "integer",
+      "label": "Regeneração natural total"
+     },
+     "af_media_total": {
+      "type": "decimal",
+      "label": "Área foliar média da visita (cm²)"
+     },
      "ameacas_observadas": {
       "type": "select_multiple",
       "label": "Ameaças observadas",
@@ -1088,12 +1096,17 @@
     "fields": {
      "codigo_parcela": {
       "type": "text",
-      "label": "Código da parcela",
+      "label": "Código da quadrícula",
       "required": true
      },
      "ponto_parcela": {
       "type": "geopoint",
-      "label": "Localização da parcela"
+      "label": "Localização da quadrícula",
+      "required": true
+     },
+     "area_parcela_m2": {
+      "type": "decimal",
+      "label": "Área da quadrícula (m²)"
      },
      "especie_parcela": {
       "type": "select_one",
@@ -1102,7 +1115,7 @@
      },
      "plantas_plantadas": {
       "type": "integer",
-      "label": "Nº de plantas plantadas na parcela"
+      "label": "Nº de plantas plantadas na quadrícula"
      },
      "plantas_vivas": {
       "type": "integer",
@@ -1110,20 +1123,64 @@
      },
      "sobrevivencia_parcela": {
       "type": "decimal",
-      "label": "Taxa de sobrevivência (%)"
+      "label": "Taxa de sobrevivência da quadrícula (%)"
+     },
+     "regeneracao_natural": {
+      "type": "integer",
+      "label": "Nº de plântulas de regeneração natural"
      },
      "altura_media": {
       "type": "decimal",
-      "label": "Altura média das plantas (cm)"
+      "label": "Altura média das plantas medidas (cm)"
+     },
+     "diametro_medio": {
+      "type": "decimal",
+      "label": "Diâmetro médio das plantas medidas (mm)"
+     },
+     "af_media_q": {
+      "type": "decimal",
+      "label": "Área foliar média da quadrícula (cm²)"
      },
      "cobertura_parcela": {
       "type": "select_one",
       "label": "Cobertura do dossel",
       "list": "cobertura"
      },
-     "regeneracao_natural": {
-      "type": "integer",
-      "label": "Nº de plântulas de regeneração natural"
+     "fz_caranguejo": {
+      "type": "select_one",
+      "label": "Caranguejos",
+      "list": "abundancia",
+      "required": true
+     },
+     "fz_gastropode": {
+      "type": "select_one",
+      "label": "Gastrópodes (caracóis)",
+      "list": "abundancia",
+      "required": true
+     },
+     "fz_bivalve": {
+      "type": "select_one",
+      "label": "Bivalves",
+      "list": "abundancia",
+      "required": true
+     },
+     "fz_peixes": {
+      "type": "select_one",
+      "label": "Peixes",
+      "list": "abundancia",
+      "required": true
+     },
+     "buracos_scylla": {
+      "type": "select_one",
+      "label": "Buracos de Scylla serrata (caranguejo-do-mangal)",
+      "list": "abundancia",
+      "required": true
+     },
+     "fz_outros": {
+      "type": "select_one",
+      "label": "Outros",
+      "list": "abundancia",
+      "required": true
      },
      "estado_plantas": {
       "type": "select_one",
@@ -1132,11 +1189,118 @@
      },
      "foto_parcela": {
       "type": "image",
-      "label": "Fotografia da parcela"
+      "label": "Fotografia da quadrícula"
      }
     },
-    "label": "Parcelas de monitoria",
+    "label": "Quadrículas (parcelas) de monitoria",
     "parent": "main"
+   },
+   "especie_q": {
+    "fields": {
+     "especies": {
+      "type": "select_one",
+      "label": "Espécie plantada",
+      "list": "especies_mangal",
+      "required": true
+     },
+     "plantadas_s": {
+      "type": "integer",
+      "label": "Nº de mudas plantadas",
+      "required": true
+     },
+     "vivas_s": {
+      "type": "integer",
+      "label": "Nº de plantas vivas",
+      "required": true
+     },
+     "taxa_s": {
+      "type": "decimal",
+      "label": "Taxa de sobrevivência (%)"
+     },
+     "recrutas_s": {
+      "type": "integer",
+      "label": "Regeneração natural (nº de plântulas novas)"
+     },
+     "total_vivas_s": {
+      "type": "integer",
+      "label": "Total de plantas vivas (plantadas + regeneração)"
+     }
+    },
+    "label": "Sobrevivência e regeneração por espécie",
+    "parent": "parcelas"
+   },
+   "medicoes": {
+    "fields": {
+     "especies_1": {
+      "type": "select_one",
+      "label": "Espécie",
+      "list": "especies_mangal",
+      "required": true
+     },
+     "cod_planta": {
+      "type": "text",
+      "label": "Código da planta"
+     },
+     "diametro": {
+      "type": "decimal",
+      "label": "Diâmetro (mm)",
+      "required": true
+     },
+     "altura_p": {
+      "type": "decimal",
+      "label": "Altura (cm)",
+      "required": true
+     },
+     "ramos": {
+      "type": "integer",
+      "label": "Número de ramos"
+     },
+     "n_folhas_med": {
+      "type": "integer",
+      "label": "Folhas medidas nesta planta"
+     },
+     "af_maior": {
+      "type": "decimal",
+      "label": "Área da maior folha da planta (cm²)"
+     },
+     "af_media_planta": {
+      "type": "decimal",
+      "label": "Área foliar média da planta (cm²)"
+     },
+     "stress": {
+      "type": "select_multiple",
+      "label": "Sinais de stress ou perturbação",
+      "list": "stress",
+      "required": true
+     },
+     "intens_stress": {
+      "type": "select_one",
+      "label": "Intensidade dos sinais",
+      "list": "intensidade"
+     }
+    },
+    "label": "Medições de plantas (amostra)",
+    "parent": "parcelas"
+   },
+   "folhas_med": {
+    "fields": {
+     "folha_comp": {
+      "type": "decimal",
+      "label": "Comprimento da folha (cm)",
+      "required": true
+     },
+     "folha_larg": {
+      "type": "decimal",
+      "label": "Largura da folha (cm)",
+      "required": true
+     },
+     "area_folha": {
+      "type": "decimal",
+      "label": "Área da folha (cm²)"
+     }
+    },
+    "label": "Folhas medidas",
+    "parent": "medicoes"
    }
   }
  },
