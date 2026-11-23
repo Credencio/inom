@@ -47,10 +47,10 @@ export function abrirDownload(paginaActual) {
 
 function excluidos() { return new Set((S.cfg.privacidade.camposExcluidos || []).map(s => s.toLowerCase())); }
 
-function linhaExport(r, ds, rotulos) {
+export function linhaExport(r, ds, rotulos, permitir = null) {
   const ex = excluidos(), o = {};
   for (const k of r.k) {
-    if (ex.has(k.toLowerCase())) continue;
+    if (ex.has(k.toLowerCase()) && !(permitir && permitir.has(k.toLowerCase()))) continue;
     let v = r.a[k];
     const f = campoSchema(ds, r.tabela, k);
     if (f && (f.type === "date" || f.type === "datetime")) v = isoDate(dataDe(v));

@@ -25,7 +25,7 @@ const PADRAO_FONTES = {
     camposInstituicao: [], tabelas: {}, pai: { dataset: "restauracao", campo: "id_area_restauracao", campoPai: "id_area_restauracao" } }
 };
 const PRIVADOS = ["codigo_tecnico", "tec_utilizador", "utilizador_sessao", "telefone_entidade", "email_entidade", "responsavel_nome", "responsavel_cargo",
-  "endereco", "documento_entidade", "nome_tecnico", "funcao_tecnico", "telefone_tecnico", "email_tecnico", "utilizador_arcgis", "obs_gestor"];
+  "endereco", "documento_entidade", "nome_tecnico", "funcao_tecnico", "telefone_tecnico", "email_tecnico", "utilizador_arcgis", "obs_gestor", "codigo_entidade"];
 export function completarConfig(cfg) {
   if (!cfg) return cfg;
   cfg.fontes = cfg.fontes || { datasets: {} }; cfg.fontes.datasets = cfg.fontes.datasets || {};
@@ -49,6 +49,18 @@ export function completarConfig(cfg) {
   cfg.validacao = cfg.validacao || {}; cfg.validacao.regras = cfg.validacao.regras || {};
   for (const r of ["sem_tecnico", "tecnico_inactivo", "entidade_pendente"]) if (cfg.validacao.regras[r] === undefined) cfg.validacao.regras[r] = true;
   if (cfg.validacao.diasPendente === undefined) cfg.validacao.diasPendente = 15;
+  // Área "Os meus dados" (consulta por entidade)
+  cfg.areaEntidade = cfg.areaEntidade || {};
+  const AE = cfg.areaEntidade;
+  if (AE.activo === undefined) AE.activo = true;
+  if (!AE.titulo) AE.titulo = { pt: "Os meus dados", en: "My data" };
+  if (!AE.intro) AE.intro = { pt: "Área para cada entidade consultar e descarregar os registos que os seus técnicos enviaram. Escreva o código da entidade ou de um dos seus técnicos e, no campo seguinte, o nome completo da entidade, tal como foi registado. Só aparecem os dados dessa entidade.",
+    en: "Area where each organisation can view and download the records its staff submitted. Type the organisation code or one of its staff codes and, in the next field, the full organisation name as registered. Only that organisation's data is shown." };
+  if (!AE.nota) AE.nota = { pt: "Esta é uma área de consulta para facilitar o acesso aos dados de cada entidade. Não é uma área protegida: os dados de campo publicados no portal são públicos e não incluem dados pessoais.",
+    en: "This is a consultation area to make each organisation's data easier to reach. It is not a protected area: the field data published on the portal is public and contains no personal data." };
+  // o código da entidade deixa de aparecer nas tabelas públicas do dashboard
+  for (const p of ((cfg.dashboard || {}).paginas || [])) for (const g of p.graficos || [])
+    if (g.tipo === "tabela" && Array.isArray(g.colunas)) g.colunas = g.colunas.filter(c => c !== "codigo_entidade");
   return cfg;
 }
 export const ORDEM_PROVINCIAS = ["cabo_delgado", "nampula", "zambézia", "sofala", "inhambane", "gaza", "maputo_província", "maputo_cidade"];

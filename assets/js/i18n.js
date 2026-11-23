@@ -2,7 +2,7 @@
 export const UI = {
   pt: {
     nav_sobre: "Sobre", nav_dashboard: "Dashboard", nav_documentos: "Documentos", nav_fichas: "Fichas de campo",
-    nav_tecnica: "Área técnica", nav_gestao: "Gestão do portal",
+    nav_tecnica: "Área técnica", nav_entidade: "Os meus dados", nav_gestao: "Gestão do portal",
     tec_validacao: "Validação de dados", tec_fontes: "Estado das fontes",
     demo_banner: "Modo demonstração: os dados apresentados são fictícios. Configure as fontes de dados na Gestão do portal.",
     carregando: "A carregar dados…", erro_fonte: "Não foi possível ler a fonte", sem_dados: "Sem dados para os filtros seleccionados",
@@ -44,7 +44,7 @@ export const UI = {
   },
   en: {
     nav_sobre: "About", nav_dashboard: "Dashboard", nav_documentos: "Documents", nav_fichas: "Field forms",
-    nav_tecnica: "Technical area", nav_gestao: "Portal management",
+    nav_tecnica: "Technical area", nav_entidade: "My data", nav_gestao: "Portal management",
     tec_validacao: "Data validation", tec_fontes: "Data source status",
     demo_banner: "Demo mode: the data shown is fictitious. Configure the data sources in Portal management.",
     carregando: "Loading data…", erro_fonte: "Could not read source", sem_dados: "No data for the selected filters",

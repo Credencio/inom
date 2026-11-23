@@ -149,7 +149,7 @@ const MENU = () => [
   ["documentos", t("nav_documentos"), "lista", () => (W.documentos || []).length], ["fichas", t("nav_fichas"), "muda", () => (W.fichas || []).length],
   ["fontes", L("Fontes de dados", "Data sources"), "grelha", () => `${DATASETS.filter(d => W.fontes.datasets[d] && W.fontes.datasets[d].url).length}/${DATASETS.length}`],
   ["dashboard", t("nav_dashboard"), "pct", () => (W.dashboard.paginas || []).length], ["tecnica", t("nav_tecnica"), "arvore", () => ((W.tecnica || {}).paineis || []).length],
-  ["validacao", t("tec_validacao"), "alerta"], ["acesso", L("Privacidade e acesso", "Privacy and access"), "pessoas"], ["backup", L("Cópia de segurança", "Backup"), "dinheiro"]
+  ["validacao", t("tec_validacao"), "alerta"], ["entidade", L("Os meus dados (entidades)", "My data (organisations)"), "pessoas"], ["acesso", L("Privacidade e acesso", "Privacy and access"), "pessoas"], ["backup", L("Cópia de segurança", "Backup"), "dinheiro"]
 ];
 const TITULOS = () => ({ resumo: [L("Bem-vindo à gestão do portal", "Welcome to portal management"), L("Escolha o que quer alterar. Nada fica público até carregar em “Publicar alterações”.", "Choose what to change. Nothing goes public until you click “Publish changes”.")],
   publicar: [L("Publicar", "Publish"), L("Torne públicas as alterações feitas nesta sessão.", "Make the changes from this session public.")],
@@ -186,7 +186,7 @@ export async function renderGestao(app) {
           h("button", { class: "btn adm-btn", onclick: preVisualizar }, L("Pré-visualizar", "Preview")),
           h("button", { id: "btn-guardar", class: "btn adm-pub" + (sujo ? " pulsar" : ""), onclick: guardar }, L("Publicar alterações", "Publish changes")))),
       conteudo)));
-  const secs = { resumo: secResumo, publicar: secPublicar, github: secGithub, geral: secGeral, sobre: secSobre, imagens: secImagens, documentos: secDocumentos, fichas: secFichas, fontes: secFontes, dashboard: secDashboard, tecnica: secTecnica, validacao: secValidacao, acesso: secAcesso, backup: secBackup };
+  const secs = { resumo: secResumo, publicar: secPublicar, github: secGithub, geral: secGeral, sobre: secSobre, imagens: secImagens, documentos: secDocumentos, fichas: secFichas, fontes: secFontes, dashboard: secDashboard, tecnica: secTecnica, validacao: secValidacao, entidade: secEntidade, acesso: secAcesso, backup: secBackup };
   (secs[seccao] || secResumo)(conteudo);
 }
 
@@ -579,6 +579,19 @@ function secValidacao(el) {
     (x, c) => { const red = () => { c.innerHTML = ""; c.append(...corpo()); }; const corpo = () => [h("div", { class: "tres" }, escolha(L("Ficha", "Form"), x, "dataset", dsOps(), { depois: red }), escolha(L("Tabela", "Table"), x, "tabela", tabOps(x.dataset), { depois: red }), escolha(L("Campo", "Field"), x, "campo", campoOps(x.dataset, x.tabela))),
       h("div", { class: "duas" }, campo("Mín.", x, "min", { tipo: "number", step: "any" }), campo("Máx.", x, "max", { tipo: "number", step: "any" }))]; c.append(...corpo()); },
     x => `${tr(W.fontes.datasets[x.dataset].nome, S.lang)} · ${x.campo ? rotuloCampo(x.dataset, x.tabela, x.campo) : "—"} (${x.min ?? "–"} a ${x.max ?? "–"})`));
+}
+
+function secEntidade(el) {
+  W.areaEntidade = W.areaEntidade || {};
+  const A = W.areaEntidade, act = () => renderShell();
+  titulo(el, "Os meus dados (entidades)", "My data (organisations)", L("Aba onde cada entidade vê e descarrega só os seus registos, depois de escrever o código (da entidade ou de um técnico) e o nome da entidade. A aba abre sempre vazia.",
+    "Tab where each organisation sees and downloads only its own records, after typing the code (organisation or staff) and the organisation name. The tab always opens empty."));
+  el.append(campo(L("Mostrar a aba no menu do site", "Show the tab in the site menu"), A, "activo", { tipo: "checkbox", depois: act }),
+    bilingue(L("Nome da aba e título", "Tab name and title"), A, "titulo", { depois: act }),
+    bilingue(L("Texto de introdução", "Introduction text"), A, "intro", { area: true, rows: 4 }),
+    bilingue(L("Nota no fim da caixa", "Note below the form"), A, "nota", { area: true, rows: 3 }),
+    h("p", { class: "nota" }, L("Só entram entidades com estado «validado». Um código de técnico só funciona se o técnico estiver «validado» (suspensos não entram). Aparecem os registos das 6 fichas cujo código de entidade é o desta entidade; registos antigos sem código de técnico não aparecem.",
+      "Only organisations with status “validated” can enter. A staff code only works if the staff member is “validated” (suspended ones cannot). Records from the 6 forms whose organisation code matches are shown; older records without a staff code are not.")));
 }
 
 function secAcesso(el) {

@@ -45,13 +45,13 @@ export function aplicarTema() {
 export function renderShell() {
   aplicarTema();
   const p = S.cfg.portal, rota = location.hash || "#/sobre";
-  const nav = [["#/sobre", "nav_sobre"], ["#/dashboard", "nav_dashboard"], ["#/documentos", "nav_documentos"], ["#/fichas", "nav_fichas"], ["#/tecnica", "nav_tecnica"], ["#/gestao", "nav_gestao"]];
+  const nav = [["#/sobre", "nav_sobre"], ["#/dashboard", "nav_dashboard"], ["#/documentos", "nav_documentos"], ["#/fichas", "nav_fichas"], ...(S.cfg.areaEntidade && S.cfg.areaEntidade.activo !== false ? [["#/entidade", "nav_entidade"]] : []), ["#/tecnica", "nav_tecnica"], ["#/gestao", "nav_gestao"]];
   const topo = $("#topo"); topo.innerHTML = "";
   topo.append(
     h("a", { class: "marca", href: "#/sobre" },
       h("img", { class: "logo-inom", src: p.logoInom, alt: "InOM" }),
       h("span", { class: "marca-txt" }, h("strong", {}, tr(p.nome, S.lang)), h("small", {}, tr(p.subtitulo, S.lang)))),
-    h("nav", { class: "menu" }, nav.map(([href, k]) => h("a", { href, class: rota.startsWith(href.split("/").slice(0, 2).join("/")) ? "active" : "" }, t(k)))),
+    h("nav", { class: "menu" }, nav.map(([href, k]) => h("a", { href, class: rota.startsWith(href.split("/").slice(0, 2).join("/")) ? "active" : "" }, k === "nav_entidade" ? (tr(S.cfg.areaEntidade.titulo, S.lang) || t(k)) : t(k)))),
     h("div", { class: "lingua" }, ["pt", "en"].map(l => h("button", { class: S.lang === l ? "active" : "", title: t(l), onclick: () => mudarLingua(l) }, l.toUpperCase()))));
   const rod = $("#rodape"); rod.innerHTML = "";
   rod.append(
@@ -85,6 +85,9 @@ export async function route() {
     const m = await import("./dash.js"); m.renderDashboard(app, sub);
   } else if (sec === "documentos") renderDocumentos(app);
   else if (sec === "fichas") renderFichas(app);
+  else if (sec === "entidade" && S.cfg.areaEntidade && S.cfg.areaEntidade.activo !== false) {
+    const m = await import("./entidade.js"); m.renderEntidade(app, () => dadosPromessa);
+  }
   else if (sec === "tecnica") {
     if (S.cfg.acesso && S.cfg.acesso.tecnicaRequerLogin && !S.auth) return pedirLogin(app);
     if ((sub || "").startsWith("painel") || (!sub && ((S.cfg.tecnica || {}).paineis || []).length)) { const m = await import("./tecnica.js"); return m.renderTecnica(app, sub || ""); }

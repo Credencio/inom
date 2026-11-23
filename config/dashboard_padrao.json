@@ -2311,7 +2311,6 @@
      "medida": "contagem",
      "largura": "1",
      "colunas": [
-      "codigo_entidade",
       "nome_entidade",
       "sigla",
       "tipo_entidade",
