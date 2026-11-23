@@ -9,6 +9,7 @@ FORMS = {
   "monitoria":   "Monitoria_das_Areas_de_Restauracao.xlsx",
   "levantamento":"Levantamento_Ecologico.xlsx",
   "ervas":       "Registo_de_Ervas_Marinhas.xlsx",
+  "entidades":   "Registo_de_Entidades_e_Tecnicos.xlsx",
 }
 def clean(s):
     if s is None: return ""
@@ -59,6 +60,21 @@ for key, fn in FORMS.items():
         for col in ("provincia", "distrito", "posto_adm"):
             if col in ch and r[ch[col]]: e[col] = str(r[ch[col]]).strip()
         d[code] = e
+# Tabela criada pelo notebook «Restauração em polígonos de mangal degradado» (não é uma ficha)
+schema["poligonos"] = {"form": None, "tables": {"main": {"fields": {
+  "id_area_restauracao": {"type": "text", "label": "ID da área de restauração"},
+  "projecto": {"type": "text", "label": "Projecto"},
+  "estado": {"type": "select_one", "label": "Resultado da procura", "list": "estado_poligono"},
+  "ano_indicado": {"type": "text", "label": "Ano indicado pelo técnico"},
+  "provincia_mapa": {"type": "text", "label": "Província do mapeamento"},
+  "ano": {"type": "integer", "label": "Ano do mapeamento"},
+  "codigo_poligono": {"type": "text", "label": "Código do polígono degradado"},
+  "ha_poligono": {"type": "decimal", "label": "Área do polígono degradado (ha)"},
+  "ha_restauracao": {"type": "decimal", "label": "Área restaurada (ha)"},
+  "ha_sobreposicao": {"type": "decimal", "label": "Área restaurada sobre o polígono (ha)"},
+  "pct_poligono_restaurado": {"type": "decimal", "label": "% do polígono restaurado"},
+  "camada": {"type": "text", "label": "Camada de origem"}}}}}
+choices["estado_poligono"] = {"encontrado": {"pt": "Polígono encontrado"}, "ponto_fora_de_poligono": {"pt": "Ponto fora dos polígonos"}, "sem_ponto": {"pt": "Sem ponto indicado"}}
 json.dump(schema, open(os.path.join(BASE, "config", "schema.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 apply_overrides(choices)
 json.dump(choices, open(os.path.join(BASE, "config", "choices.json"), "w", encoding="utf-8"), ensure_ascii=False)

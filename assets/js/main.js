@@ -1,5 +1,5 @@
 // Arranque do portal, navegação e páginas Sobre, Documentos e Fichas de campo.
-import { S, carregarTudo, DATASETS } from "./data.js";
+import { S, carregarTudo, DATASETS, completarConfig } from "./data.js";
 import { UI } from "./i18n.js";
 import { $, h, esc, tr, toast, fmt, imagem, comImagem } from "./util.js";
 
@@ -203,6 +203,7 @@ function renderFichas(app) {
 async function iniciar() {
   try {
     [S.cfg, S.choices, S.schema] = await Promise.all([lerJSON("config/portal.json"), lerJSON("config/choices.json"), lerJSON("config/schema.json")]);
+    completarConfig(S.cfg);
   } catch (e) {
     document.body.innerHTML = `<div class="erro-fatal">Não foi possível ler a configuração do portal.<br><small>${esc(e.message)}</small></div>`;
     return;

@@ -31,7 +31,7 @@ export const UI = {
     r_obrigatorio: "Campo obrigatório vazio", r_sem_geom: "Sem localização no mapa", r_fora_bbox: "Localização fora de Moçambique",
     r_data_futura: "Data no futuro", r_data_antiga: "Data anterior a 1950", r_limite: "Valor fora do intervalo esperado",
     r_duplicado: "Possível registo duplicado (mesmo nome e distrito)", r_ligacao: "Ligação a um registo que não existe",
-    r_sigla: "Nome de instituição em sigla", r_vivas: "Plantas vivas acima das plantadas",
+    r_sigla: "Nome de instituição em sigla", r_vivas: "Plantas vivas acima das plantadas", r_sem_tecnico: "Registo sem código de técnico", r_tecnico_inactivo: "Técnico não validado ou suspenso", r_entidade_pendente: "Entidade pendente há muito tempo",
     fontes_intro: "Estado da ligação a cada serviço de dados (Feature Service) e número de registos lidos.",
     fonte_ok: "Ligado", fonte_demo: "Demonstração", fonte_vazio: "Não configurado", fonte_erro: "Erro",
     campos_em_falta: "Campos da ficha em falta no serviço", ultimo_registo: "Último registo", tabelas: "Tabelas relacionadas",
@@ -73,7 +73,7 @@ export const UI = {
     r_obrigatorio: "Required field is empty", r_sem_geom: "No map location", r_fora_bbox: "Location outside Mozambique",
     r_data_futura: "Date in the future", r_data_antiga: "Date before 1950", r_limite: "Value outside expected range",
     r_duplicado: "Possible duplicate (same name and district)", r_ligacao: "Link to a record that does not exist",
-    r_sigla: "Institution name as acronym", r_vivas: "Live plants exceed planted",
+    r_sigla: "Institution name as acronym", r_vivas: "Live plants exceed planted", r_sem_tecnico: "Record without staff code", r_tecnico_inactivo: "Staff member not validated or suspended", r_entidade_pendente: "Organisation pending for too long",
     fontes_intro: "Connection status of each data service (Feature Service) and number of records read.",
     fonte_ok: "Connected", fonte_demo: "Demo", fonte_vazio: "Not configured", fonte_erro: "Error",
     campos_em_falta: "Form fields missing from the service", ultimo_registo: "Latest record", tabelas: "Related tables",
@@ -99,7 +99,8 @@ export const LISTAS_VIRTUAIS = {
   _dataset: {
     viveiros: { pt: "Viveiros", en: "Nurseries" }, degradadas: { pt: "Áreas degradadas", en: "Degraded areas" },
     restauracao: { pt: "Áreas de restauração", en: "Restoration areas" }, monitoria: { pt: "Monitoria", en: "Monitoring" },
-    levantamento: { pt: "Levantamento ecológico", en: "Ecological survey" }, ervas: { pt: "Ervas marinhas", en: "Seagrass" }
+    levantamento: { pt: "Levantamento ecológico", en: "Ecological survey" }, ervas: { pt: "Ervas marinhas", en: "Seagrass" },
+    entidades: { pt: "Entidades", en: "Organisations" }, poligonos: { pt: "Restauração em mangal degradado mapeado", en: "Restoration on mapped degraded mangrove" }
   },
   _vazio: { "": { pt: "Sem informação", en: "No information" } }
 };

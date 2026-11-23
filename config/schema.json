@@ -4,18 +4,22 @@
   "tables": {
    "main": {
     "fields": {
-     "nome_digitalizador": {
+     "codigo_tecnico": {
       "type": "text",
-      "label": "Nome da pessoa que preencheu o formulário",
+      "label": "Código do técnico",
       "required": true
      },
-     "email_digitalizador": {
-      "type": "text",
-      "label": "Correio electrónico"
+     "nome_digitalizador": {
+      "type": "calculate",
+      "label": "Nome do técnico"
      },
-     "telefone_digitalizador": {
-      "type": "integer",
-      "label": "Número de telefone"
+     "codigo_entidade": {
+      "type": "calculate",
+      "label": "Código da entidade"
+     },
+     "nome_entidade": {
+      "type": "calculate",
+      "label": "Entidade"
      },
      "id_viveiro": {
       "type": "calculate",
@@ -250,18 +254,22 @@
   "tables": {
    "main": {
     "fields": {
-     "nome_digitalizador": {
+     "codigo_tecnico": {
       "type": "text",
-      "label": "Nome da pessoa que preencheu o formulário",
+      "label": "Código do técnico",
       "required": true
      },
-     "email_digitalizador": {
-      "type": "text",
-      "label": "Correio electrónico"
+     "nome_digitalizador": {
+      "type": "calculate",
+      "label": "Nome do técnico"
      },
-     "telefone_digitalizador": {
-      "type": "integer",
-      "label": "Número de telefone"
+     "codigo_entidade": {
+      "type": "calculate",
+      "label": "Código da entidade"
+     },
+     "nome_entidade": {
+      "type": "calculate",
+      "label": "Entidade"
      },
      "id_area_degradada": {
       "type": "calculate",
@@ -563,18 +571,22 @@
   "tables": {
    "main": {
     "fields": {
-     "nome_digitalizador": {
+     "codigo_tecnico": {
       "type": "text",
-      "label": "Nome da pessoa que preencheu o formulário",
+      "label": "Código do técnico",
       "required": true
      },
-     "email": {
-      "type": "text",
-      "label": "Correio electrónico"
+     "nome_digitalizador": {
+      "type": "calculate",
+      "label": "Nome do técnico"
      },
-     "telefone": {
-      "type": "integer",
-      "label": "Número de telefone"
+     "codigo_entidade": {
+      "type": "calculate",
+      "label": "Código da entidade"
+     },
+     "nome_entidade": {
+      "type": "calculate",
+      "label": "Entidade"
      },
      "id_area_restauracao": {
       "type": "calculate",
@@ -587,13 +599,30 @@
      },
      "em_area_degradada": {
       "type": "select_one",
-      "label": "A restauração decorre numa área degradada já registada?",
-      "list": "sim_nao_naosabe"
+      "label": "A restauração decorre numa área degradada?",
+      "list": "origem_degradacao"
      },
      "id_area_degradada": {
       "type": "select_one_from_file",
       "label": "Área degradada registada",
       "file": "areas_degradadas.csv"
+     },
+     "ponto_degradado": {
+      "type": "geopoint",
+      "label": "Toque dentro do polígono degradado"
+     },
+     "ano_mapeamento": {
+      "type": "select_one",
+      "label": "Ano do mapeamento (se souber)",
+      "list": "ano_mapeamento"
+     },
+     "lat_degradado": {
+      "type": "calculate",
+      "label": "Latitude do ponto no polígono degradado"
+     },
+     "lon_degradado": {
+      "type": "calculate",
+      "label": "Longitude do ponto no polígono degradado"
      },
      "inicio_do_projecto": {
       "type": "date",
@@ -984,18 +1013,22 @@
   "tables": {
    "main": {
     "fields": {
-     "nome_digitalizador": {
+     "codigo_tecnico": {
       "type": "text",
-      "label": "Nome da pessoa que preencheu o formulário",
+      "label": "Código do técnico",
       "required": true
      },
-     "email": {
-      "type": "text",
-      "label": "Correio electrónico"
+     "nome_digitalizador": {
+      "type": "calculate",
+      "label": "Nome do técnico"
      },
-     "telefone": {
-      "type": "integer",
-      "label": "Número de telefone"
+     "codigo_entidade": {
+      "type": "calculate",
+      "label": "Código da entidade"
+     },
+     "nome_entidade": {
+      "type": "calculate",
+      "label": "Entidade"
      },
      "id_area_restauracao": {
       "type": "select_one_from_file",
@@ -1309,20 +1342,22 @@
   "tables": {
    "main": {
     "fields": {
+     "codigo_tecnico": {
+      "type": "text",
+      "label": "Código do técnico",
+      "required": true
+     },
      "nome_digitalizador": {
-      "type": "text",
-      "label": "Nome da pessoa que preencheu o formulário",
-      "required": true
+      "type": "calculate",
+      "label": "Nome do técnico"
      },
-     "email_digitalizador": {
-      "type": "text",
-      "label": "Correio electrónico",
-      "required": true
+     "codigo_entidade": {
+      "type": "calculate",
+      "label": "Código da entidade"
      },
-     "telefone_digitalizador": {
-      "type": "integer",
-      "label": "Número de telefone",
-      "required": true
+     "nome_entidade": {
+      "type": "calculate",
+      "label": "Entidade"
      },
      "id_levantamento_ecologico": {
       "type": "calculate",
@@ -1545,18 +1580,22 @@
   "tables": {
    "main": {
     "fields": {
-     "nome_digitalizador": {
+     "codigo_tecnico": {
       "type": "text",
-      "label": "Nome da pessoa que preencheu o formulário",
+      "label": "Código do técnico",
       "required": true
      },
-     "email_digitalizador": {
-      "type": "text",
-      "label": "Correio electrónico"
+     "nome_digitalizador": {
+      "type": "calculate",
+      "label": "Nome do técnico"
      },
-     "telefone_digitalizador": {
-      "type": "integer",
-      "label": "Número de telefone"
+     "codigo_entidade": {
+      "type": "calculate",
+      "label": "Código da entidade"
+     },
+     "nome_entidade": {
+      "type": "calculate",
+      "label": "Entidade"
      },
      "provincia": {
       "type": "select_one",
@@ -1726,6 +1765,182 @@
     },
     "label": "Entidade(s) que forneceram apoio",
     "parent": "main"
+   }
+  }
+ },
+ "entidades": {
+  "form": "Registo_de_Entidades_e_Tecnicos.xlsx",
+  "tables": {
+   "main": {
+    "fields": {
+     "nome_entidade": {
+      "type": "text",
+      "label": "Nome da entidade",
+      "required": true
+     },
+     "sigla": {
+      "type": "text",
+      "label": "Sigla"
+     },
+     "tipo_entidade": {
+      "type": "select_one",
+      "label": "Tipo de entidade",
+      "list": "partes_interessadas",
+      "required": true
+     },
+     "tipo_entidade_outro": {
+      "type": "text",
+      "label": "Especifique o tipo"
+     },
+     "provincias_actuacao": {
+      "type": "select_multiple",
+      "label": "Províncias onde actua",
+      "list": "provincia",
+      "required": true
+     },
+     "endereco": {
+      "type": "text",
+      "label": "Endereço"
+     },
+     "responsavel_nome": {
+      "type": "text",
+      "label": "Nome do responsável da entidade",
+      "required": true
+     },
+     "responsavel_cargo": {
+      "type": "text",
+      "label": "Cargo do responsável"
+     },
+     "telefone_entidade": {
+      "type": "text",
+      "label": "Telefone",
+      "required": true
+     },
+     "email_entidade": {
+      "type": "text",
+      "label": "Correio electrónico"
+     },
+     "documento_entidade": {
+      "type": "image",
+      "label": "Documento de credenciação ou carta de apresentação (opcional)"
+     },
+     "n_tecnicos": {
+      "type": "calculate",
+      "label": "Nº de técnicos"
+     },
+     "estado_entidade": {
+      "type": "select_one",
+      "label": "Estado da entidade",
+      "list": "estado_validacao"
+     },
+     "codigo_entidade": {
+      "type": "text",
+      "label": "Código da entidade"
+     },
+     "data_validacao": {
+      "type": "date",
+      "label": "Data de validação"
+     },
+     "obs_gestor": {
+      "type": "text",
+      "label": "Observações do gestor"
+     }
+    }
+   },
+   "tecnicos": {
+    "fields": {
+     "nome_tecnico": {
+      "type": "text",
+      "label": "Nome completo do técnico",
+      "required": true
+     },
+     "funcao_tecnico": {
+      "type": "text",
+      "label": "Função"
+     },
+     "telefone_tecnico": {
+      "type": "text",
+      "label": "Telefone",
+      "required": true
+     },
+     "email_tecnico": {
+      "type": "text",
+      "label": "Correio electrónico"
+     },
+     "utilizador_arcgis": {
+      "type": "text",
+      "label": "Utilizador ArcGIS (se tiver conta própria)"
+     },
+     "estado_tecnico": {
+      "type": "select_one",
+      "label": "Estado do técnico",
+      "list": "estado_validacao"
+     },
+     "codigo_tecnico": {
+      "type": "text",
+      "label": "Código do técnico"
+     }
+    },
+    "label": "Técnicos que vão preencher as fichas",
+    "parent": "main"
+   }
+  }
+ },
+ "poligonos": {
+  "form": null,
+  "tables": {
+   "main": {
+    "fields": {
+     "id_area_restauracao": {
+      "type": "text",
+      "label": "ID da área de restauração"
+     },
+     "projecto": {
+      "type": "text",
+      "label": "Projecto"
+     },
+     "estado": {
+      "type": "select_one",
+      "label": "Resultado da procura",
+      "list": "estado_poligono"
+     },
+     "ano_indicado": {
+      "type": "text",
+      "label": "Ano indicado pelo técnico"
+     },
+     "provincia_mapa": {
+      "type": "text",
+      "label": "Província do mapeamento"
+     },
+     "ano": {
+      "type": "integer",
+      "label": "Ano do mapeamento"
+     },
+     "codigo_poligono": {
+      "type": "text",
+      "label": "Código do polígono degradado"
+     },
+     "ha_poligono": {
+      "type": "decimal",
+      "label": "Área do polígono degradado (ha)"
+     },
+     "ha_restauracao": {
+      "type": "decimal",
+      "label": "Área restaurada (ha)"
+     },
+     "ha_sobreposicao": {
+      "type": "decimal",
+      "label": "Área restaurada sobre o polígono (ha)"
+     },
+     "pct_poligono_restaurado": {
+      "type": "decimal",
+      "label": "% do polígono restaurado"
+     },
+     "camada": {
+      "type": "text",
+      "label": "Camada de origem"
+     }
+    }
    }
   }
  }

@@ -42,6 +42,29 @@ export function gerarDemo(choices, schema) {
   const base = (l, y0 = 2019, y1 = 2026) => ({ globalid: gid(), provincia: l.p, distrito: l.d, posto_adm: l.po, CreationDate: date(y0, y1) });
   const out = {};
 
+  // Entidades e técnicos (fictícios). Os códigos seguem a regra do notebook: ENT-001, ENT-001-T01…
+  out.entidades = { main: [], tables: { tecnicos: [] } };
+  const TIPO_ENT = { organizacao_comunitaria: "organizacao_comunitaria", governo: "governo", ong: "ong", instituicao_academica: "instituicao_academica",
+    agencia_intergovernamental: "agencia_intergovernamental", agencia_estrangeira: "agencia_estrangeira", setor_privado: "setor_privado" };
+  const ESTADOS_ENT = ["validado", "validado", "validado", "validado", "validado", "validado", "validado", "validado", "pendente", "rejeitado"];
+  const activos = [];
+  INST.forEach(([nome, tipo], i) => {
+    const estado = ESTADOS_ENT[i], cod = estado === "validado" ? `ENT-${String(i + 1).padStart(3, "0")}` : null;
+    const criado = estado === "pendente" ? Date.now() - 40 * 864e5 : date(2023, 2025);
+    const a = { globalid: gid(), CreationDate: criado, nome_entidade: nome, sigla: nome.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 5),
+      tipo_entidade: TIPO_ENT[tipo] || "outra", provincias_actuacao: some(provs.slice(0, 7), 1, 3).join(","), estado_entidade: estado,
+      codigo_entidade: cod, data_validacao: cod ? criado + int(2, 20) * 864e5 : null };
+    out.entidades.main.push({ attributes: a, geometry: null });
+    const nt = int(2, 5);
+    for (let k = 1; k <= nt; k++) {
+      const et = !cod ? "pendente" : (k === nt && R() > 0.6 ? "suspenso" : "validado");
+      const ct = et === "validado" || et === "suspenso" ? `${cod}-T${String(k).padStart(2, "0")}` : null;
+      out.entidades.tables.tecnicos.push({ attributes: { globalid: gid(), parentglobalid: a.globalid, estado_tecnico: et, codigo_tecnico: ct } });
+      if (et === "validado") activos.push({ codigo_tecnico: ct, codigo_entidade: cod, nome_entidade: nome });
+    }
+  });
+  const quem = () => (R() < 0.06 ? {} : { ...pick(activos), nome_digitalizador: "Técnico de demonstração" });
+
   // Viveiros
   out.viveiros = { main: [], tables: { registo_especies: [] } };
   for (let i = 1; i <= 24; i++) {
@@ -83,9 +106,11 @@ export function gerarDemo(choices, schema) {
   out.restauracao = { main: [], tables: { partes_interessadas_rpt: [], partes_executoras_rpt: [], material_vegetal: [], financiadores_grp: [] } };
   for (let i = 1; i <= 40; i++) {
     const l = local(), prop = int(5, 50), ha = Math.max(1, Math.round(prop * (0.3 + R() * 0.7))), tec = wpick(["restauracao_activa", "restauracao_hidrologica", "restauracao_combinada"], [6, 3, 1]);
-    const dg = R() > 0.5 ? `ADM_DEMO_${int(1, 100)}` : null;
+    const orig = wpick(["sim", "mapeada", "nao", "Sem_informação"], [35, 25, 30, 10]);
+    const dg = orig === "sim" ? `ADM_DEMO_${int(1, 100)}` : null;
     const a = { ...base(l), id_area_restauracao: `ARM_DEMO_${i}`, nome_do_projecto: `Projecto Demo ${i}`, inicio_do_projecto: date(2018, 2026),
-      em_area_degradada: dg ? "sim" : "nao", id_area_degradada: dg, area_total: prop, tecnica_restauracao_usadas: tec,
+      em_area_degradada: orig, id_area_degradada: dg,
+      lat_degradado: orig === "mapeada" ? l.lat : null, lon_degradado: orig === "mapeada" ? l.lon : null, ano_mapeamento: orig === "mapeada" && R() > 0.4 ? String(int(2018, 2024)) : null, area_total: prop, tecnica_restauracao_usadas: tec,
       num_homens: int(10, 120), num_mulheres: int(10, 130), custo_total_mt: R() > 0.3 ? int(2, 25) * 100000 : null, apoio_financeiro: "sim",
       plano_monitoria: R() > 0.4 ? "sim" : "nao", especies_utilizadas: some(ESP.slice(0, 6), 1, 3).join(",") };
     out.restauracao.main.push({ attributes: a, geometry: quad(l.lat, l.lon, ha) });
@@ -103,8 +128,25 @@ export function gerarDemo(choices, schema) {
     const f = pick(INST); out.restauracao.tables.financiadores_grp.push({ attributes: { globalid: gid(), parentglobalid: a.globalid, tipo_financiador: f[1], nome_financiador: f[0], percentagem_aporte: 100 } });
   }
 
+  // Tabela «Restauração em polígonos de mangal degradado» (normalmente criada pelo notebook)
+  out.poligonos = { main: [], tables: {} };
+  const SIG = { cabo_delgado: "CD", nampula: "NP", "zambézia": "ZB", sofala: "SF", inhambane: "IN", gaza: "GZ", "maputo_província": "MP", maputo_cidade: "MP" };
+  for (const r of out.restauracao.main) {
+    const a = r.attributes; if (a.em_area_degradada !== "mapeada") continue;
+    const haR = a.area_total || 5, base0 = { id_area_restauracao: a.id_area_restauracao, projecto: a.nome_do_projecto, ano_indicado: a.ano_mapeamento, ha_restauracao: haR };
+    if (R() < 0.15) { out.poligonos.main.push({ attributes: { globalid: gid(), ...base0, estado: "ponto_fora_de_poligono" }, geometry: null }); continue; }
+    const anos = some([2018, 2019, 2020, 2021, 2022, 2023, 2024], 1, 2).sort();
+    for (const ano of anos) {
+      const hp = Math.round((0.4 + R() * 8) * 100) / 100, hs = Math.round(Math.min(hp, haR) * (0.3 + R() * 0.7) * 100) / 100;
+      out.poligonos.main.push({ attributes: { globalid: gid(), ...base0, estado: "encontrado", ano, codigo_poligono: `${SIG[a.provincia] || "XX"}${ano}_${int(100, 50000)}`,
+        provincia_mapa: a.provincia, ha_poligono: hp, ha_sobreposicao: hs, pct_poligono_restaurado: Math.round((hs / hp) * 1000) / 10, camada: `Demo ${ano}` }, geometry: null });
+    }
+  }
+
   // Monitoria
-  out.monitoria = { main: [], tables: { parcelas: [] } };
+  out.monitoria = { main: [], tables: { parcelas: [], especie_q: [], medicoes: [], folhas_med: [] } };
+  const ABUND = ["inexistente", "baixa", "moderada", "alta"];
+  const STRESS = ["folhas_amarelas", "desfolha", "herbivoria", "pragas", "algas", "soterramento", "erosao", "danos", "lixo"];
   const projs = out.restauracao.main.map(r => r.attributes).filter(() => R() > 0.3);
   for (const p of projs) {
     const nv = int(1, 4);
@@ -118,15 +160,44 @@ export function gerarDemo(choices, schema) {
         temp_monitoria: anos < 1 ? "0_1" : anos < 3 ? "1_3" : anos < 5 ? "3_5" : "5_10", visita: v === 0 ? "linha_base" : "periodica",
         ameacas_observadas: some(["corte", "gado", "herbivoria", "cracas_algas", "sedimentacao", "erosao", "lixo"], 0, 2).join(",") || null,
         replantio_necessario: R() > 0.6 ? "sim" : "nao", participantes_homens: int(0, 15), participantes_mulheres: int(0, 18) };
-      let pl = 0, vv = 0;
+      let pl = 0, vv = 0, rec = 0, afs = [];
       const np = R() > 0.15 ? int(2, 4) : 0;
       for (let k = 1; k <= np; k++) {
-        const plant = 100, viv = Math.round(plant * Math.max(0.05, Math.min(1, 0.25 + R() * 0.6 - v * 0.03)));
-        pl += plant; vv += viv;
-        out.monitoria.tables.parcelas.push({ attributes: { globalid: gid(), parentglobalid: a.globalid, codigo_parcela: `P${k}`, especie_parcela: pick(ESP.slice(0, 4)),
-          plantas_plantadas: plant, plantas_vivas: viv, sobrevivencia_parcela: viv, altura_media: int(20, 180), cobertura_parcela: pick(["0_20", "21_40", "41_60"]),
-          regeneracao_natural: int(0, 40), estado_plantas: viv > 60 ? "bom" : viv > 35 ? "razoavel" : "mau" } });
+        const pa = { globalid: gid(), parentglobalid: a.globalid, codigo_parcela: `Q${String(k).padStart(2, "0")}`, area_parcela_m2: 100,
+          cobertura_parcela: pick(["0_20", "21_40", "41_60", "61_80"]), fz_caranguejo: wpick(ABUND, [1, 3, 4, 3]), fz_gastropode: wpick(ABUND, [2, 4, 3, 1]),
+          fz_bivalve: wpick(ABUND, [4, 3, 2, 1]), fz_peixes: wpick(ABUND, [3, 3, 3, 1]), buracos_scylla: wpick(ABUND, [3, 4, 2, 1]), fz_outros: wpick(ABUND, [6, 2, 1, 1]) };
+        let ppl = 0, pvv = 0, prec = 0;
+        const esps = some(ESP.slice(0, 4), 1, 3);
+        for (const e of esps) {
+          const plant = int(20, 60), taxaBase = { avicennia_marina: 0.75, rhizophora_mucronata: 0.62, ceriops_tagal: 0.55, bruguiera_gymnorrhiza: 0.45 }[e] || 0.5;
+          const viv = Math.round(plant * Math.max(0.05, Math.min(1, taxaBase + (R() - 0.5) * 0.4 - v * 0.03))), rc = int(0, 12);
+          ppl += plant; pvv += viv; prec += rc;
+          out.monitoria.tables.especie_q.push({ attributes: { globalid: gid(), parentglobalid: pa.globalid, especies: e, plantadas_s: plant, vivas_s: viv,
+            taxa_s: Math.round((viv / plant) * 1000) / 10, recrutas_s: rc, total_vivas_s: viv + rc } });
+        }
+        const alts = [], dias = [];
+        for (let m = 1; m <= int(3, 6); m++) {
+          const e = pick(esps), alt = Math.round(25 + anos * 45 + R() * 40), dia = Math.round((4 + anos * 9 + R() * 6) * 10) / 10;
+          alts.push(alt); dias.push(dia);
+          const st = R() < 0.45 ? ["nenhum"] : some(STRESS, 1, 2);
+          const me = { globalid: gid(), parentglobalid: pa.globalid, especies_1: e, cod_planta: `${pa.codigo_parcela}-P${m}`, diametro: dia, altura_p: alt,
+            ramos: a.temp_monitoria === "1_3" ? int(2, 12) : null, stress: st.join(","), intens_stress: st[0] === "nenhum" ? null : wpick(["baixa", "moderada", "alta"], [5, 3, 1]) };
+          if (a.temp_monitoria === "0_1") {
+            const fs = [];
+            for (let fo = 1; fo <= int(2, 3); fo++) { const c = Math.round((3 + R() * 5) * 10) / 10, lg = Math.round((1.5 + R() * 2.5) * 10) / 10, ar = Math.round(2 / 3 * c * lg * 10) / 10; fs.push(ar);
+              out.monitoria.tables.folhas_med.push({ attributes: { globalid: gid(), parentglobalid: me.globalid, folha_comp: c, folha_larg: lg, area_folha: ar } }); }
+            me.n_folhas_med = fs.length; me.af_maior = Math.max(...fs); me.af_media_planta = Math.round(fs.reduce((x, y) => x + y, 0) / fs.length * 10) / 10; afs.push(...fs);
+          }
+          out.monitoria.tables.medicoes.push({ attributes: me });
+        }
+        Object.assign(pa, { especie_parcela: esps[0], plantas_plantadas: ppl, plantas_vivas: pvv, sobrevivencia_parcela: Math.round((pvv / ppl) * 1000) / 10,
+          regeneracao_natural: prec, altura_media: Math.round(alts.reduce((x, y) => x + y, 0) / alts.length), diametro_medio: Math.round(dias.reduce((x, y) => x + y, 0) / dias.length * 10) / 10,
+          estado_plantas: pvv / ppl > 0.6 ? "bom" : pvv / ppl > 0.35 ? "razoavel" : "mau" });
+        out.monitoria.tables.parcelas.push({ attributes: pa });
+        pl += ppl; vv += pvv; rec += prec;
       }
+      a.regeneracao_total = rec;
+      if (afs.length) a.af_media_total = Math.round(afs.reduce((x, y) => x + y, 0) / afs.length * 10) / 10;
       a.sobrevivencia_media = pl ? Math.round((vv / pl) * 1000) / 10 : null;
       out.monitoria.main.push({ attributes: a, geometry: pt(geo[1], geo[0]) });
     }
@@ -166,6 +237,8 @@ export function gerarDemo(choices, schema) {
     for (const e of esp) out.ervas.tables.dominancia.push({ attributes: { globalid: gid(), parentglobalid: a.globalid, especie_codigo: e, escala_dominancia: pick(["minima", "baixa", "moderada", "alta", "muito_alta"]) } });
     if (a.iniciativa_de_gestao === "sim") { const g = pick(INST); out.ervas.tables.gestores_rpt.push({ attributes: { globalid: gid(), parentglobalid: a.globalid, tipo_entidade_gestora: g[1], nome_entidade_gestora: g[0] } }); }
   }
+  for (const ds of ["viveiros", "degradadas", "restauracao", "monitoria", "levantamento", "ervas"]) for (const r of out[ds].main) Object.assign(r.attributes, quem());
+
   // Preenche campos obrigatórios em falta (os dados de demonstração devem passar a validação),
   // deixando alguns problemas de propósito para a Área técnica ter exemplos.
   if (schema) for (const [ds, D] of Object.entries(out)) {
@@ -177,6 +250,7 @@ export function gerarDemo(choices, schema) {
         const a = row.attributes;
         for (const [c, f] of Object.entries(campos)) {
           if (!f.required || (a[c] !== undefined && a[c] !== null && a[c] !== "")) continue;
+          if (c.startsWith("codigo_")) continue; // registos antigos sem código de técnico (exemplo para a validação)
           if (i % 23 === 7) continue; // problema intencional
           if (f.type === "select_one") { const L = choices[f.list] || {}; const ks = Object.keys(L).filter(k => !L[k].distrito || L[k].distrito === a.distrito); a[c] = ks[0] || null; }
           else if (f.type === "select_multiple") a[c] = Object.keys(choices[f.list] || {})[0] || null;
@@ -186,7 +260,7 @@ export function gerarDemo(choices, schema) {
         }
       });
     }
-    if (D.main[5] && ds !== "levantamento") D.main[5].geometry = null; // registo sem localização (exemplo)
+    if (D.main[5] && !["levantamento", "entidades", "poligonos"].includes(ds)) D.main[5].geometry = null; // registo sem localização (exemplo)
   }
   return out;
 }

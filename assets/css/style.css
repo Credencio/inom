@@ -296,3 +296,14 @@ a.credito-img:hover{opacity:1;text-decoration:underline}
 .dica-mapa.ok{color:#126b44;font-weight:600}
 .pop-btn{display:block;margin-top:.45rem}
 @media (max-width:860px){.eco{grid-template-columns:1fr}.eco-cartao{min-height:190px}}
+
+/* Blocos de imagem e quadro das tabelas das fontes */
+.card-c.imagem, .imagem{ text-align:center }
+.bloco-img{ max-width:100%; height:auto; border-radius:10px; display:block; margin:0 auto }
+.legenda-img{ font-size:.82rem; color:#5b6670; margin:.4rem 0 0 }
+.md img{ max-width:100%; border-radius:10px }
+.mapa-tabelas{ width:100%; font-size:.85rem; margin:.4rem 0 }
+.mapa-tabelas td, .mapa-tabelas th{ padding:.3rem .4rem; vertical-align:middle }
+.mapa-tabelas select, .mapa-tabelas input{ width:100%; min-width:140px }
+.mapa-tabelas .campo{ margin:0 } .mapa-tabelas .campo > span{ display:none }
+.ok-txt{ color:#1f7a5c; font-weight:600 }

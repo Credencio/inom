@@ -115,7 +115,7 @@ export async function gerarPDF(paginas) {
     }
     for (const g of pg.graficos || []) {
       if (g.tipo === "mapa") continue;
-      if (g.tipo === "texto") continue;
+      if (g.tipo === "texto" || g.tipo === "imagem") continue;
       espaco(20);
       doc.setTextColor(30, 40, 50); doc.setFont("helvetica", "bold"); doc.setFontSize(10.5);
       doc.text(doc.splitTextToSize(tr(g.titulo, lang), W - 2 * M), M, y); y += 4.5;

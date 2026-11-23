@@ -33,7 +33,7 @@ function renderPainel(pg, p) {
 }
 
 /* ---------------- Regras ---------------- */
-const CAMPOS_NOME = { viveiros: "nome_viveiro", restauracao: "nome_do_projecto", ervas: "nome_tapete" };
+const CAMPOS_NOME = { viveiros: "nome_viveiro", restauracao: "nome_do_projecto", ervas: "nome_tapete", entidades: "nome_entidade" };
 const LIGACOES = [
   { ds: "restauracao", tabela: "main", campo: "id_area_degradada", alvo: "degradadas", campoAlvo: "id_area_degradada" },
   { ds: "restauracao", tabela: "material_vegetal", campo: "viveiro_origem", alvo: "viveiros", campoAlvo: "id_viveiro" },
@@ -56,7 +56,7 @@ export function validar() {
       const campos = (sc && sc.tables[tab] && sc.tables[tab].fields) || {};
       for (const r of rows) {
         if (R.obrigatorios) for (const [c, f] of Object.entries(campos)) {
-          if (!f.required || ["geoshape", "geopoint", "geotrace", "image", "calculate"].includes(f.type)) continue;
+          if (!f.required || ["geoshape", "geopoint", "geotrace", "image", "calculate"].includes(f.type) || c === "codigo_tecnico") continue;
           const v = r.a[c] ?? r.a[c.toLowerCase()];
           if (v === null || v === undefined || v === "") add(r, c, "r_obrigatorio", "");
         }
@@ -101,6 +101,32 @@ export function validar() {
   if (R.consistencia && S.data.monitoria && S.data.monitoria.tables.parcelas) for (const p of S.data.monitoria.tables.parcelas) {
     const pl = num(p.a.plantas_plantadas), vv = num(p.a.plantas_vivas);
     if (pl !== null && vv !== null && vv > pl) add(p, "plantas_vivas", "r_vivas", `${vv} > ${pl}`);
+  }
+  // Quem preencheu: código do técnico (fichas com o sistema de entidades e técnicos)
+  const FICHAS = ["viveiros", "degradadas", "restauracao", "monitoria", "levantamento", "ervas"];
+  const E = S.data.entidades;
+  const entOk = E && E.main && E.estado !== "vazio" && E.estado !== "erro";
+  const activos = new Set();
+  if (entOk) for (const t of (E.tables.tecnicos || [])) {
+    const ent = t.parent || t.root;
+    if (String(t.a.estado_tecnico || "") === "validado" && ent && String(ent.a.estado_entidade || "") === "validado" && t.a.codigo_tecnico) activos.add(String(t.a.codigo_tecnico));
+  }
+  for (const ds of FICHAS) {
+    const D = S.data[ds]; if (!D || !D.main) continue;
+    for (const r of D.main) {
+      const c = r.a.codigo_tecnico;
+      if (!c) { if (R.sem_tecnico !== false) add(r, "codigo_tecnico", "r_sem_tecnico", "", "aviso"); continue; }
+      if (R.tecnico_inactivo !== false && entOk && !activos.has(String(c))) add(r, "codigo_tecnico", "r_tecnico_inactivo", c);
+    }
+  }
+  if (R.entidade_pendente !== false && entOk) {
+    const dias = Number(V.diasPendente ?? 15);
+    for (const r of E.main) {
+      if (String(r.a.estado_entidade || "pendente") !== "pendente") continue;
+      const d = dataDe(r.a.CreationDate ?? r.a.creationdate);
+      const n = d ? Math.floor((hoje - d.getTime()) / 864e5) : null;
+      if (n === null || n >= dias) add(r, "estado_entidade", "r_entidade_pendente", n === null ? "" : `${n} ${S.lang === "en" ? "days" : "dias"}`, "aviso");
+    }
   }
   return out;
 }

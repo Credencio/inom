@@ -1,5 +1,5 @@
 // Gestão do portal: editor gráfico da configuração, com gravação no GitHub (token pessoal).
-import { S, DATASETS, lerArcGIS, rotuloCampo } from "./data.js";
+import { S, DATASETS, lerArcGIS, rotuloCampo, completarConfig } from "./data.js";
 import { UI, VIRTUAIS_CAMPOS } from "./i18n.js";
 import { $, h, tr, clone, toast, b64utf8, fileToB64, slug, download, esc, imagem, IMAGENS_PADRAO, IMAGENS_SLOTS } from "./util.js";
 import { renderShell, repoPadrao, recarregarDados, modal } from "./main.js";
@@ -117,7 +117,7 @@ const MEDIDAS = () => [["contagem", L("Contagem de registos", "Record count")], 
 const TIPOS = () => [["barras", L("Barras verticais", "Vertical bars")], ["barrash", L("Barras horizontais", "Horizontal bars")], ["empilhado", L("Barras empilhadas", "Stacked bars")],
   ["pizza", L("Anel (pizza)", "Donut")], ["linha", L("Linha", "Line")], ["area", L("Área (linha preenchida)", "Area (filled line)")],
   ["treemap", L("Mosaico (treemap)", "Treemap")], ["sankey", L("Fluxo (sankey): categorias → divisão", "Flow (sankey): categories → split")], ["gauge", L("Medidor (um só valor)", "Gauge (single value)")], ["mapa", L("Mapa", "Map")], ["tabela", L("Tabela de registos", "Record table")],
-  ["cobertura", L("Registos por província", "Records by province")], ["texto", L("Texto", "Text")]];
+  ["cobertura", L("Registos por província", "Records by province")], ["texto", L("Texto", "Text")], ["imagem", L("Imagem", "Image")]];
 const ICONES_OPS = () => [["lista", L("Lista", "List")], ["mapa", L("Mapa", "Map")], ["alerta", L("Alerta", "Alert")], ["folha", L("Folha", "Leaf")], ["muda", L("Muda", "Seedling")],
   ["viveiro", L("Viveiro", "Nursery")], ["grelha", L("Grelha", "Grid")], ["onda", L("Onda", "Wave")], ["pessoas", L("Pessoas", "People")], ["dinheiro", L("Dinheiro", "Money")], ["pct", "%"], ["arvore", L("Árvore", "Tree")]];
 const LARGURAS = [["1/3", "1/3"], ["1/2", "1/2"], ["2/3", "2/3"], ["1", L("Linha inteira", "Full row")]];
@@ -265,7 +265,7 @@ async function guardar() {
 }
 async function descartar() {
   if (!confirm(L("Descartar todas as alterações não guardadas?", "Discard all unsaved changes?"))) return;
-  const r = await fetch("config/portal.json?v=" + Date.now()); W = await r.json(); S.cfg = W; sujo = false; S.gestaoSujo = false; S.preview = false; renderShell(); renderGestao($("#app"));
+  const r = await fetch("config/portal.json?v=" + Date.now()); W = completarConfig(await r.json()); S.cfg = W; sujo = false; S.gestaoSujo = false; S.preview = false; renderShell(); renderGestao($("#app"));
 }
 function sair() { if (sujo && !confirm(L("Há alterações não guardadas. Sair mesmo assim?", "There are unsaved changes. Sign out anyway?"))) return; S.auth = null; sessionStorage.removeItem("gh_auth"); W = null; sujo = false; renderGestao($("#app")); }
 window.addEventListener("beforeunload", e => { if (sujo) { e.preventDefault(); e.returnValue = ""; } });
@@ -341,9 +341,28 @@ function secImagens(el) {
   }
 }
 
+/* Carrega uma imagem e acrescenta-a ao fim do texto (PT e EN) em Markdown. */
+function inserirImagem(obj, chave, depois) {
+  const ficheiro = h("input", { type: "file", accept: "image/*", style: "display:none", onchange: async e => {
+    const f = e.target.files[0]; if (!f) return;
+    const ext = f.name.includes(".") ? f.name.split(".").pop().toLowerCase() : "jpg";
+    const nome = `assets/img/${slug(f.name.replace(/\.[^.]+$/, ""))}.${ext}`;
+    try {
+      toast(L("A enviar ", "Uploading ") + f.name + "…");
+      await gravarFicheiro(nome, await fileToB64(f), `Portal: imagem ${nome}`);
+      if (typeof obj[chave] !== "object" || obj[chave] === null) obj[chave] = { pt: obj[chave] || "", en: "" };
+      for (const l of ["pt", "en"]) obj[chave][l] = `${obj[chave][l] || ""}\n\n![${f.name.replace(/\.[^.]+$/, "")}](${nome})\n`;
+      marcar(); if (depois) depois(); else renderGestao($("#app"));
+      toast(L("Imagem inserida no fim do texto. Pode mover a linha ![…](…) para onde quiser.", "Image added at the end of the text. You can move the ![…](…) line anywhere."), "ok", 7000);
+    } catch (err) { toast(err.message, "erro", 8000); }
+  } });
+  return h("div", { class: "linha" }, ficheiro, h("button", { class: "btn", type: "button", onclick: () => ficheiro.click() }, "🖼 " + L("Inserir imagem no texto", "Insert image in the text")));
+}
+
 function secSobre(el) {
   titulo(el, "Página Sobre", "About page", L("Escreva em texto simples. Formatação: ## Título, **negrito**, *itálico*, - lista, [texto](https://ligação).", "Write plain text. Formatting: ## Heading, **bold**, *italic*, - list, [text](https://link)."));
   if (typeof W.sobre !== "object") W.sobre = { pt: W.sobre || "", en: "" };
+  el.append(inserirImagem(W, "sobre"));
   for (const l of ["pt", "en"]) {
     const prev = h("div", { class: "md preview", html: window.marked ? window.marked.parse(W.sobre[l] || "") : "" });
     const ta = h("textarea", { rows: 18, oninput: e => { W.sobre[l] = e.target.value; marcar(); prev.innerHTML = window.marked ? window.marked.parse(e.target.value) : esc(e.target.value); } }, W.sobre[l] || "");
@@ -371,27 +390,66 @@ function secFichas(el) {
 }
 
 function secFontes(el) {
-  titulo(el, "Fontes de dados", "Data sources", L("Cole o URL de cada Feature Service (termina em /FeatureServer). As camadas têm de estar partilhadas publicamente (de preferência uma vista sem dados pessoais) para o portal as ler.",
-    "Paste each Feature Service URL (ends in /FeatureServer). Layers must be shared publicly (ideally a view without personal data) for the portal to read them."));
+  titulo(el, "Fontes de dados", "Data sources", L("Para cada ficha, cole o URL do Feature Service (termina em /FeatureServer). O portal lê sozinho a camada principal e TODAS as tabelas das repetições da ficha. Enquanto uma ficha não tiver URL, o portal mostra dados de demonstração. As camadas têm de estar partilhadas publicamente (de preferência uma vista sem dados pessoais).",
+    "For each form, paste the Feature Service URL (ends in /FeatureServer). The portal reads the main layer and ALL the repeat tables by itself. Until a form has a URL, the portal shows demo data. Layers must be shared publicly (ideally a view without personal data)."));
   el.append(campo(L("Usar dados de demonstração nas fichas sem URL", "Use demo data for forms without a URL"), W.fontes, "modoDemo", { tipo: "checkbox" }),
     h("button", { class: "btn", onclick: async () => { await recarregarDados(); toast(L("Dados recarregados.", "Data reloaded."), "ok"); } }, "↻ " + L("Recarregar dados com estas definições", "Reload data with these settings")));
   for (const ds of DATASETS) {
-    const c = W.fontes.datasets[ds];
-    const res = h("small", { class: "res" });
-    el.append(h("details", { class: "item", open: !c.url }, h("summary", {}, h("strong", {}, tr(c.nome, S.lang)), " ", h("span", { class: "tag " + (c.url ? "ok" : "vazio") }, c.url ? t("fonte_ok") : t("fonte_vazio"))),
+    const c = W.fontes.datasets[ds]; if (!c) continue;
+    c.tabelas = c.tabelas || {};
+    const sc = S.schema[ds];
+    const esperadas = sc ? Object.keys(sc.tables) : ["main"];
+    const res = h("div", { class: "res" });
+    const quadro = h("div", { class: "sub" });
+    const desenharQuadro = (raw, erro) => {
+      quadro.innerHTML = "";
+      const nomesServ = raw ? raw.meta.servico.map(i => i.nome) : [];
+      quadro.append(h("small", {}, L("Tabelas da ficha e onde o portal as encontrou. Só precisa de mexer numa linha se ela aparecer com ✗ (tabela com outro nome ou noutro serviço).",
+        "Form tables and where the portal found them. Only change a row if it shows ✗ (table with another name or in another service).")));
+      const tb = h("table", { class: "tabela mapa-tabelas" }, h("thead", {}, h("tr", {}, h("th", {}, L("Tabela da ficha", "Form table")), h("th", {}, L("Registos", "Records")),
+        h("th", {}, L("Nome no serviço (se for diferente)", "Name in the service (if different)")), h("th", {}, L("Ou URL próprio (outro serviço)", "Or its own URL (another service)")))));
+      const corpo = h("tbody");
+      for (const t of esperadas) {
+        const m = c.tabelas[t] = c.tabelas[t] || {};
+        const n = raw ? (t === "main" ? raw.main.length : (raw.tables[t] ? raw.tables[t].length : null)) : null;
+        const rot = t === "main" ? L("Principal", "Main") + (raw && raw.meta.principal ? ` (${raw.meta.principal.nome})` : "") : (sc.tables[t].label ? `${t} · ${sc.tables[t].label}` : t);
+        const estado = !raw ? "—" : n === null ? h("span", { class: "erro-txt" }, "✗ " + L("não encontrada", "not found")) : h("span", { class: "ok-txt" }, `✓ ${n}`);
+        const sel = t === "main"
+          ? escolha("", c, "camadaPrincipal", [["", L("Automática (camada 0)", "Automatic (layer 0)")], ...(raw ? raw.meta.servico.map(i => [String(i.id), `${i.id} · ${i.nome}`]) : (c.camadaPrincipal !== undefined && c.camadaPrincipal !== "" ? [[String(c.camadaPrincipal), String(c.camadaPrincipal)]] : []))])
+          : h("select", { onchange: e => { m.nome = e.target.value || undefined; if (!m.nome) delete m.nome; marcar(); } },
+              h("option", { value: "" }, L("Automático (mesmo nome)", "Automatic (same name)")),
+              [...new Set([...(nomesServ || []), ...(m.nome ? [m.nome] : [])])].map(x => h("option", { value: x, selected: m.nome === x }, x)));
+        const url = t === "main" ? h("span", { class: "nota" }, "—") : h("input", { type: "text", placeholder: "https://…/FeatureServer/1", value: m.url || "", oninput: e => { m.url = e.target.value.trim() || undefined; if (!m.url) delete m.url; marcar(); } });
+        corpo.append(h("tr", {}, h("td", {}, rot), h("td", {}, estado), h("td", {}, sel), h("td", {}, url)));
+      }
+      tb.append(corpo); quadro.append(tb);
+      if (raw) {
+        const sobra = Object.keys(raw.tables).filter(k => !esperadas.includes(k));
+        if (sobra.length) quadro.append(h("small", {}, L("No serviço mas não na ficha (ignoradas): ", "In the service but not in the form (ignored): ") + sobra.join(", ")));
+      }
+      if (erro) quadro.append(h("p", { class: "erro-txt" }, "✗ " + erro));
+    };
+    const testar = async () => {
+      if (!c.url) { res.textContent = L("Cole primeiro o URL.", "Paste the URL first."); return; }
+      res.textContent = L("A ler o serviço…", "Reading the service…"); res.className = "res";
+      try { const raw = await lerArcGIS(c, ds); res.textContent = "✓ " + L("Ligação a funcionar", "Connection working"); res.className = "res ok"; desenharQuadro(raw); }
+      catch (e) { res.textContent = ""; desenharQuadro(null, e.message); }
+    };
+    desenharQuadro(null);
+    el.append(h("details", { class: "item", open: !c.url && ds !== "poligonos" }, h("summary", {}, h("strong", {}, tr(c.nome, S.lang)), " ", h("span", { class: "tag " + (c.url ? "ok" : "vazio") }, c.url ? t("fonte_ok") : L("dados de demonstração", "demo data"))),
       h("div", { class: "item-corpo" },
+        ds === "poligonos" ? h("p", { class: "nota" }, L("Tabela criada pelo notebook «Restauração em polígonos de mangal degradado». Cole o URL da tabela publicada (partilhada publicamente).", "Table created by the “Restoration on degraded mangrove polygons” notebook. Paste the URL of the published table (shared publicly).")) : null,
+        ds === "entidades" ? h("p", { class: "nota" }, L("Use uma VISTA pública da ficha de entidades só com os campos da entidade e o estado (sem telefones, e-mails nem nomes dos técnicos).", "Use a public VIEW of the organisations form with only organisation fields and status (no phones, e-mails or staff names).")) : null,
         bilingue(L("Nome", "Name"), c, "nome"),
         campo(L("URL do Feature Service", "Feature Service URL"), c, "url", { ajuda: "https://services….arcgis.com/…/arcgis/rest/services/…/FeatureServer" }),
-        h("div", { class: "linha" }, h("button", { class: "btn", onclick: async () => {
-          res.textContent = L("A testar…", "Testing…");
-          try { const raw = await lerArcGIS(c); res.textContent = `✓ ${raw.main.length} ${t("registos")} · ${Object.entries(raw.tables).map(([k, v]) => `${k}: ${v.length}`).join(" · ")}`; res.className = "res ok"; }
-          catch (e) { res.textContent = "✗ " + e.message; res.className = "res erro-txt"; }
-        } }, L("Testar ligação", "Test connection")), res),
+        h("div", { class: "linha" }, h("button", { class: "btn", onclick: testar }, L("Testar ligação e ver as tabelas", "Test connection and show tables")), res),
+        quadro,
         campo(L("ID do formulário Survey123 (para o botão Editar na validação)", "Survey123 form item ID (for the Edit button in validation)"), c, "formItemId"),
         escolha(L("Campo usado no filtro de ano", "Field used for the year filter"), c, "campoAno", datasCampos(ds)),
         campo(L("Cor no mapa", "Map colour"), c, "cor", { tipo: "color" }),
-        campoLista(L("Campos com nomes de instituições (separados por vírgula)", "Fields with institution names (comma separated)"), c.camposInstituicao, v => (c.camposInstituicao = v),
-          L("Use tabela.campo para tabelas relacionadas, ex.: partes_executoras_rpt.nome_parte_executora", "Use table.field for related tables, e.g. partes_executoras_rpt.nome_parte_executora")),
+        campoLista(L("Campos com o nome da instituição (separados por vírgula)", "Fields with the institution name (comma separated)"), c.camposInstituicao, v => (c.camposInstituicao = v),
+          L("Por omissão: nome_entidade (entidade validada do técnico). Use tabela.campo para tabelas relacionadas.", "Default: nome_entidade (the staff member's validated organisation). Use table.field for related tables.")),
+        campoLista(L("Alternativa para registos antigos sem entidade", "Fallback for older records without an organisation"), c.camposInstituicaoAlternativos, v => (c.camposInstituicaoAlternativos = v)),
         campo(L("Token ArcGIS (só se a camada não for pública; fica visível no repositório)", "ArcGIS token (only if the layer is not public; visible in the repository)"), c, "token"))));
   }
 }
@@ -400,7 +458,7 @@ function secDashboard(el) {
   const D = W.dashboard;
   titulo(el, "Dashboard", "Dashboard", L("Cada página tem indicadores (números em destaque) e gráficos. Altere títulos, tipo de gráfico, campos e ordem. As opções avançadas permitem gráficos com várias séries.",
     "Each page has indicators (headline numbers) and charts. Change titles, chart type, fields and order. Advanced options allow multi-series charts."));
-  el.append(h("div", { class: "sub" }, (D.versao || 1) < 3 ? h("p", {}, h("strong", {}, L("Há uma versão nova do dashboard disponível", "A new dashboard version is available")), " — " + L("mapas com o contorno das áreas restauradas e degradadas, fluxo viveiro → restauração, mosaico de espécies, medidores, áreas acumuladas e indicadores com tendência.", "maps with restored and degraded area outlines, nursery → restoration flow, species treemap, gauges, cumulative areas and indicators with trends.")) : null,
+  el.append(h("div", { class: "sub" }, (D.versao || 1) < 4 ? h("p", {}, h("strong", {}, L("Há uma versão nova do dashboard disponível", "A new dashboard version is available")), " — " + L("página «Entidades e contribuições», sobrevivência e regeneração por espécie, crescimento, sinais de stress, fauna associada e restauração sobre mangal degradado mapeado.", "“Organisations and contributions” page, survival and regeneration by species, growth, stress signs, associated fauna and restoration on mapped degraded mangrove.")) : null,
     h("button", { class: "btn", onclick: async () => {
       if (!confirm(L("Substituir as páginas, indicadores e gráficos do dashboard pela versão padrão? As outras definições do portal não mudam.", "Replace the dashboard pages, indicators and charts with the default version? Other portal settings stay the same."))) return;
       try { const r = await fetch("config/dashboard_padrao.json?v=" + Date.now()); const novo = await r.json();
@@ -452,7 +510,7 @@ function editorFiltro(obj) {
 
 function editarGrafico(g, c) {
   const redesenhar = () => { c.innerHTML = ""; editarGrafico(g, c); };
-  const simples = !["mapa", "tabela", "cobertura", "texto", "gauge"].includes(g.tipo);
+  const simples = !["mapa", "tabela", "cobertura", "texto", "gauge", "imagem"].includes(g.tipo);
   c.append(bilingue(L("Título", "Title"), g, "titulo"), bilingue(L("Subtítulo", "Subtitle"), g, "subtitulo"),
     h("div", { class: "tres" }, escolha(L("Tipo", "Type"), g, "tipo", TIPOS(), { depois: redesenhar }), escolha(L("Largura", "Width"), g, "largura", LARGURAS), campo(L("Altura (px, opcional)", "Height (px, optional)"), g, "altura", { tipo: "number" })),
     h("div", { class: "duas" }, escolha(L("Ficha", "Form"), g, "dataset", dsOps(), { depois: redesenhar }), escolha(L("Tabela", "Table"), g, "tabela", tabOps(g.dataset), { depois: redesenhar })));
@@ -480,7 +538,9 @@ function editarGrafico(g, c) {
     onchange: e => { g.camadas = (g.camadas || []).filter(x => x !== d); if (e.target.checked) g.camadas.push(d); marcar(); } }), " " + tr(W.fontes.datasets[d].nome, S.lang)))));
   if (g.tipo === "tabela") c.append(campoLista(L("Colunas (campos separados por vírgula)", "Columns (comma-separated fields)"), g.colunas, v => (g.colunas = v),
     L("Campos disponíveis: ", "Available fields: ") + campoOps(g.dataset, g.tabela, false).map(o => o[0]).join(", ")));
-  if (g.tipo === "texto") c.append(bilingue(L("Texto", "Text"), g, "texto", { area: true, rows: 8 }));
+  if (g.tipo === "texto") c.append(bilingue(L("Texto", "Text"), g, "texto", { area: true, rows: 8 }), inserirImagem(g, "texto"));
+  if (g.tipo === "imagem") c.append(carregar(L("Imagem", "Image"), g, "imagem", "assets/img", { accept: "image/*", imagem: true }),
+    bilingue(L("Legenda (opcional)", "Caption (optional)"), g, "legenda"), campo(L("Ligação ao clicar (opcional)", "Link on click (optional)"), g, "ligacao"));
   // Avançado: JSON do gráfico
   const ta = h("textarea", { rows: 10, class: "mono" }, JSON.stringify(g, null, 1));
   const msg = h("small", {});
@@ -504,8 +564,12 @@ function secValidacao(el) {
   titulo(el, "Validação de dados", "Data validation", L("Regras usadas na Área técnica › Validação de dados.", "Rules used in Technical area › Data validation."));
   const nomes = { obrigatorios: L("Campos obrigatórios", "Required fields"), geometria: L("Localização (existe e está dentro de Moçambique)", "Location (exists and is inside Mozambique)"),
     datas: L("Datas plausíveis", "Plausible dates"), limites: L("Valores dentro dos limites", "Values within limits"), duplicados: L("Possíveis duplicados", "Possible duplicates"),
-    ligacoes: L("Ligações entre fichas", "Links between forms"), siglas: L("Instituições escritas em sigla", "Institutions written as acronyms"), consistencia: L("Plantas vivas ≤ plantadas", "Live plants ≤ planted") };
+    ligacoes: L("Ligações entre fichas", "Links between forms"), siglas: L("Instituições escritas em sigla", "Institutions written as acronyms"), consistencia: L("Plantas vivas ≤ plantadas", "Live plants ≤ planted"),
+    sem_tecnico: L("Registos sem código de técnico (registos antigos)", "Records without a staff code (older records)"),
+    tecnico_inactivo: L("Código de técnico não validado ou suspenso", "Staff code not validated or suspended"),
+    entidade_pendente: L("Entidades à espera de validação", "Organisations awaiting validation") };
   el.append(h("div", { class: "checks" }, Object.keys(nomes).map(k => campo(nomes[k], V.regras, k, { tipo: "checkbox" }))));
+  el.append(campo(L("Avisar sobre entidades pendentes há mais de (dias)", "Warn about organisations pending for more than (days)"), V, "diasPendente", { tipo: "number" }));
   const bb = { a: V.bbox[0], b: V.bbox[1], c: V.bbox[2], d: V.bbox[3] };
   const upd = () => { V.bbox = [bb.a, bb.b, bb.c, bb.d].map(Number); };
   el.append(h("h4", {}, L("Rectângulo de Moçambique (graus)", "Mozambique bounding box (degrees)")),
@@ -533,7 +597,7 @@ function secBackup(el) {
   titulo(el, "Cópia de segurança", "Backup", L("Guarde uma cópia da configuração antes de grandes alterações. Pode repô-la mais tarde.", "Keep a copy of the configuration before big changes. You can restore it later."));
   const inp = h("input", { type: "file", accept: ".json", style: "display:none", onchange: async e => {
     const f = e.target.files[0]; if (!f) return;
-    try { const o = JSON.parse(await f.text()); if (!o.portal || !o.dashboard) throw new Error(L("Ficheiro não é uma configuração do portal", "Not a portal configuration file")); W = o; S.cfg = W; marcar(); renderShell(); toast(L("Configuração carregada. Clique em Guardar e publicar.", "Configuration loaded. Click Save and publish."), "ok"); }
+    try { const o = JSON.parse(await f.text()); if (!o.portal || !o.dashboard) throw new Error(L("Ficheiro não é uma configuração do portal", "Not a portal configuration file")); W = completarConfig(o); S.cfg = W; marcar(); renderShell(); toast(L("Configuração carregada. Clique em Guardar e publicar.", "Configuration loaded. Click Save and publish."), "ok"); }
     catch (err) { toast(err.message, "erro"); }
   } });
   el.append(h("div", { class: "linha" },

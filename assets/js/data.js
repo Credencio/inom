@@ -12,7 +12,45 @@ export const S = {
   auth: null
 };
 
-export const DATASETS = ["viveiros", "degradadas", "restauracao", "monitoria", "levantamento", "ervas"];
+export const DATASETS = ["viveiros", "degradadas", "restauracao", "monitoria", "levantamento", "ervas", "entidades", "poligonos"];
+// Conjuntos que não são fichas de campo com localização (não entram no mapa geral nem nos totais por ficha)
+export const DATASETS_APOIO = ["entidades", "poligonos"];
+
+/* Definições por omissão de conjuntos acrescentados depois da 1.ª versão do portal.
+   Uma configuração antiga (portal.json) é completada com estas, sem apagar nada. */
+const PADRAO_FONTES = {
+  entidades: { nome: { pt: "Entidades e técnicos", en: "Organisations and staff" }, url: "", formItemId: "", campoAno: "data_validacao", cor: "#7a8b99",
+    camposInstituicao: ["nome_entidade"], tabelas: {} },
+  poligonos: { nome: { pt: "Restauração em mangal degradado mapeado", en: "Restoration on mapped degraded mangrove" }, url: "", formItemId: "", campoAno: "ano", cor: "#c2417a",
+    camposInstituicao: [], tabelas: {}, pai: { dataset: "restauracao", campo: "id_area_restauracao", campoPai: "id_area_restauracao" } }
+};
+const PRIVADOS = ["codigo_tecnico", "tec_utilizador", "utilizador_sessao", "telefone_entidade", "email_entidade", "responsavel_nome", "responsavel_cargo",
+  "endereco", "documento_entidade", "nome_tecnico", "funcao_tecnico", "telefone_tecnico", "email_tecnico", "utilizador_arcgis", "obs_gestor"];
+export function completarConfig(cfg) {
+  if (!cfg) return cfg;
+  cfg.fontes = cfg.fontes || { datasets: {} }; cfg.fontes.datasets = cfg.fontes.datasets || {};
+  for (const [k, v] of Object.entries(PADRAO_FONTES)) if (!cfg.fontes.datasets[k]) cfg.fontes.datasets[k] = JSON.parse(JSON.stringify(v));
+  for (const ds of DATASETS) {
+    const c = cfg.fontes.datasets[ds]; if (!c) continue;
+    c.tabelas = c.tabelas || {};
+    // a entidade validada (código do técnico) passa a ser a instituição principal; os campos antigos ficam como alternativa
+    if (!DATASETS_APOIO.includes(ds) && !c.entidadeMigrada) {
+      const antigos = (c.camposInstituicao || []).filter(x => x !== "nome_entidade");
+      c.camposInstituicao = ["nome_entidade"]; c.camposInstituicaoAlternativos = antigos; c.entidadeMigrada = true;
+    }
+  }
+  cfg.fichas = cfg.fichas || [];
+  if (!cfg.fichas.some(f => f.id === "entidades")) cfg.fichas.unshift({ id: "entidades", nome: { pt: "Registo de Entidades e Técnicos", en: "Organisation and Staff Registration" },
+    descricao: { pt: "Registo da entidade e dos técnicos que vão preencher as fichas. Fica pendente até ser validado pelo gestor do sistema; depois cada técnico recebe o seu código.",
+      en: "Registration of the organisation and the staff who will fill in the forms. It stays pending until validated by the system manager; then each staff member receives a code." },
+    versao: "1.0", ficheiro: "fichas/Registo_de_Entidades_e_Tecnicos.xlsx", survey123: "" });
+  cfg.privacidade = cfg.privacidade || { camposExcluidos: [] };
+  for (const x of PRIVADOS) if (!cfg.privacidade.camposExcluidos.includes(x)) cfg.privacidade.camposExcluidos.push(x);
+  cfg.validacao = cfg.validacao || {}; cfg.validacao.regras = cfg.validacao.regras || {};
+  for (const r of ["sem_tecnico", "tecnico_inactivo", "entidade_pendente"]) if (cfg.validacao.regras[r] === undefined) cfg.validacao.regras[r] = true;
+  if (cfg.validacao.diasPendente === undefined) cfg.validacao.diasPendente = 15;
+  return cfg;
+}
 export const ORDEM_PROVINCIAS = ["cabo_delgado", "nampula", "zambézia", "sofala", "inhambane", "gaza", "maputo_província", "maputo_cidade"];
 
 /* ---------------- Leitura ---------------- */
@@ -47,24 +85,55 @@ async function queryAll(base, id, isLayer, token) {
   return out;
 }
 
-export async function lerArcGIS(cfgDs) {
-  const base = serviceRoot(cfgDs.url);
+function partesURL(url) {
+  const u = String(url || "").trim().replace(/\?.*$/, "").replace(/\/+$/, "");
+  const m = u.match(/^(.*\/(?:FeatureServer|MapServer))(?:\/(\d+))?$/i);
+  return m ? { base: m[1], id: m[2] !== undefined ? Number(m[2]) : null } : { base: serviceRoot(u), id: null };
+}
+const simples = s => String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+/** Lê um serviço: a camada principal + TODAS as camadas e tabelas relacionadas (repetições da ficha).
+ *  cfgDs.tabelas permite, para cada tabela da ficha, indicar outro nome no serviço ou um URL próprio. */
+export async function lerArcGIS(cfgDs, ds) {
+  const { base, id: idUrl } = partesURL(cfgDs.url);
   const token = cfgDs.token || "";
   const meta = await getJSON(base, { f: "json" }, token);
   const items = [...(meta.layers || []).map(l => ({ ...l, isLayer: true })), ...(meta.tables || []).map(t => ({ ...t, isLayer: false }))]
     .sort((a, b) => a.id - b.id);
   if (!items.length) throw new Error("O serviço não tem camadas nem tabelas");
-  const mainItem = items.find(i => i.id === 0) || items[0];
-  const raw = { main: await queryAll(base, mainItem.id, mainItem.isLayer, token), tables: {}, meta: { nomes: {} } };
+  const pedido = cfgDs.camadaPrincipal !== undefined && cfgDs.camadaPrincipal !== "" && cfgDs.camadaPrincipal !== null ? Number(cfgDs.camadaPrincipal) : idUrl;
+  const mainItem = (pedido !== null && items.find(i => i.id === pedido)) || items.find(i => i.id === 0) || items[0];
+  const raw = { main: await queryAll(base, mainItem.id, mainItem.isLayer, token), tables: {}, meta: { nomes: {}, servico: items.map(i => ({ id: i.id, nome: i.name, camada: i.isLayer })) } };
+  const mapa = cfgDs.tabelas || {};
+  const usadosNoutroURL = new Set(Object.values(mapa).filter(m => m && m.nome).map(m => simples(m.nome)));
   for (const it of items) {
     if (it === mainItem) continue;
     raw.tables[it.name] = await queryAll(base, it.id, it.isLayer, token);
   }
-  // campos existentes (para a área técnica)
+  // 1) tabelas indicadas à mão (outro nome no serviço ou outro URL)
+  for (const [esperada, m] of Object.entries(mapa)) {
+    if (!m) continue;
+    if (m.url) {
+      const p = partesURL(m.url);
+      const info = await getJSON(`${p.base}/${p.id ?? 0}`, { f: "json" }, m.token || token);
+      raw.tables[esperada] = await queryAll(p.base, p.id ?? 0, !!info.geometryType, m.token || token);
+    } else if (m.nome && raw.tables[m.nome] && m.nome !== esperada) {
+      raw.tables[esperada] = raw.tables[m.nome]; delete raw.tables[m.nome];
+    }
+  }
+  // 2) correspondência automática pelo nome (maiúsculas, acentos e sufixos como "_1" não contam)
+  const sc = ds && S.schema && S.schema[ds];
+  if (sc) for (const esperada of Object.keys(sc.tables)) {
+    if (esperada === "main" || raw.tables[esperada]) continue;
+    const alvo = simples(esperada);
+    const cand = Object.keys(raw.tables).find(n => !(sc.tables[n]) && !usadosNoutroURL.has(simples(n)) && (simples(n) === alvo || simples(n).startsWith(alvo)));
+    if (cand) { raw.tables[esperada] = raw.tables[cand]; delete raw.tables[cand]; raw.meta.nomes[esperada] = cand; }
+  }
   try {
     const info = await getJSON(`${base}/${mainItem.id}`, { f: "json" }, token);
     raw.meta.campos = (info.fields || []).map(f => f.name);
     raw.meta.editInfo = info.editingInfo || null;
+    raw.meta.principal = { id: mainItem.id, nome: mainItem.name };
   } catch { /* opcional */ }
   return raw;
 }
@@ -85,6 +154,7 @@ export function campoAno(ds) { return (S.cfg.fontes.datasets[ds] || {}).campoAno
 
 function anoDe(v) {
   if (v === null || v === undefined || v === "") return null;
+  if (/^\d{4}$/.test(String(v).trim())) return Number(v);   // campo que já é um ano (ex.: 2020)
   const d = typeof v === "number" ? new Date(v) : new Date(String(v));
   return isNaN(d) ? null : d.getFullYear();
 }
@@ -142,10 +212,12 @@ function derivar(ds, r, cfgDs) {
   // instituições
   const inst = new Map();
   const add = v => { if (v === null || v === undefined) return; const s = String(v).trim(); if (s && !/^sem informa/i.test(s)) inst.set(normName(s), s); };
-  for (const c of cfgDs.camposInstituicao || []) {
+  const juntar = lista => { for (const c of lista || []) {
     if (c.includes(".")) { const [t, f] = c.split("."); (r.kids[t] || []).forEach(k => add(valorBruto(k, f))); }
     else add(valorBruto(r, c));
-  }
+  } };
+  juntar(cfgDs.camposInstituicao);
+  if (!inst.size) juntar(cfgDs.camposInstituicaoAlternativos);
   d._inst = inst;
   d._area_ha = r.g ? areaHa(r.g) : null;
   if (d._area_ha !== null) d._area_ha = Math.round(d._area_ha * 100) / 100;
@@ -170,6 +242,12 @@ function derivar(ds, r, cfgDs) {
     d._rotulo = valorBruto(r, "nome_comunidade") || valorBruto(r, "id_levantamento_ecologico") || "";
   } else if (ds === "ervas") {
     d._rotulo = valorBruto(r, "nome_tapete") || valorBruto(r, "nome_comunidade") || "";
+  } else if (ds === "entidades") {
+    d._rotulo = valorBruto(r, "nome_entidade") || "";
+    d._provs = new Set(String(valorBruto(r, "provincias_actuacao") || "").split(/[,\s]+/).filter(Boolean));
+    if (!d._provincia && d._provs.size === 1) d._provincia = [...d._provs][0];
+  } else if (ds === "poligonos") {
+    d._rotulo = valorBruto(r, "codigo_poligono") || valorBruto(r, "id_area_restauracao") || "";
   }
 }
 function isoLocal(v) { const d = dataDe(v); return d ? d.toISOString().slice(0, 10) : ""; }
@@ -228,8 +306,8 @@ export async function carregarTudo(onProgress) {
     onProgress && onProgress();
     try {
       let raw;
-      if (c.url && c.activo !== false) { raw = await lerArcGIS(c); S.data[ds].estado = "ok"; }
-      else if (cfg.modoDemo) { demo = demo || gerarDemo(S.choices, S.schema); raw = demo[ds]; S.data[ds].estado = "demo"; }
+      if (c.url && c.activo !== false) { raw = await lerArcGIS(c, ds); S.data[ds].estado = "ok"; }
+      else if (cfg.modoDemo) { demo = demo || gerarDemo(S.choices, S.schema); raw = demo[ds]; if (!raw) { S.data[ds].estado = "vazio"; continue; } S.data[ds].estado = "demo"; }
       else { S.data[ds].estado = "vazio"; continue; }
       const n = normalizar(ds, raw);
       Object.assign(S.data[ds], n);
@@ -333,7 +411,8 @@ export function chaveGlobal(campo) { return MAPA_GLOBAL[campo] || null; }
 function passaGlobal(r, saltar = "") {
   const f = { ...S.filters };
   if (saltar) f[saltar] = "";
-  if (f.provincia && r.d._provincia !== f.provincia) return false;
+  const root = r.root || r;
+  if (f.provincia && r.d._provincia !== f.provincia && !(root.d._provs && root.d._provs.has(f.provincia))) return false;
   if (f.distrito && r.d._distrito !== f.distrito) return false;
   if (f.posto && r.d._posto !== f.posto) return false;
   if (f.ano && r.d._ano !== f.ano) return false;

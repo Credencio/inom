@@ -1,46 +1,530 @@
 {
- "tecnica_restauracao": {"restauracao_activa": ["Restauração activa", "Active restoration"], "restauracao_hidrologica": ["Restauração hidrológica", "Hydrological restoration"], "restauracao_combinada": ["Restauração combinada", "Combined restoration"], "nenhuma": "None", "Sem_informação": "No information", "outra_tecnica": "Other"},
- "tipo_material": {"muda": ["Mudas", "Seedlings"], "propagulo": ["Propágulos", "Propagules"]},
- "origem_muda": {"viveiro": ["Viveiro", "Nursery"], "transplante_sem_solo": ["Transplante sem solo", "Transplant without soil"], "transplante_com_raiz": ["Transplante com solo", "Transplant with soil"], "muda_desconhecido": "Unknown", "muda_outro": "Other"},
- "origem_propagulo": {"recolhido": ["Colectado no mangal", "Collected in mangroves"], "propagulo_desconhecido": "Unknown", "propagulo_outro": "Other"},
- "nivel_degradacao": {"1": ["Muito degradado (80–100%)", "Very degraded (80–100%)"], "2": ["Degradado (60–79%)", "Degraded (60–79%)"], "3": ["Médio (40–59%)", "Moderate (40–59%)"], "4": ["Menos degradado (20–39%)", "Less degraded (20–39%)"]},
- "causas_producao": {"agricultura": "Agriculture", "aquacultura": "Aquaculture", "colecta_invertebrados": "Invertebrate collection", "extracao_madeira": ["Extracção de madeira", "Wood extraction"], "garimpo": "Artisanal mining", "industria_mineradora": "Mining, oil and gas", "pastagem": ["Pecuária", "Livestock"], "sobre_madeira": "Wood over-exploitation"},
- "causas_naturais": {"nivel_mar": "Sea level change", "ciclones": "Cyclones", "granizo": "Hail", "inundacoes": "Floods", "morte_natural": "Natural die-off", "seca": "Drought", "tempestades": "Storms"},
- "causas_infraestrutura": {"abertura_caminhos": "Path opening", "desenvolvimento_costeiro": ["Desenvolvimento costeiro", "Coastal development"], "expansao_urbana": "Urban expansion", "inertes_rios": "Riverbed sand mining", "energia": "Power infrastructure", "fluxos_hidrologicos": "Reduced hydrological flows", "salinas": "Salt pans"},
- "causas_ecologicas": {"assoreamento": "Siltation", "erosao": "Soil/coastal erosion"},
- "causas_poluicao": {"poluicao": ["Poluição", "Pollution"]},
- "causas_outras": {"outra": "Other"},
- "sinais_visiveis": {"clareiras_cepos": "Clearings with stumps", "arvores_dispersas": "Very sparse trees", "erosao_solo": "Visible soil erosion", "lixo_residuos": "Litter or solid waste", "canais_artificiais": "Drainage or artificial channels", "arvores_cortadas": "Trees cut by people", "sedimentacao": "Mud or soil accumulation", "outro": "Other"},
- "partes_interessadas": {"agencia_intergovernamental": ["Agência intergovernamental", "Intergovernmental agency"], "agencia_estrangeira": ["Agência governamental estrangeira", "Foreign government agency"], "governo": ["Governo", "Government"], "setor_privado": "Private sector", "instituicao_academica": ["Instituição académica", "Academic institution"], "ong": "NGO", "operador_turistico": "Tour operator", "organizacao_comunitaria": ["Organização comunitária", "Community-based organisation"], "Sem_informação": "No information", "Sem_informacao": "No information", "outra": "Other"},
- "partes_interessadas_exec": {"agencia_intergovernamental_exec": ["Agência intergovernamental", "Intergovernmental agency"], "agencia_estrangeira_exec": ["Agência governamental estrangeira", "Foreign government agency"], "governo_exec": ["Governo", "Government"], "setor_privado_exec": "Private sector", "sector_privado_exec": "Private sector", "instituicao_academica_exec": ["Instituição académica", "Academic institution"], "ong_exec": "NGO", "operador_turistico_exec": "Tour operator", "organizacao_comunitaria_exec": ["Organização comunitária", "Community-based organisation"], "nao_sabe_exec": "No information", "Sem_informação_exec": "No information", "outra_exec": "Other"},
- "partes_interessadas_fin": {"agencia_intergovernamental_fin": ["Agência intergovernamental", "Intergovernmental agency"], "agencia_estrangeira_fin": ["Agência governamental estrangeira", "Foreign government agency"], "governo_fin": ["Governo", "Government"], "sector_privado_fin": "Private sector", "instituicao_academica_fin": ["Instituição académica", "Academic institution"], "ong_fin": "NGO", "operador_turistico_fin": "Tour operator", "organizacao_comunitaria_fin": ["Organização comunitária", "Community-based organisation"], "nao_sabe_fin": "No information", "Sem_informação_fin": "No information", "outra_fin": "Other"},
- "tempo": {"Permanente": "Permanent", "Temporario": "Temporary"},
- "desafios": {"recursos_escassos": "Scarce funding", "pessoal_nao_formado": "Lack of qualified staff", "apoio_tecnico": "Lack of technical support", "infraestrutura": "Inadequate infrastructure", "transporte": "Transport and access limits", "conhecimento_mangal": "Limited species knowledge", "seguranca": "Infrastructure security", "outro": "Other"},
- "necessidades_prioritarias": {"formacao": "Staff training", "financiamento": "Ongoing funding", "transporte": "Transport/logistics", "estufas": "Greenhouse improvement", "apoio_tecnico": "Regular technical follow-up", "conhecimento_especies": "Information on species and practices", "sensibilizacao": "Environmental awareness", "outra": "Other"},
- "temp_monitoria": {"0_1": ["0–1 ano", "0–1 year"], "1_3": ["1–3 anos", "1–3 years"], "3_5": ["3–5 anos", "3–5 years"], "5_10": ["5–10 anos", "5–10 years"], "10_mais": ["10 anos ou mais", "10+ years"]},
- "visita": {"linha_base": "Baseline (1st visit)", "periodica": "Periodic monitoring"},
- "estado_plantas": {"bom": "Good", "razoavel": "Fair", "mau": "Poor"},
- "ameacas_monitoria": {"corte": "Mangrove cutting", "gado": "Livestock trampling/grazing", "herbivoria": "Crab or herbivore damage", "cracas_algas": "Barnacles or algae on plants", "sedimentacao": "Sedimentation", "erosao": "Erosion", "alagamento": "Prolonged flooding", "lixo": "Litter or pollution", "outra": "Other"},
- "cobertura": {"0_20": "0–20%", "21_40": "21–40%", "41_60": "41–60%", "61_80": "61–80%", "81_100": "81–100%"},
- "condicao": {"I": ["Intacta (I)", "Intact (I)"], "PC": ["Parcialmente cortada (PC)", "Partially cut (PC)"], "SC": ["Severamente cortada (SC)", "Severely cut (SC)"], "cepo": ["Cepo", "Stump"], "MN": ["Morte natural", "Natural death"]},
- "regeneracao": {"RCI": ["RCI (< 40 cm)", "RCI (< 40 cm)"], "RCII": ["RCII (40 cm – 1,5 m)", "RCII (40 cm – 1.5 m)"], "RCIII": ["RCIII (1,5 – 3 m)", "RCIII (1.5 – 3 m)"]},
- "Tipo_de_floresta": {"Oceananica": "Fringe mangrove", "Ribeirinha": "Riverine mangrove", "sobrelavado": "Overwash mangrove", "rede": "Basin network mangrove", "bacia": "Basin mangrove", "Anao": "Dwarf mangrove"},
- "ameacas": {"Âncora/Danos_de_barcos": "Anchors/boat damage", "Pisoteio_excessivo": "Excessive trampling", "Celecta_de_invertebrados_(escavação)": "Invertebrate collection (digging)", "Pesca_de_arrasto": "Trawl fishing", "Sedimentação": "Sedimentation", "Construção_de_habitats": "Coastal development", "Poluição": "Pollution", "Outras": "Other"},
- "escala_dominancia": {"minima": "Minimal (< 10%)", "baixa": "Low (10–25%)", "moderada": "Moderate (25–50%)", "alta": "High (50–75%)", "muito_alta": "Very high (> 75%)"},
- "fauna": {"tartaruga": "Sea turtles", "dugongos": "Dugongs", "tubarões": "Sharks and rays", "Cavalos-marinhos": "Seahorses", "moluscos": "Molluscs", "peixes": "Fish", "crustáceos": "Crustaceans", "Equinodermes": "Echinoderms", "outra": "Other"},
- "protecao": {"anac": "Conservation areas (ANAC)", "acc": "Community conservation areas", "apgc": "Community fishing areas", "reserva_nformal": "Informal community reserves", "reserva_formal": "Formal community reserves", "sem_protecao": "No protection", "Sem_informação": "No information", "other": "Other"},
- "metodologia": {"percepcao": "Perception", "imagem_satelite": "Satellite imagery", "quadriculas": "Quadrats"},
- "abundancia_relativa": {"dominante": "Dominant (≥ 70%)", "abundante": "Abundant (40–70%)", "pouco_abundante": "Uncommon (10–40%)", "rara": "Rare (≤ 10%)"},
- "simnao": {"sim": "Yes", "nao": "No"},
- "simnao2": {"sim": "Yes", "nao": "No"},
- "sim_nao_naosabe": {"sim": "Yes", "nao": "No", "Sem_informação": "No information"},
- "simnao_naosabe": {"sim": "Yes", "nao": "No", "nao_sabe": "No information"},
- "simnao_degradada": {"sim": "Yes", "nao": "No (< 20% of trees lost)"},
- "simnao_fisca": {"sim_regular": "Yes, regular", "sim_ocasional": "Yes, occasional", "nao": "No enforcement"},
- "simnao1": {"sim": "Yes", "tentativas_anteriores": ["Tentativas anteriores", "Previous attempts"], "nunca": "Never"},
- "area_ligada": {"restauracao": "Restoration area", "degradada": "Degraded area", "nenhuma": "None"},
- "freq_monitoria": {"Mensal": "Monthly", "Trimestral": "Quarterly", "Semestral": "Every six months", "Anual": "Annual"},
- "exposicao": {"Protegido": "Sheltered", "Moderado": "Moderate", "Exposto": "Exposed"},
- "fonte_evidencia": {"satelite": "Satellite imagery", "observacao": "Local observation", "historico": "Community testimony", "relatorio": "Scientific data/reports", "outra": "Other"},
- "apoio_tipo": {"financeiro": ["Apoio financeiro", "Financial support"], "materiais": ["Materiais", "Materials"], "infraestrutura": ["Infraestruturas", "Infrastructure"], "tecnico": ["Apoio técnico", "Technical support"], "capacitacao": ["Capacitação", "Training"], "logistica": ["Logística", "Logistics"], "institucional": ["Apoio institucional", "Institutional support"], "sensibilizacao": ["Sensibilização", "Awareness"], "outro": ["Outro", "Other"]}
+ "tecnica_restauracao": {
+  "restauracao_activa": [
+   "Restauração activa",
+   "Active restoration"
+  ],
+  "restauracao_hidrologica": [
+   "Restauração hidrológica",
+   "Hydrological restoration"
+  ],
+  "restauracao_combinada": [
+   "Restauração combinada",
+   "Combined restoration"
+  ],
+  "nenhuma": "None",
+  "Sem_informação": "No information",
+  "outra_tecnica": "Other"
+ },
+ "tipo_material": {
+  "muda": [
+   "Mudas",
+   "Seedlings"
+  ],
+  "propagulo": [
+   "Propágulos",
+   "Propagules"
+  ]
+ },
+ "origem_muda": {
+  "viveiro": [
+   "Viveiro",
+   "Nursery"
+  ],
+  "transplante_sem_solo": [
+   "Transplante sem solo",
+   "Transplant without soil"
+  ],
+  "transplante_com_raiz": [
+   "Transplante com solo",
+   "Transplant with soil"
+  ],
+  "muda_desconhecido": "Unknown",
+  "muda_outro": "Other"
+ },
+ "origem_propagulo": {
+  "recolhido": [
+   "Colectado no mangal",
+   "Collected in mangroves"
+  ],
+  "propagulo_desconhecido": "Unknown",
+  "propagulo_outro": "Other"
+ },
+ "nivel_degradacao": {
+  "1": [
+   "Muito degradado (80–100%)",
+   "Very degraded (80–100%)"
+  ],
+  "2": [
+   "Degradado (60–79%)",
+   "Degraded (60–79%)"
+  ],
+  "3": [
+   "Médio (40–59%)",
+   "Moderate (40–59%)"
+  ],
+  "4": [
+   "Menos degradado (20–39%)",
+   "Less degraded (20–39%)"
+  ]
+ },
+ "causas_producao": {
+  "agricultura": "Agriculture",
+  "aquacultura": "Aquaculture",
+  "colecta_invertebrados": "Invertebrate collection",
+  "extracao_madeira": [
+   "Extracção de madeira",
+   "Wood extraction"
+  ],
+  "garimpo": "Artisanal mining",
+  "industria_mineradora": "Mining, oil and gas",
+  "pastagem": [
+   "Pecuária",
+   "Livestock"
+  ],
+  "sobre_madeira": "Wood over-exploitation"
+ },
+ "causas_naturais": {
+  "nivel_mar": "Sea level change",
+  "ciclones": "Cyclones",
+  "granizo": "Hail",
+  "inundacoes": "Floods",
+  "morte_natural": "Natural die-off",
+  "seca": "Drought",
+  "tempestades": "Storms"
+ },
+ "causas_infraestrutura": {
+  "abertura_caminhos": "Path opening",
+  "desenvolvimento_costeiro": [
+   "Desenvolvimento costeiro",
+   "Coastal development"
+  ],
+  "expansao_urbana": "Urban expansion",
+  "inertes_rios": "Riverbed sand mining",
+  "energia": "Power infrastructure",
+  "fluxos_hidrologicos": "Reduced hydrological flows",
+  "salinas": "Salt pans"
+ },
+ "causas_ecologicas": {
+  "assoreamento": "Siltation",
+  "erosao": "Soil/coastal erosion"
+ },
+ "causas_poluicao": {
+  "poluicao": [
+   "Poluição",
+   "Pollution"
+  ]
+ },
+ "causas_outras": {
+  "outra": "Other"
+ },
+ "sinais_visiveis": {
+  "clareiras_cepos": "Clearings with stumps",
+  "arvores_dispersas": "Very sparse trees",
+  "erosao_solo": "Visible soil erosion",
+  "lixo_residuos": "Litter or solid waste",
+  "canais_artificiais": "Drainage or artificial channels",
+  "arvores_cortadas": "Trees cut by people",
+  "sedimentacao": "Mud or soil accumulation",
+  "outro": "Other"
+ },
+ "partes_interessadas": {
+  "agencia_intergovernamental": [
+   "Agência intergovernamental",
+   "Intergovernmental agency"
+  ],
+  "agencia_estrangeira": [
+   "Agência governamental estrangeira",
+   "Foreign government agency"
+  ],
+  "governo": [
+   "Governo",
+   "Government"
+  ],
+  "setor_privado": "Private sector",
+  "instituicao_academica": [
+   "Instituição académica",
+   "Academic institution"
+  ],
+  "ong": "NGO",
+  "operador_turistico": "Tour operator",
+  "organizacao_comunitaria": [
+   "Organização comunitária",
+   "Community-based organisation"
+  ],
+  "Sem_informação": "No information",
+  "Sem_informacao": "No information",
+  "outra": "Other"
+ },
+ "partes_interessadas_exec": {
+  "agencia_intergovernamental_exec": [
+   "Agência intergovernamental",
+   "Intergovernmental agency"
+  ],
+  "agencia_estrangeira_exec": [
+   "Agência governamental estrangeira",
+   "Foreign government agency"
+  ],
+  "governo_exec": [
+   "Governo",
+   "Government"
+  ],
+  "setor_privado_exec": "Private sector",
+  "sector_privado_exec": "Private sector",
+  "instituicao_academica_exec": [
+   "Instituição académica",
+   "Academic institution"
+  ],
+  "ong_exec": "NGO",
+  "operador_turistico_exec": "Tour operator",
+  "organizacao_comunitaria_exec": [
+   "Organização comunitária",
+   "Community-based organisation"
+  ],
+  "nao_sabe_exec": "No information",
+  "Sem_informação_exec": "No information",
+  "outra_exec": "Other"
+ },
+ "partes_interessadas_fin": {
+  "agencia_intergovernamental_fin": [
+   "Agência intergovernamental",
+   "Intergovernmental agency"
+  ],
+  "agencia_estrangeira_fin": [
+   "Agência governamental estrangeira",
+   "Foreign government agency"
+  ],
+  "governo_fin": [
+   "Governo",
+   "Government"
+  ],
+  "sector_privado_fin": "Private sector",
+  "instituicao_academica_fin": [
+   "Instituição académica",
+   "Academic institution"
+  ],
+  "ong_fin": "NGO",
+  "operador_turistico_fin": "Tour operator",
+  "organizacao_comunitaria_fin": [
+   "Organização comunitária",
+   "Community-based organisation"
+  ],
+  "nao_sabe_fin": "No information",
+  "Sem_informação_fin": "No information",
+  "outra_fin": "Other"
+ },
+ "tempo": {
+  "Permanente": "Permanent",
+  "Temporario": "Temporary"
+ },
+ "desafios": {
+  "recursos_escassos": "Scarce funding",
+  "pessoal_nao_formado": "Lack of qualified staff",
+  "apoio_tecnico": "Lack of technical support",
+  "infraestrutura": "Inadequate infrastructure",
+  "transporte": "Transport and access limits",
+  "conhecimento_mangal": "Limited species knowledge",
+  "seguranca": "Infrastructure security",
+  "outro": "Other"
+ },
+ "necessidades_prioritarias": {
+  "formacao": "Staff training",
+  "financiamento": "Ongoing funding",
+  "transporte": "Transport/logistics",
+  "estufas": "Greenhouse improvement",
+  "apoio_tecnico": "Regular technical follow-up",
+  "conhecimento_especies": "Information on species and practices",
+  "sensibilizacao": "Environmental awareness",
+  "outra": "Other"
+ },
+ "temp_monitoria": {
+  "0_1": [
+   "0–1 ano",
+   "0–1 year"
+  ],
+  "1_3": [
+   "1–3 anos",
+   "1–3 years"
+  ],
+  "3_5": [
+   "3–5 anos",
+   "3–5 years"
+  ],
+  "5_10": [
+   "5–10 anos",
+   "5–10 years"
+  ],
+  "10_mais": [
+   "10 anos ou mais",
+   "10+ years"
+  ]
+ },
+ "visita": {
+  "linha_base": "Baseline (1st visit)",
+  "periodica": "Periodic monitoring"
+ },
+ "estado_plantas": {
+  "bom": "Good",
+  "razoavel": "Fair",
+  "mau": "Poor"
+ },
+ "ameacas_monitoria": {
+  "corte": "Mangrove cutting",
+  "gado": "Livestock trampling/grazing",
+  "herbivoria": "Crab or herbivore damage",
+  "cracas_algas": "Barnacles or algae on plants",
+  "sedimentacao": "Sedimentation",
+  "erosao": "Erosion",
+  "alagamento": "Prolonged flooding",
+  "lixo": "Litter or pollution",
+  "outra": "Other"
+ },
+ "cobertura": {
+  "0_20": "0–20%",
+  "21_40": "21–40%",
+  "41_60": "41–60%",
+  "61_80": "61–80%",
+  "81_100": "81–100%"
+ },
+ "condicao": {
+  "I": [
+   "Intacta (I)",
+   "Intact (I)"
+  ],
+  "PC": [
+   "Parcialmente cortada (PC)",
+   "Partially cut (PC)"
+  ],
+  "SC": [
+   "Severamente cortada (SC)",
+   "Severely cut (SC)"
+  ],
+  "cepo": [
+   "Cepo",
+   "Stump"
+  ],
+  "MN": [
+   "Morte natural",
+   "Natural death"
+  ]
+ },
+ "regeneracao": {
+  "RCI": [
+   "RCI (< 40 cm)",
+   "RCI (< 40 cm)"
+  ],
+  "RCII": [
+   "RCII (40 cm – 1,5 m)",
+   "RCII (40 cm – 1.5 m)"
+  ],
+  "RCIII": [
+   "RCIII (1,5 – 3 m)",
+   "RCIII (1.5 – 3 m)"
+  ]
+ },
+ "Tipo_de_floresta": {
+  "Oceananica": "Fringe mangrove",
+  "Ribeirinha": "Riverine mangrove",
+  "sobrelavado": "Overwash mangrove",
+  "rede": "Basin network mangrove",
+  "bacia": "Basin mangrove",
+  "Anao": "Dwarf mangrove"
+ },
+ "ameacas": {
+  "Âncora/Danos_de_barcos": "Anchors/boat damage",
+  "Pisoteio_excessivo": "Excessive trampling",
+  "Celecta_de_invertebrados_(escavação)": "Invertebrate collection (digging)",
+  "Pesca_de_arrasto": "Trawl fishing",
+  "Sedimentação": "Sedimentation",
+  "Construção_de_habitats": "Coastal development",
+  "Poluição": "Pollution",
+  "Outras": "Other"
+ },
+ "escala_dominancia": {
+  "minima": "Minimal (< 10%)",
+  "baixa": "Low (10–25%)",
+  "moderada": "Moderate (25–50%)",
+  "alta": "High (50–75%)",
+  "muito_alta": "Very high (> 75%)"
+ },
+ "fauna": {
+  "tartaruga": "Sea turtles",
+  "dugongos": "Dugongs",
+  "tubarões": "Sharks and rays",
+  "Cavalos-marinhos": "Seahorses",
+  "moluscos": "Molluscs",
+  "peixes": "Fish",
+  "crustáceos": "Crustaceans",
+  "Equinodermes": "Echinoderms",
+  "outra": "Other"
+ },
+ "protecao": {
+  "anac": "Conservation areas (ANAC)",
+  "acc": "Community conservation areas",
+  "apgc": "Community fishing areas",
+  "reserva_nformal": "Informal community reserves",
+  "reserva_formal": "Formal community reserves",
+  "sem_protecao": "No protection",
+  "Sem_informação": "No information",
+  "other": "Other"
+ },
+ "metodologia": {
+  "percepcao": "Perception",
+  "imagem_satelite": "Satellite imagery",
+  "quadriculas": "Quadrats"
+ },
+ "abundancia_relativa": {
+  "dominante": "Dominant (≥ 70%)",
+  "abundante": "Abundant (40–70%)",
+  "pouco_abundante": "Uncommon (10–40%)",
+  "rara": "Rare (≤ 10%)"
+ },
+ "simnao": {
+  "sim": "Yes",
+  "nao": "No"
+ },
+ "simnao2": {
+  "sim": "Yes",
+  "nao": "No"
+ },
+ "sim_nao_naosabe": {
+  "sim": "Yes",
+  "nao": "No",
+  "Sem_informação": "No information"
+ },
+ "simnao_naosabe": {
+  "sim": "Yes",
+  "nao": "No",
+  "nao_sabe": "No information"
+ },
+ "simnao_degradada": {
+  "sim": "Yes",
+  "nao": "No (< 20% of trees lost)"
+ },
+ "simnao_fisca": {
+  "sim_regular": "Yes, regular",
+  "sim_ocasional": "Yes, occasional",
+  "nao": "No enforcement"
+ },
+ "simnao1": {
+  "sim": "Yes",
+  "tentativas_anteriores": [
+   "Tentativas anteriores",
+   "Previous attempts"
+  ],
+  "nunca": "Never"
+ },
+ "area_ligada": {
+  "restauracao": "Restoration area",
+  "degradada": "Degraded area",
+  "nenhuma": "None"
+ },
+ "freq_monitoria": {
+  "Mensal": "Monthly",
+  "Trimestral": "Quarterly",
+  "Semestral": "Every six months",
+  "Anual": "Annual"
+ },
+ "exposicao": {
+  "Protegido": "Sheltered",
+  "Moderado": "Moderate",
+  "Exposto": "Exposed"
+ },
+ "fonte_evidencia": {
+  "satelite": "Satellite imagery",
+  "observacao": "Local observation",
+  "historico": "Community testimony",
+  "relatorio": "Scientific data/reports",
+  "outra": "Other"
+ },
+ "apoio_tipo": {
+  "financeiro": [
+   "Apoio financeiro",
+   "Financial support"
+  ],
+  "materiais": [
+   "Materiais",
+   "Materials"
+  ],
+  "infraestrutura": [
+   "Infraestruturas",
+   "Infrastructure"
+  ],
+  "tecnico": [
+   "Apoio técnico",
+   "Technical support"
+  ],
+  "capacitacao": [
+   "Capacitação",
+   "Training"
+  ],
+  "logistica": [
+   "Logística",
+   "Logistics"
+  ],
+  "institucional": [
+   "Apoio institucional",
+   "Institutional support"
+  ],
+  "sensibilizacao": [
+   "Sensibilização",
+   "Awareness"
+  ],
+  "outro": [
+   "Outro",
+   "Other"
+  ]
+ },
+ "stress": {
+  "nenhum": "No signs",
+  "folhas_amarelas": "Yellow or dry leaves",
+  "desfolha": "Leaf loss",
+  "herbivoria": "Herbivory",
+  "pragas": "Pests or disease",
+  "algas": "Algae on plants",
+  "soterramento": "Buried by sediment",
+  "erosao": "Exposed roots (erosion)",
+  "danos": "Physical damage",
+  "lixo": "Entangled litter"
+ },
+ "intensidade": {
+  "baixa": "Low",
+  "moderada": "Moderate",
+  "alta": "High"
+ },
+ "abundancia": {
+  "inexistente": "Absent",
+  "baixa": "Low",
+  "moderada": "Moderate",
+  "alta": "High"
+ },
+ "estado_validacao": {
+  "pendente": "Pending",
+  "validado": "Validated",
+  "rejeitado": "Rejected",
+  "suspenso": "Suspended"
+ },
+ "origem_degradacao": {
+  "sim": [
+   "Área degradada registada",
+   "Registered degraded area"
+  ],
+  "mapeada": [
+   "Área mapeada (2018–2024)",
+   "Mapped area (2018–2024)"
+  ],
+  "nao": [
+   "Fora de área degradada",
+   "Not in a degraded area"
+  ],
+  "Sem_informação": [
+   "Sem informação",
+   "No information"
+  ]
+ },
+ "estado_poligono": {
+  "encontrado": "Polygon found",
+  "ponto_fora_de_poligono": "Point outside polygons",
+  "sem_ponto": "No point given"
+ }
 }

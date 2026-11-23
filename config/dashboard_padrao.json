@@ -1,5 +1,5 @@
 {
- "versao": 3,
+ "versao": 4,
  "limiarSobrevivencia": 50,
  "areaQuadricula_m2": 100,
  "paginas": [
@@ -248,15 +248,21 @@
     {
      "id": "g5",
      "titulo": {
-      "pt": "Registos por ficha",
-      "en": "Records by form"
+      "pt": "Registos por entidade",
+      "en": "Records by organisation"
      },
-     "tipo": "pizza",
+     "subtitulo": {
+      "pt": "Entidade validada do técnico que preencheu · clique para filtrar",
+      "en": "Validated organisation of the staff member · click to filter"
+     },
+     "tipo": "empilhado",
      "dataset": "restauracao",
      "tabela": "main",
      "medida": "contagem",
      "largura": "1/3",
-     "dimensao": "_dataset",
+     "dimensao": "_instituicao",
+     "limite": 12,
+     "altura": 470,
      "series": [
       {
        "dataset": "degradadas"
@@ -626,6 +632,31 @@
      },
      "icone": "dinheiro",
      "compacto": true
+    },
+    {
+     "id": "k6",
+     "titulo": {
+      "pt": "Em mangal degradado",
+      "en": "On degraded mangrove"
+     },
+     "subtitulo": {
+      "pt": "área restaurada em áreas degradadas registadas ou mapeadas",
+      "en": "area restored on registered or mapped degraded areas"
+     },
+     "dataset": "restauracao",
+     "tabela": "main",
+     "medida": "soma",
+     "campo": "_area_ha",
+     "sufixo": " ha",
+     "decimais": 0,
+     "icone": "alerta",
+     "filtro": {
+      "campo": "em_area_degradada",
+      "valores": [
+       "sim",
+       "mapeada"
+      ]
+     }
     }
    ],
    "graficos": [
@@ -778,6 +809,70 @@
      "ordem": "provincias"
     },
     {
+     "id": "g9",
+     "titulo": {
+      "pt": "Origem da área restaurada",
+      "en": "Origin of the restored area"
+     },
+     "subtitulo": {
+      "pt": "hectares · área degradada registada, mapeada (2018–2024) ou outra",
+      "en": "hectares · registered degraded area, mapped (2018–2024) or other"
+     },
+     "tipo": "pizza",
+     "dataset": "restauracao",
+     "tabela": "main",
+     "medida": "soma",
+     "campo": "_area_ha",
+     "dimensao": "em_area_degradada",
+     "ordem": "lista",
+     "largura": "1/3",
+     "decimais": 0
+    },
+    {
+     "id": "g10",
+     "titulo": {
+      "pt": "Restauração sobre mangal degradado mapeado",
+      "en": "Restoration on mapped degraded mangrove"
+     },
+     "subtitulo": {
+      "pt": "hectares restaurados dentro dos polígonos degradados, por ano do mapeamento",
+      "en": "hectares restored inside degraded polygons, by mapping year"
+     },
+     "tipo": "barras",
+     "dataset": "poligonos",
+     "tabela": "main",
+     "medida": "soma",
+     "campo": "ha_sobreposicao",
+     "dimensao": "ano",
+     "ordem": "cronologica",
+     "largura": "1/3",
+     "filtro": {
+      "campo": "estado",
+      "valores": [
+       "encontrado"
+      ]
+     },
+     "cor": "#c2417a"
+    },
+    {
+     "id": "g11",
+     "titulo": {
+      "pt": "Polígono indicado pelo técnico",
+      "en": "Polygon indicated by staff"
+     },
+     "subtitulo": {
+      "pt": "resultado da procura no mapeamento 2018–2024",
+      "en": "result of the search in the 2018–2024 mapping"
+     },
+     "tipo": "pizza",
+     "dataset": "poligonos",
+     "tabela": "main",
+     "medida": "contagem",
+     "dimensao": "estado",
+     "ordem": "lista",
+     "largura": "1/3"
+    },
+    {
      "id": "g8",
      "titulo": {
       "pt": "Projectos de restauração registados",
@@ -826,7 +921,7 @@
      "medida": "razao",
      "campo": "plantas_vivas",
      "subtitulo": {
-      "pt": "vivas ÷ plantadas, todas as parcelas",
+      "pt": "vivas ÷ plantadas, todas as quadrículas",
       "en": "live ÷ planted, all plots"
      },
      "icone": "muda",
@@ -905,7 +1000,7 @@
     {
      "id": "k5",
      "titulo": {
-      "pt": "Parcelas monitoradas",
+      "pt": "Quadrículas monitoradas",
       "en": "Plots monitored"
      },
      "dataset": "monitoria",
@@ -916,6 +1011,23 @@
       "en": "all visits"
      },
      "icone": "grelha"
+    },
+    {
+     "id": "k6",
+     "titulo": {
+      "pt": "Regeneração natural",
+      "en": "Natural regeneration"
+     },
+     "subtitulo": {
+      "pt": "plântulas novas contadas",
+      "en": "new seedlings counted"
+     },
+     "dataset": "monitoria",
+     "tabela": "especie_q",
+     "medida": "soma",
+     "campo": "recrutas_s",
+     "icone": "muda",
+     "compacto": true
     }
    ],
    "graficos": [
@@ -988,16 +1100,16 @@
      },
      "tipo": "barrash",
      "dataset": "monitoria",
-     "tabela": "parcelas",
+     "tabela": "especie_q",
      "medida": "razao",
      "largura": "1/3",
-     "dimensao": "especie_parcela",
-     "campo": "plantas_vivas",
+     "dimensao": "especies",
+     "campo": "vivas_s",
      "subtitulo": {
-      "pt": "%",
-      "en": "%"
+      "pt": "% de plantas vivas, por espécie plantada",
+      "en": "% of plants alive, by species planted"
      },
-     "campo2": "plantas_plantadas",
+     "campo2": "plantadas_s",
      "formato": "pct"
     },
     {
@@ -1036,7 +1148,7 @@
     {
      "id": "g7",
      "titulo": {
-      "pt": "Estado das plantas nas parcelas",
+      "pt": "Estado das plantas nas quadrículas",
       "en": "Plant condition in plots"
      },
      "tipo": "pizza",
@@ -1046,6 +1158,176 @@
      "largura": "1/2",
      "dimensao": "estado_plantas",
      "ordem": "lista"
+    },
+    {
+     "id": "g9",
+     "titulo": {
+      "pt": "Sobrevivência por espécie e tempo de restauração",
+      "en": "Survival by species and restoration time"
+     },
+     "subtitulo": {
+      "pt": "% de plantas vivas",
+      "en": "% of plants alive"
+     },
+     "tipo": "barras",
+     "dataset": "monitoria",
+     "tabela": "especie_q",
+     "medida": "razao",
+     "campo": "vivas_s",
+     "campo2": "plantadas_s",
+     "formato": "pct",
+     "dimensao": "especies",
+     "serieDimensao": "temp_monitoria",
+     "largura": "2/3"
+    },
+    {
+     "id": "g10",
+     "titulo": {
+      "pt": "Regeneração natural por espécie",
+      "en": "Natural regeneration by species"
+     },
+     "subtitulo": {
+      "pt": "plântulas novas contadas",
+      "en": "new seedlings counted"
+     },
+     "tipo": "barrash",
+     "dataset": "monitoria",
+     "tabela": "especie_q",
+     "medida": "soma",
+     "campo": "recrutas_s",
+     "dimensao": "especies",
+     "largura": "1/3",
+     "cor": "#1f9e74"
+    },
+    {
+     "id": "g11",
+     "titulo": {
+      "pt": "Crescimento: altura média",
+      "en": "Growth: mean height"
+     },
+     "subtitulo": {
+      "pt": "cm, plantas medidas, por tempo de restauração",
+      "en": "cm, measured plants, by restoration time"
+     },
+     "tipo": "barras",
+     "dataset": "monitoria",
+     "tabela": "medicoes",
+     "medida": "media",
+     "campo": "altura_p",
+     "dimensao": "temp_monitoria",
+     "serieDimensao": "especies_1",
+     "ordem": "lista",
+     "largura": "1/2",
+     "decimais": 0
+    },
+    {
+     "id": "g12",
+     "titulo": {
+      "pt": "Crescimento: diâmetro médio",
+      "en": "Growth: mean diameter"
+     },
+     "subtitulo": {
+      "pt": "mm, plantas medidas, por espécie",
+      "en": "mm, measured plants, by species"
+     },
+     "tipo": "barrash",
+     "dataset": "monitoria",
+     "tabela": "medicoes",
+     "medida": "media",
+     "campo": "diametro",
+     "dimensao": "especies_1",
+     "largura": "1/2",
+     "decimais": 1
+    },
+    {
+     "id": "g13",
+     "titulo": {
+      "pt": "Sinais de stress nas plantas",
+      "en": "Stress signs in plants"
+     },
+     "subtitulo": {
+      "pt": "plantas com cada sinal, por intensidade",
+      "en": "plants with each sign, by intensity"
+     },
+     "tipo": "empilhado",
+     "dataset": "monitoria",
+     "tabela": "medicoes",
+     "medida": "contagem",
+     "dimensao": "stress",
+     "serieDimensao": "intens_stress",
+     "largura": "1/2",
+     "filtro": {
+      "campo": "stress",
+      "valores": [
+       "nenhum"
+      ],
+      "nao": true
+     }
+    },
+    {
+     "id": "g14",
+     "titulo": {
+      "pt": "Fauna associada",
+      "en": "Associated fauna"
+     },
+     "subtitulo": {
+      "pt": "% das quadrículas em cada nível de abundância",
+      "en": "% of plots at each abundance level"
+     },
+     "tipo": "empilhado",
+     "dataset": "monitoria",
+     "tabela": "parcelas",
+     "medida": "contagem",
+     "dimensao": [
+      "fz_caranguejo",
+      "fz_gastropode",
+      "fz_bivalve",
+      "fz_peixes",
+      "buracos_scylla",
+      "fz_outros"
+     ],
+     "serieDimensao": "_valor",
+     "comoPercentagem": true,
+     "formato": "pct",
+     "largura": "1/2"
+    },
+    {
+     "id": "g15",
+     "titulo": {
+      "pt": "Cobertura do dossel",
+      "en": "Canopy cover"
+     },
+     "subtitulo": {
+      "pt": "quadrículas por classe de cobertura",
+      "en": "plots by cover class"
+     },
+     "tipo": "pizza",
+     "dataset": "monitoria",
+     "tabela": "parcelas",
+     "medida": "contagem",
+     "dimensao": "cobertura_parcela",
+     "ordem": "lista",
+     "largura": "1/3"
+    },
+    {
+     "id": "g16",
+     "titulo": {
+      "pt": "Área foliar média (até 1 ano)",
+      "en": "Mean leaf area (up to 1 year)"
+     },
+     "subtitulo": {
+      "pt": "cm² por folha, por espécie",
+      "en": "cm² per leaf, by species"
+     },
+     "tipo": "barrash",
+     "dataset": "monitoria",
+     "tabela": "medicoes",
+     "medida": "media",
+     "campo": "af_media_planta",
+     "dimensao": "especies_1",
+     "largura": "1/3",
+     "decimais": 1,
+     "cor": "#5bb35b"
     },
     {
      "id": "g8",
@@ -1064,7 +1346,9 @@
       "visita",
       "temp_monitoria",
       "sobrevivencia_media",
+      "regeneracao_total",
       "replantio_necessario",
+      "nome_entidade",
       "_provincia"
      ]
     }
@@ -1754,6 +2038,292 @@
      "largura": "1/2",
      "dimensao": "_provincia",
      "ordem": "provincias"
+    }
+   ]
+  },
+  {
+   "id": "entidades",
+   "titulo": {
+    "pt": "Entidades e contribuições",
+    "en": "Organisations and contributions"
+   },
+   "icone": "pessoas",
+   "imagem": "hero",
+   "descricao": {
+    "pt": "Quem recolhe os dados: entidades validadas pelo gestor do sistema, os seus técnicos e os registos que enviaram.",
+    "en": "Who collects the data: organisations validated by the system manager, their staff and the records they sent."
+   },
+   "kpis": [
+    {
+     "id": "k1",
+     "titulo": {
+      "pt": "Entidades validadas",
+      "en": "Validated organisations"
+     },
+     "dataset": "entidades",
+     "tabela": "main",
+     "medida": "contagem",
+     "icone": "pessoas",
+     "filtro": {
+      "campo": "estado_entidade",
+      "valores": [
+       "validado"
+      ]
+     }
+    },
+    {
+     "id": "k2",
+     "titulo": {
+      "pt": "Técnicos activos",
+      "en": "Active staff"
+     },
+     "subtitulo": {
+      "pt": "validados, podem preencher as fichas",
+      "en": "validated, can fill in the forms"
+     },
+     "dataset": "entidades",
+     "tabela": "tecnicos",
+     "medida": "contagem",
+     "icone": "pessoas",
+     "filtro": {
+      "campo": "estado_tecnico",
+      "valores": [
+       "validado"
+      ]
+     }
+    },
+    {
+     "id": "k3",
+     "titulo": {
+      "pt": "Entidades pendentes",
+      "en": "Pending organisations"
+     },
+     "subtitulo": {
+      "pt": "à espera de validação",
+      "en": "awaiting validation"
+     },
+     "dataset": "entidades",
+     "tabela": "main",
+     "medida": "contagem",
+     "icone": "alerta",
+     "filtro": {
+      "campo": "estado_entidade",
+      "valores": [
+       "pendente"
+      ]
+     },
+     "tendencia": false
+    },
+    {
+     "id": "k4",
+     "titulo": {
+      "pt": "Províncias cobertas",
+      "en": "Provinces covered"
+     },
+     "subtitulo": {
+      "pt": "onde actuam entidades validadas",
+      "en": "where validated organisations work"
+     },
+     "dataset": "entidades",
+     "tabela": "main",
+     "medida": "distintos",
+     "campo": "provincias_actuacao",
+     "icone": "mapa",
+     "filtro": {
+      "campo": "estado_entidade",
+      "valores": [
+       "validado"
+      ]
+     },
+     "tendencia": false
+    }
+   ],
+   "graficos": [
+    {
+     "id": "g1",
+     "titulo": {
+      "pt": "Registos enviados por entidade",
+      "en": "Records sent by organisation"
+     },
+     "subtitulo": {
+      "pt": "por ficha · clique numa entidade para filtrar todo o portal",
+      "en": "by form · click an organisation to filter the whole portal"
+     },
+     "tipo": "empilhado",
+     "dataset": "restauracao",
+     "tabela": "main",
+     "medida": "contagem",
+     "dimensao": "_instituicao",
+     "largura": "2/3",
+     "limite": 15,
+     "series": [
+      {
+       "dataset": "degradadas"
+      },
+      {
+       "dataset": "restauracao"
+      },
+      {
+       "dataset": "monitoria"
+      },
+      {
+       "dataset": "viveiros"
+      },
+      {
+       "dataset": "levantamento"
+      },
+      {
+       "dataset": "ervas"
+      }
+     ]
+    },
+    {
+     "id": "g2",
+     "titulo": {
+      "pt": "Entidades por tipo",
+      "en": "Organisations by type"
+     },
+     "subtitulo": {
+      "pt": "entidades validadas",
+      "en": "validated organisations"
+     },
+     "tipo": "pizza",
+     "dataset": "entidades",
+     "tabela": "main",
+     "medida": "contagem",
+     "dimensao": "tipo_entidade",
+     "largura": "1/3",
+     "filtro": {
+      "campo": "estado_entidade",
+      "valores": [
+       "validado"
+      ]
+     }
+    },
+    {
+     "id": "g3",
+     "titulo": {
+      "pt": "Contribuições ao longo do tempo",
+      "en": "Contributions over time"
+     },
+     "subtitulo": {
+      "pt": "registos por ano, por ficha",
+      "en": "records per year, by form"
+     },
+     "tipo": "linha",
+     "dataset": "restauracao",
+     "tabela": "main",
+     "medida": "contagem",
+     "dimensao": "_ano",
+     "ordem": "cronologica",
+     "largura": "1/2",
+     "series": [
+      {
+       "dataset": "degradadas"
+      },
+      {
+       "dataset": "restauracao"
+      },
+      {
+       "dataset": "monitoria"
+      },
+      {
+       "dataset": "viveiros"
+      },
+      {
+       "dataset": "levantamento"
+      },
+      {
+       "dataset": "ervas"
+      }
+     ]
+    },
+    {
+     "id": "g4",
+     "titulo": {
+      "pt": "Entidades por província de actuação",
+      "en": "Organisations by province of work"
+     },
+     "subtitulo": {
+      "pt": "uma entidade pode actuar em várias",
+      "en": "one organisation may work in several"
+     },
+     "tipo": "barras",
+     "dataset": "entidades",
+     "tabela": "main",
+     "medida": "contagem",
+     "dimensao": "provincias_actuacao",
+     "ordem": "provincias",
+     "largura": "1/2",
+     "filtro": {
+      "campo": "estado_entidade",
+      "valores": [
+       "validado"
+      ]
+     },
+     "cor": "#7a8b99"
+    },
+    {
+     "id": "g5",
+     "titulo": {
+      "pt": "Técnicos por entidade",
+      "en": "Staff by organisation"
+     },
+     "subtitulo": {
+      "pt": "por estado",
+      "en": "by status"
+     },
+     "tipo": "empilhado",
+     "dataset": "entidades",
+     "tabela": "tecnicos",
+     "medida": "contagem",
+     "dimensao": "nome_entidade",
+     "serieDimensao": "estado_tecnico",
+     "largura": "1/2"
+    },
+    {
+     "id": "g6",
+     "titulo": {
+      "pt": "Estado dos registos de entidades",
+      "en": "Organisation registration status"
+     },
+     "tipo": "pizza",
+     "dataset": "entidades",
+     "tabela": "main",
+     "medida": "contagem",
+     "dimensao": "estado_entidade",
+     "ordem": "lista",
+     "largura": "1/2"
+    },
+    {
+     "id": "g7",
+     "titulo": {
+      "pt": "Entidades validadas",
+      "en": "Validated organisations"
+     },
+     "subtitulo": {
+      "pt": "sem dados pessoais",
+      "en": "no personal data"
+     },
+     "tipo": "tabela",
+     "dataset": "entidades",
+     "tabela": "main",
+     "medida": "contagem",
+     "largura": "1",
+     "colunas": [
+      "codigo_entidade",
+      "nome_entidade",
+      "sigla",
+      "tipo_entidade",
+      "provincias_actuacao",
+      "data_validacao"
+     ],
+     "filtro": {
+      "campo": "estado_entidade",
+      "valores": [
+       "validado"
+      ]
+     }
     }
    ]
   },

@@ -1,5 +1,5 @@
 // Dashboard: cálculo de indicadores, gráficos (ECharts), mapa (Leaflet), tabelas e filtros cruzados.
-import { S, DATASETS, ORDEM_PROVINCIAS, vista, linhas, valores, get, rotulo, rotuloCampo, ordemLista, campoSchema,
+import { S, DATASETS, DATASETS_APOIO, ORDEM_PROVINCIAS, vista, linhas, valores, get, rotulo, rotuloCampo, ordemLista, campoSchema,
   temFiltros, invalidar, chaveGlobal, dataDe, descricaoFiltros } from "./data.js";
 import { UI, LISTAS_VIRTUAIS } from "./i18n.js";
 import { $, h, esc, num, fmt, fmtDate, tr, geomCenter, toCSV, download, imagem, comImagem } from "./util.js";
@@ -94,6 +94,7 @@ export function rotuloCat(g, code, ds) {
 
 export function dadosGrafico(g, opts = {}) {
   const excl = opts.completo ? "" : chaveCross(g);
+  if (Array.isArray(g.dimensao) && g.serieDimensao === "_valor") return dadosPorValor(g, excl);
   const defs = g.series && g.series.length ? g.series.map(s => ({ ...g, ...s, series: undefined, nome: s.nome })) : [{ ...g, nome: g.titulo }];
   const series = [], allCats = new Map();
   for (const sd of defs) {
@@ -133,6 +134,24 @@ export function dadosGrafico(g, opts = {}) {
   if (cats.length > lim) cats = cats.slice(0, lim);
   return { cats, labels: cats.map(c => rotuloCat(g, c)), series };
 }
+/* Várias perguntas com a mesma lista de respostas (ex.: abundância de caranguejos, peixes…):
+   uma categoria por pergunta, uma série por resposta. */
+function dadosPorValor(g, excl) {
+  const ds = g.dataset, tab = g.tabela || "main", dims = g.dimensao;
+  const rows = linhasDe(g, excl).filter(r => passaFiltroLocal(r, g.filtro));
+  const porValor = new Map();
+  for (const d of dims) for (const r of rows) for (const v of valores(r, d)) {
+    if (!porValor.has(v)) porValor.set(v, new Map());
+    const m = porValor.get(v); m.set(d, (m.get(d) || 0) + 1);
+  }
+  const lista = campoSchema(ds, tab, dims[0]) && campoSchema(ds, tab, dims[0]).list;
+  const ord = ordemLista(ds, tab, dims[0]) || [];
+  let chaves = [...porValor.keys()].sort((a, b) => (ord.indexOf(a) + 1 || 999) - (ord.indexOf(b) + 1 || 999));
+  if (g.excluirValores) chaves = chaves.filter(k => !g.excluirValores.includes(k));
+  const series = chaves.map(v => ({ nome: rotulo(ds, tab, dims[0], v), codigo: v, vals: new Map(dims.map(d => [d, porValor.get(v).get(d) || 0])), lista }));
+  if (g.comoPercentagem) for (const d of dims) { const tot = series.reduce((a, s) => a + (s.vals.get(d) || 0), 0); for (const s of series) s.vals.set(d, tot ? (s.vals.get(d) / tot) * 100 : null); }
+  return { cats: dims, labels: dims.map(d => rotuloCampo(ds, tab, d)), series };
+}
 function listaCor(ds, tab, campo) { const c = campoSchema(ds, tab, campo); return (c && c.list) || campo; }
 
 /* ================= Cores ================= */
@@ -145,7 +164,12 @@ const CORES_LISTA = {
   escala_dominancia: { minima: "#d6eef2", baixa: "#9fd8e2", moderada: "#4fb6c9", alta: "#13879b", muito_alta: "#0a5562" },
   estado_plantas: { bom: "#1f9e74", razoavel: "#d4a017", mau: "#e05c5c" },
   condicao: { I: "#1f9e74", PC: "#d4a017", SC: "#e8743b", cepo: "#8a3b12", MN: "#7a8b99" },
-  _dataset: { degradadas: "#e8743b", restauracao: "#2f6fdb", monitoria: "#1f9e74", viveiros: "#4b3fa8", levantamento: "#8a6d1f", ervas: "#13a3b8" }
+  _dataset: { degradadas: "#e8743b", restauracao: "#2f6fdb", monitoria: "#1f9e74", viveiros: "#4b3fa8", levantamento: "#8a6d1f", ervas: "#13a3b8", entidades: "#7a8b99", poligonos: "#c2417a" },
+  abundancia: { inexistente: "#d9dee2", baixa: "#a8dcc5", moderada: "#3fae8a", alta: "#0b6b4f" },
+  intensidade: { baixa: "#f3d27a", moderada: "#e8743b", alta: "#b8361f" },
+  estado_validacao: { validado: "#1f9e74", pendente: "#d4a017", rejeitado: "#e05c5c", suspenso: "#7a8b99" },
+  origem_degradacao: { sim: "#e8743b", mapeada: "#c2417a", nao: "#2f6fdb", "Sem_informação": "#b7bfc7" },
+  estado_poligono: { encontrado: "#1f9e74", ponto_fora_de_poligono: "#e8743b", sem_ponto: "#b7bfc7" }
 };
 function corSerie(s, i) {
   if (s.cor) return s.cor;
@@ -474,6 +498,14 @@ function renderGrafico(x) {
     if (g.tipo === "tabela") return renderTabela(g, corpo, x);
     if (g.tipo === "cobertura") return renderCobertura(g, corpo);
     if (g.tipo === "texto") { corpo.innerHTML = window.marked ? window.marked.parse(tr(g.texto, S.lang)) : esc(tr(g.texto, S.lang)); corpo.classList.add("texto"); }
+    if (g.tipo === "imagem") {
+      const src = String(g.imagem || "").trim();
+      if (!src) { corpo.append(h("p", { class: "vazio" }, L("Sem imagem.", "No image."))); return; }
+      const img = h("img", { src, alt: tr(g.legenda, S.lang) || tr(g.titulo, S.lang) || "", loading: "lazy", class: "bloco-img", style: g.altura ? `max-height:${Number(g.altura)}px` : "" });
+      corpo.classList.add("imagem");
+      corpo.append(g.ligacao ? h("a", { href: g.ligacao, target: "_blank", rel: "noopener" }, img) : img,
+        g.legenda && tr(g.legenda, S.lang) ? h("p", { class: "legenda-img" }, tr(g.legenda, S.lang)) : null);
+    }
     return;
   }
   const dados = g.tipo === "gauge" ? { cats: [1], labels: [""], series: [] } : dadosGrafico(g);
@@ -610,7 +642,7 @@ export function valorCelula(ds, tab, r, campo) {
 function renderTabela(g, corpo, x) {
   const ds = g.dataset, tab = g.tabela || "main";
   const cols = (g.colunas || ["_rotulo"]).map(c => (typeof c === "string" ? { campo: c } : c));
-  const rows = linhas(ds, tab);
+  const rows = linhas(ds, tab).filter(r => passaFiltroLocal(r, g.filtro));
   let ordem = { i: -1, dir: 1 }, q = "";
   const wrap = h("div", { class: "tabela-wrap" }), contador = h("span", { class: "card-s" });
   const desenhar = () => {
@@ -635,7 +667,7 @@ function renderTabela(g, corpo, x) {
 }
 
 function renderCobertura(g, corpo) {
-  const dss = DATASETS.filter(d => S.data[d] && S.data[d].main);
+  const dss = DATASETS.filter(d => !DATASETS_APOIO.includes(d) && S.data[d] && S.data[d].main);
   const provs = new Set(), cont = {}, ult = {};
   for (const ds of dss) for (const r of vista(ds).main) {
     const p = r.d._provincia || ""; provs.add(p);
@@ -655,7 +687,7 @@ function renderCobertura(g, corpo) {
 
 /* Dados analisados (exportação, "ver dados") */
 export function tabelaAnalisada(g) {
-  if (["mapa", "texto"].includes(g.tipo)) return null;
+  if (["mapa", "texto", "imagem"].includes(g.tipo)) return null;
   if (g.tipo === "tabela") {
     const ds = g.dataset, tab = g.tabela || "main";
     const cols = (g.colunas || []).map(c => (typeof c === "string" ? c : c.campo));
@@ -663,7 +695,7 @@ export function tabelaAnalisada(g) {
   }
   if (g.tipo === "cobertura") {
     const m = {};
-    for (const ds of DATASETS) for (const r of vista(ds).main) { const k = rotulo("restauracao", "main", "_provincia", r.d._provincia); m[k] = m[k] || {}; const n = tr(S.cfg.fontes.datasets[ds].nome, S.lang); m[k][n] = (m[k][n] || 0) + 1; }
+    for (const ds of DATASETS.filter(d => !DATASETS_APOIO.includes(d))) for (const r of vista(ds).main) { const k = rotulo("restauracao", "main", "_provincia", r.d._provincia); m[k] = m[k] || {}; const n = tr(S.cfg.fontes.datasets[ds].nome, S.lang); m[k][n] = (m[k][n] || 0) + 1; }
     return { nome: tr(g.titulo, S.lang), linhas: Object.entries(m).map(([k, v]) => ({ [t("f_provincia")]: k, ...v })) };
   }
   if (g.tipo === "gauge") { const v = kpiValor(g); return { nome: tr(g.titulo, S.lang), linhas: [{ [L("Indicador", "Indicator")]: tr(g.titulo, S.lang), [L("Valor", "Value")]: v === null ? null : Math.round(v * 100) / 100 }] }; }
